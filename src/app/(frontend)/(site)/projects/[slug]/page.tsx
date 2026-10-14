@@ -105,7 +105,10 @@ export default async function ProjectPage({ params }: Props) {
           )}
         </dl>
         <Link className="case-back" href="/projects" transitionTypes={['nav-back']}>
-          ← Back to projects
+          <span className="arrow" aria-hidden="true">
+            ←
+          </span>
+          Back to projects
         </Link>
       </aside>
 

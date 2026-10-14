@@ -309,7 +309,8 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .case-meta dt { font-family: var(--font-condensed); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
 .case-meta dd { margin: 0; font-size: 13px; color: var(--text-soft); line-height: 1.45; }
 .case-meta dd a { color: var(--accent); }
-.case-back { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); width: 100%; font-family: var(--font-condensed); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.case-back { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); width: 100%; font-family: var(--font-condensed); font-size: 16px; font-weight: 500; line-height: 1; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.case-back .arrow { display: inline-block; font-family: var(--font-sans); font-size: 18px; line-height: 1; transform: translateY(-1px); }
 .case-body { padding: 30px var(--gutter) 60px; display: grid; gap: calc(44px * var(--space)); }
 .case-hero { border-radius: var(--radius); overflow: hidden; background: var(--bg-elevated); border: 1px solid var(--line); }
 .case-hero img, .case-hero video { width: 100%; height: auto; }
