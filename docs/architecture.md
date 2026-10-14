@@ -23,6 +23,9 @@ src/
   seed/                      verified initial content and the seed runner
 ```
 
+## Scrolling and page turns
+The content column (`.main`) is the scroll container, not the document, so view-transition snapshots never shift with the scroll position during a page turn. `NavFlag` resets the column to the top on each navigation.
+
 ## Data flow
 Pages are server components that call Payload's local API through `src/data/content.ts` and map documents to small view models. Every public page is `force-dynamic`, so a publish is visible on the next request; the hooks in `src/hooks/revalidate.ts` additionally clear Next's data cache for the affected paths. There is no scheduled delay.
 

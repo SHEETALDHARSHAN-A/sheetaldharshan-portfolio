@@ -13,6 +13,8 @@ export function NavFlag() {
       return
     }
     if (pathname !== first.current) document.documentElement.dataset.navigated = '1'
+    // The content column is the scroll container; start each page at its top.
+    document.querySelector('.main')?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
   }, [pathname])
   return null
 }
