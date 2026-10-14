@@ -155,7 +155,13 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
                 {item.thumbnail ? <Picture media={item.thumbnail} size="small" sizes="148px" /> : item.heroImage ? <Picture media={item.heroImage} size="small" sizes="148px" /> : <span className="thumb-blank" data-accent={item.accent} />}
               </span>
               <span className="tab">
-                <span className="t">{item.title}</span>
+                <span className="tab-text">
+                  <span className="t">{item.title}</span>
+                  <span className="k">{category}</span>
+                </span>
+                <span className="tab-arrow" aria-hidden="true">
+                  →
+                </span>
               </span>
             </Link>
           )

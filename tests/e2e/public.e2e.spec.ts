@@ -106,6 +106,8 @@ test.describe('Public site', () => {
     await expect(page.locator('.tabbar')).toBeVisible()
     expect(await page.locator('.tabbar a').count()).toBeGreaterThanOrEqual(4)
     await expect(page.locator('.tabbar a[aria-current="page"]')).toHaveText(/Projects/i)
+    await expect(page.locator('.yk-stage')).toBeHidden()
+    expect(await page.locator('.project-row .thumb img').count()).toBeGreaterThanOrEqual(2)
     const width = await page.evaluate(() => document.documentElement.scrollWidth)
     expect(width).toBeLessThanOrEqual(390)
     await context.close()

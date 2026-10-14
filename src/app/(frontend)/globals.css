@@ -221,6 +221,7 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .thumb-blank[data-accent='violet'] { background: linear-gradient(135deg, rgba(167, 139, 250, 0.5), var(--surface)); }
 .project-row .tab { position: relative; z-index: 2; display: flex; align-items: center; height: 100%; padding: 0 40px 0 20px; background: var(--bg); white-space: nowrap; transition: opacity 240ms ease; }
 .project-row .tab .t { font-family: var(--font-condensed); font-weight: 500; font-size: 15px; line-height: 1; letter-spacing: 0.01em; text-transform: uppercase; color: var(--text); }
+.project-row .tab .k, .project-row .tab .tab-arrow { display: none; }
 .project-row:hover .n { color: var(--accent); }
 /* card layer */
 .project-row .card { position: absolute; top: 0; bottom: 0; left: 0; z-index: 1; display: flex; align-items: center; width: max-content; min-width: 420px; padding-right: 28px; background: var(--card); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); opacity: 0; transition: opacity 320ms ease; }
@@ -447,24 +448,24 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
   .topbar .menu a { display: grid; grid-template-columns: 26px 1fr; padding: 8px 10px; border-radius: var(--radius-sm); font-family: var(--font-condensed); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
   .topbar .menu a .n { font-size: 11px; color: var(--faint); }
   .topbar .menu a:hover, .topbar .menu a[aria-current='page'] { background: var(--surface); color: var(--text); }
-  .yk { height: auto; min-height: 0; display: grid; grid-template-rows: 58vw auto; }
-  .yk-stage { position: relative; inset: auto; height: 58vw; max-height: 420px; }
-  .yk-list { position: relative; inset: auto; padding: 10px var(--gutter) 18px; justify-content: flex-start; pointer-events: auto; overflow: visible; }
-  .project-row { --n-w: 40px; --thumb-w: 88px; --row-h: 50px; --card-h: 92px; --card-num-w: 64px; --sliver-w: 5px; }
-  .project-row .card { min-width: 0; width: 100%; padding-right: 14px; }
-  .project-row .card-t { font-size: 18px; line-height: 21px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
-  .project-row .card-k { font-size: 12px; }
-  .project-row .roll { font-size: 40px; }
-  .project-row.active .thumb { height: var(--card-h); }
-  .project-row .n { font-size: 15px; }
-  .project-row .tab { padding: 0 16px; white-space: normal; min-width: 0; flex: 1; }
-  .project-row .tab .t { font-size: 15px; }
-  .project-row .roll { font-size: 40px; }
-  .project-row .card-t { font-size: 20px; line-height: 22px; white-space: normal; }
-  .project-row .card-k { font-size: 13px; }
-  .project-row .card-text { margin-left: calc(var(--sliver-w) + 14px); min-width: 0; padding-right: 8px; }
-  .project-row .card-arrow { margin-right: 14px; font-size: 20px; }
-  .yk-open { position: static; margin: 0 var(--gutter) 24px; width: fit-content; }
+  /* Phones: no hover state, so the explorer becomes a stack of tappable cards with the picture on top. */
+  .yk { height: auto; min-height: 0; display: block; padding: 14px var(--gutter) 28px; isolation: auto; }
+  .yk-stage { display: none; }
+  .yk-list { position: static; inset: auto; display: grid; gap: 14px; padding: 0; pointer-events: auto; overflow: visible; }
+  .project-row { display: grid; grid-template-columns: 1fr; height: auto; border-radius: var(--radius); overflow: hidden; background: var(--bg-elevated); border: 1px solid var(--line); transition: none; }
+  .project-row .thumb { position: relative; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 0; margin: 0; transition: none; }
+  .project-row .thumb img, .project-row .thumb video, .project-row .thumb .thumb-blank { position: absolute; inset: 0; left: 0; width: 100%; height: 100%; max-width: none; transform: none; }
+  .project-row .n { position: absolute; top: 10px; left: 12px; z-index: 3; width: auto; height: auto; padding: 4px 9px; background: rgba(0, 0, 0, 0.55); border-radius: 6px; font-size: 14px; font-weight: 400; color: #fff; opacity: 1 !important; }
+  .project-row .tab { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: auto; padding: 14px 16px; background: transparent; white-space: normal; opacity: 1 !important; pointer-events: auto; }
+  .project-row .tab .tab-text { display: grid; gap: 3px; min-width: 0; }
+  .project-row .tab .t { font-size: 18px; font-weight: 600; line-height: 1.1; }
+  .project-row .tab .k { display: block; font-family: var(--font-sans); font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--muted); }
+  .project-row .tab .tab-arrow { display: block; flex: none; font-family: var(--font-sans); font-size: 22px; line-height: 1; color: #ff3d00; }
+  .project-row .card { display: none; }
+  .project-row.active { height: auto; }
+  .project-row.active .thumb { width: 100%; height: auto; margin: 0; }
+  .project-row:active { background: var(--surface); }
+  .yk-intro .project-row { animation-delay: calc(80ms + var(--i, 0) * 110ms); }
   .case { grid-template-columns: minmax(0, 1fr); }
   .case-info { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; }
   .case-info .case-back { order: -1; width: auto; align-self: flex-start; margin: 0 0 22px; padding: 0; border-top: 0; }
