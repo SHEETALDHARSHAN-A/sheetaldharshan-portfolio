@@ -68,3 +68,15 @@
 @media (prefers-reduced-motion: reduce) {
   .breathe, .svg[data-bounce='true'], .palm, .zzz { animation: none !important; }
 }
+
+/* full-body variant: the bust body is replaced by the drawn torso, the wave arm comes from the shoulder */
+.root[data-variant='full'] .body { display: none; }
+.root[data-variant='full'] .breathe { transform-origin: 100px 360px; }
+.root[data-variant='full'] .head { transform-origin: 100px 160px; }
+.restArm, .waveArm { transition: opacity 160ms ease; }
+.waveArm { opacity: 0; }
+.root[data-variant='full'][data-expression='wave'] .restArm { opacity: 0; }
+.root[data-variant='full'][data-expression='wave'] .waveArm { opacity: 1; }
+.root[data-variant='full'] .handSleeve { display: none; }
+.root[data-variant='full'] .hand { transform: translate(-4px, 26px); }
+.root[data-variant='full'][data-expression='wave'] .hand { transform: none; }

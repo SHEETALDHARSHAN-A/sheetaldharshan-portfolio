@@ -21,8 +21,8 @@ const SLEEP_AFTER = 30000
  * route changes and long inactivity have their own faces. Animation work happens only while the
  * pointer is moving, and stops offscreen, in hidden tabs and under reduced motion.
  */
-export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; className?: string; label?: string }>(function InteractiveAvatar(
-  { size = 150, className, label = 'Animated avatar of Sheetaldharshan' },
+export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; className?: string; label?: string; variant?: 'bust' | 'full' }>(function InteractiveAvatar(
+  { size = 150, className, label = 'Animated avatar of Sheetaldharshan', variant = 'bust' },
   ref,
 ) {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -196,14 +196,15 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
       data-expression={expression}
       data-blink={blink ? 'true' : 'false'}
       data-paused="false"
-      style={{ width: size, height: size }}
+      data-variant={variant}
+      style={{ width: size, height: variant === 'full' ? size * 1.9 : size }}
       onPointerEnter={() => !s.current.held && apply('curious', { duration: 99999 })}
       onPointerLeave={() => !s.current.held && s.current.expr === 'curious' && apply('idle')}
       onClick={() => apply('happy')}
       role="img"
       aria-label={label}
     >
-      <svg viewBox="0 0 200 200" className={styles.svg} key={bounce} data-bounce={bounce > 0 ? 'true' : 'false'} aria-hidden="true">
+      <svg viewBox={variant === 'full' ? '0 0 200 380' : '0 0 200 200'} className={styles.svg} key={bounce} data-bounce={bounce > 0 ? 'true' : 'false'} aria-hidden="true">
         <defs>
           <radialGradient id="mj-skin" cx="38%" cy="30%" r="80%">
             <stop offset="0" stopColor="#d9a07c" />
@@ -245,6 +246,49 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
         </defs>
 
         <g className={styles.breathe}>
+          {variant === 'full' && (
+            <g className={styles.fullBody}>
+              <defs>
+                <linearGradient id="mj-jeans" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#3b4d6e" />
+                  <stop offset="1" stopColor="#24324a" />
+                </linearGradient>
+                <linearGradient id="mj-hoodie" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="#3a3d46" />
+                  <stop offset="1" stopColor="#15161b" />
+                </linearGradient>
+              </defs>
+              {/* ground shadow */}
+              <ellipse cx="100" cy="372" rx="58" ry="7" fill="#000" opacity=".35" />
+              {/* legs */}
+              <path d="M70 270h28l-2 84H74z" fill="url(#mj-jeans)" />
+              <path d="M102 270h28l-4 84h-22z" fill="url(#mj-jeans)" />
+              <path d="M98 272v60" stroke="#1b2538" strokeWidth="2" opacity=".6" />
+              {/* sneakers */}
+              <path d="M64 352c0-6 6-9 14-9h20c3 0 4 3 4 6v9c0 4-3 7-7 7H70c-4 0-6-3-6-6z" fill="#f2f2ee" />
+              <path d="M102 352c0-3 1-6 4-6h20c8 0 14 3 14 9v4c0 3-2 6-6 6h-25c-4 0-7-3-7-7z" fill="#f2f2ee" />
+              <path d="M64 360h38M102 360h38" stroke="#c9c9c2" strokeWidth="3" />
+              {/* hoodie torso */}
+              <path d="M52 200c0-26 20-40 48-40s48 14 48 40l4 72c0 6-4 10-10 10H58c-6 0-10-4-10-10z" fill="url(#mj-hoodie)" />
+              <path d="M58 262h84v14c0 5-4 8-9 8H67c-5 0-9-3-9-8z" fill="#2a2c33" />
+              <path d="M76 232h48v20c0 4-3 6-6 6H82c-3 0-6-2-6-6z" fill="#2c2f37" opacity=".85" />
+              <path d="M78 164c6 10 13 14 22 14s16-4 22-14" fill="none" stroke="#4b4f5a" strokeWidth="5" strokeLinecap="round" />
+              <path d="M90 176v26M110 176v26" stroke="#e8e6e0" strokeWidth="2.6" strokeLinecap="round" />
+              <circle cx="90" cy="204" r="3" fill="#e8e6e0" /><circle cx="110" cy="204" r="3" fill="#e8e6e0" />
+              {/* left arm resting */}
+              <path d="M56 186c-14 10-18 40-14 74" stroke="url(#mj-hoodie)" strokeWidth="22" strokeLinecap="round" fill="none" />
+              <circle cx="44" cy="266" r="11" fill="#c48a68" />
+              {/* right arm resting (hidden while waving) */}
+              <g className={styles.restArm}>
+                <path d="M144 186c14 10 18 40 14 74" stroke="url(#mj-hoodie)" strokeWidth="22" strokeLinecap="round" fill="none" />
+                <circle cx="156" cy="266" r="11" fill="#c48a68" />
+              </g>
+              {/* right arm raised from the shoulder (shown while waving) */}
+              <path className={styles.waveArm} d="M146 194c14-2 22-14 23-34" stroke="url(#mj-hoodie)" strokeWidth="20" strokeLinecap="round" fill="none" />
+              <path d="M88 150h24v14c0 5-6 8-12 8s-12-3-12-8z" fill="#9a6447" />
+            </g>
+          )}
+
           {/* small body */}
           <g className={styles.body}>
             <path d="M40 200c2-26 26-44 60-44s58 18 60 44z" fill="url(#mj-hood)" />
@@ -333,7 +377,7 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
 
           {/* waving hand */}
           <g className={styles.hand}>
-            <path d="M156 200c2-18 6-30 12-40" stroke="#2a2c33" strokeWidth="15" strokeLinecap="round" fill="none" />
+            <path className={styles.handSleeve} d="M156 200c2-18 6-30 12-40" stroke="#2a2c33" strokeWidth="15" strokeLinecap="round" fill="none" />
             <g className={styles.palm}>
               <circle cx="170" cy="150" r="13" fill="#c48a68" />
               <path d="M161 141c-1-9 2-14 5-14s4 5 3 12M168 138c0-10 2-15 5-15s4 5 3 14M175 140c1-9 4-13 7-12s3 5 0 13M181 145c3-6 6-8 8-7s2 5-2 10" stroke="#c48a68" strokeWidth="6.5" strokeLinecap="round" fill="none" />

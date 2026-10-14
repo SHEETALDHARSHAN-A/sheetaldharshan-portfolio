@@ -12,7 +12,7 @@ export function Sidebar({ site }: { site: Site }) {
         <span className="dot">.</span>
       </Link>
       <div className="sidebar-avatar">
-        <InteractiveAvatar size={148} />
+        <InteractiveAvatar size={130} variant="full" />
       </div>
       <div>
         <nav className="sidebar-nav" aria-label="Primary">
