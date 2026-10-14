@@ -1,5 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { s3Storage } from '@payloadcms/storage-s3'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -63,7 +64,13 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
+      // Managed Postgres (Supabase, Neon, RDS) requires TLS; local Postgres does not.
+      ssl: process.env.DATABASE_SSL === 'true' || /supabase\.co|neon\.tech|\.rds\.amazonaws\.com/.test(process.env.DATABASE_URL || '') ? { rejectUnauthorized: false } : undefined,
+      max: Number(process.env.DATABASE_POOL_MAX || 10),
     },
+    migrationDir: path.resolve(dirname, 'migrations'),
+    // Production never pushes schema changes; it runs the committed migrations.
+    push: process.env.NODE_ENV !== 'production',
   }),
   collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
@@ -75,6 +82,18 @@ export default buildConfig({
       enabled: !!process.env.BLOB_READ_WRITE_TOKEN,
       collections: { media: true },
       token: process.env.BLOB_READ_WRITE_TOKEN || '',
+    }),
+    // Supabase Storage through its S3-compatible endpoint. Enabled when S3_BUCKET is set.
+    s3Storage({
+      enabled: !!process.env.S3_BUCKET,
+      collections: { media: { prefix: 'media' } },
+      bucket: process.env.S3_BUCKET || '',
+      config: {
+        endpoint: process.env.S3_ENDPOINT,
+        region: process.env.S3_REGION || 'us-east-1',
+        forcePathStyle: true,
+        credentials: { accessKeyId: process.env.S3_ACCESS_KEY_ID || '', secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '' },
+      },
     }),
   ],
   secret: process.env.PAYLOAD_SECRET,

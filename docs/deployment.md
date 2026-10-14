@@ -1,9 +1,20 @@
 # Deployment
 
+## Supabase (chosen database)
+
+1. Create a project at supabase.com. Note the database password you set.
+2. Project Settings → Database → Connection string → **Session pooler** (port 5432). Use that as `DATABASE_URL`. The transaction pooler (6543) does not support the prepared statements Payload's adapter uses. TLS is switched on automatically for `*.supabase.co` hosts.
+3. Media: Storage → New bucket `media`, public. Project Settings → Storage → S3 access keys → create a key. Set `S3_BUCKET=media`, `S3_ENDPOINT=https://<project-ref>.storage.supabase.co/storage/v1/s3`, `S3_REGION=<project region>`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`. Leave `BLOB_READ_WRITE_TOKEN` empty.
+4. Schema: run `pnpm payload migrate` with the Supabase `DATABASE_URL` (locally once, or as part of the build command). The committed migration in `src/migrations/` creates every table; production never pushes schema changes automatically.
+5. Content: `pnpm seed` with the Supabase `DATABASE_URL` loads the verified starter content, or enter it in the admin.
+6. Open `/admin` on the deployed site and create the first user.
+
+Supabase's free tier pauses projects after a week without traffic; the first request afterwards is slow while it resumes. Upgrade or keep a ping if that matters.
+
 ## Production architecture
 - **App**: Next.js 16 + Payload on Vercel (Node 20+). One deployment serves the site, `/admin` and `/api`.
-- **Database**: managed PostgreSQL (Neon, Supabase, Railway, RDS or Vercel Postgres). SSL on.
-- **Media**: Vercel Blob (`BLOB_READ_WRITE_TOKEN`). The adapter is already wired and activates when the token exists. Uploads must not rely on the deployment filesystem.
+- **Database**: Supabase Postgres (session pooler). Any managed Postgres works the same way.
+- **Media**: Supabase Storage through the S3 adapter (`S3_*` variables) or Vercel Blob (`BLOB_READ_WRITE_TOKEN`); whichever is configured activates. Uploads must not rely on the deployment filesystem.
 - **Domain**: `sheetaldharshan.me` canonical, `www` redirects to it.
 
 ## Environment variables
@@ -11,7 +22,9 @@ From `.env.example`:
 
 | Name | Purpose |
 |---|---|
-| `DATABASE_URL` | Postgres connection string with `?sslmode=require` on managed hosts |
+| `DATABASE_URL` | Supabase session-pooler connection string |
+| `DATABASE_SSL` | `true` to force TLS on hosts not recognised automatically |
+| `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Supabase Storage (S3 endpoint) for media |
 | `PAYLOAD_SECRET` | 32+ random bytes, `openssl rand -hex 32` |
 | `PREVIEW_SECRET` | random string protecting draft preview |
 | `NEXT_PUBLIC_SERVER_URL` | `https://sheetaldharshan.me` |
@@ -28,7 +41,7 @@ pnpm payload migrate:create   # once per schema change, commit the files in src/
 pnpm payload migrate          # run during deploy (Vercel build command: pnpm payload migrate && pnpm build)
 ```
 
-The first production migration creates every table. If `src/migrations` is empty, create it from a clean local database before the first deploy.
+The initial migration (`src/migrations/20261014_182700_initial.ts`) creates every table and was verified against an empty database.
 
 ## Steps
 1. Create the Postgres database; copy its connection string.

@@ -3,7 +3,7 @@
 Personal portfolio, project showcase and publishing platform for Sheetaldharshan A. One Next.js application with Payload CMS at `/admin` and PostgreSQL behind it. Content, navigation, appearance and pages are managed from the admin; ordinary updates never need a code change.
 
 ## Stack
-Next.js 16 (App Router) · React 19 · TypeScript · Payload CMS 3.90 · PostgreSQL · Lexical rich text · anime.js (homepage motion) · Tailwind v4 utilities + CSS custom properties · pnpm · Playwright + Vitest · Vercel-compatible.
+Next.js 16 (App Router) · React 19 · TypeScript · Payload CMS 3.90 · PostgreSQL (Supabase in production) · Lexical rich text · anime.js (homepage motion) · Tailwind v4 utilities + CSS custom properties · pnpm · Playwright + Vitest · Vercel-compatible.
 
 ## Prerequisites
 Node 20+, pnpm 9+, PostgreSQL 14+ reachable from `DATABASE_URL`.
