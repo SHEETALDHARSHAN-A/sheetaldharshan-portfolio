@@ -236,10 +236,14 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 /* load order: left panel → visual → cards top to bottom */
 .yk-intro .project-row { animation: row-in 560ms var(--ease-out) both; animation-delay: calc(1500ms + var(--i, 0) * 140ms); }
 .yk-intro .stage-media.active { animation-delay: 560ms; }
-html[data-navigated] .yk-intro .project-row { animation-delay: calc(420ms + var(--i, 0) * 110ms); }
-html[data-navigated] .yk-intro .stage-media.active { animation-delay: 0ms; }
-html[data-navigated] .yk-intro .stage-media.active img, html[data-navigated] .yk-intro .stage-media.active video, html[data-navigated] .yk-intro .stage-media.active .stage-placeholder { animation-delay: 0ms, 820ms; }
-html[data-navigated] .yk-intro .yk-open { animation-delay: 700ms; }
+/* arriving by navigation: the page itself slides in, so the visual is present from the first frame and the cards follow at once */
+html[data-navigated] .yk-intro .project-row { animation-delay: calc(80ms + var(--i, 0) * 90ms); }
+html[data-navigated] .yk-intro .stage-media.active { animation: none; clip-path: none; }
+html[data-navigated] .yk-intro .stage-media.active img, html[data-navigated] .yk-intro .stage-media.active video, html[data-navigated] .yk-intro .stage-media.active .stage-placeholder { animation: kenburns 14s cubic-bezier(0.25, 0.4, 0.3, 1) forwards; }
+html[data-navigated] .yk-intro .yk-open { animation-delay: 400ms; }
+html[data-navigated] .page > * { animation-delay: 60ms; }
+html[data-navigated] .page > *:nth-child(2) { animation-delay: 140ms; } html[data-navigated] .page > *:nth-child(3) { animation-delay: 220ms; } html[data-navigated] .page > *:nth-child(n + 4) { animation-delay: 300ms; }
+html[data-navigated] .about-photo, html[data-navigated] .article-cover { animation: none !important; }
 html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, html[data-navigated] .sidebar-foot, html[data-navigated] .topbar { animation: none; }
 .yk-intro .stage-media.active img, .yk-intro .stage-media.active video, .yk-intro .stage-media.active .stage-placeholder, .yk-intro .stage-media.leaving img, .yk-intro .stage-media.leaving video, .yk-intro .stage-media.leaving .stage-placeholder { animation-delay: 560ms, 1380ms; }
 .yk-intro .yk-open { animation: el-in 500ms var(--ease-out) both; animation-delay: 1500ms; }
