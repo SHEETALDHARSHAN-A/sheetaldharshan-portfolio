@@ -18,7 +18,6 @@ export default async function BlogPage({ searchParams }: Props) {
     <PageFrame>
     <div className="page">
       <header className="page-head">
-        <span className="eyebrow">Notes</span>
         <h1 className="h1-accent">Notes and questions</h1>
         <p>Technical writing on backend systems, AI agents, developer tools and the decisions that make them reliable.</p>
       </header>

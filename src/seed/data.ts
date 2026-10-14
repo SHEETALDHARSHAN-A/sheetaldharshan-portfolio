@@ -25,6 +25,7 @@ export const homepageMessages = [
 export const navigation = {
   items: [
     { label: 'Projects', href: '/projects', visible: true },
+    { label: 'Notes', href: '/blog', visible: true },
     { label: 'About', href: '/about', visible: true },
     { label: 'Research', href: '/research', visible: true },
     { label: 'Contact', href: '/contact', visible: true },
