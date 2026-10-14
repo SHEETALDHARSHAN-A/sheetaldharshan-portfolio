@@ -165,9 +165,6 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
       <div className="stage-card sr-only" aria-live="polite">
         <span className="t">{project.title}</span>
       </div>
-      <Link className="yk-open" href={`/projects/${project.slug}`} transitionTypes={['nav-forward']}>
-        Open project <span aria-hidden="true">→</span>
-      </Link>
     </section>
   )
 }
