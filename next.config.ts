@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
     ],
     qualities: [100],
     remotePatterns: [
+      { protocol: 'https', hostname: '*.supabase.co' },
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
         const url = new URL(item)
 

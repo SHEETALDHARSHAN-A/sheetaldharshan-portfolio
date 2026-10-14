@@ -2,6 +2,9 @@
 
 ## Supabase (chosen database)
 
+Live project: **Portfolio** (`itfzpetffxsglwfmnghl`, ap-south-1, org "my"). Migrated and seeded on 15 October 2026; bucket `media` is public and holds the project images. Media uses session-token S3 auth (`S3_ACCESS_KEY_ID`=project ref, `S3_SECRET_ACCESS_KEY`=anon key, `S3_SESSION_TOKEN`=service role key); dashboard S3 access keys work too. Set the same variables in the hosting provider; never commit them.
+
+
 1. Create a project at supabase.com. Note the database password you set.
 2. Project Settings → Database → Connection string → **Session pooler** (port 5432). Use that as `DATABASE_URL`. The transaction pooler (6543) does not support the prepared statements Payload's adapter uses. TLS is switched on automatically for `*.supabase.co` hosts.
 3. Media: Storage → New bucket `media`, public. Project Settings → Storage → S3 access keys → create a key. Set `S3_BUCKET=media`, `S3_ENDPOINT=https://<project-ref>.storage.supabase.co/storage/v1/s3`, `S3_REGION=<project region>`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`. Leave `BLOB_READ_WRITE_TOKEN` empty.

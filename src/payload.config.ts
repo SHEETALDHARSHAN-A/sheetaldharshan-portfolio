@@ -92,7 +92,12 @@ export default buildConfig({
         endpoint: process.env.S3_ENDPOINT,
         region: process.env.S3_REGION || 'us-east-1',
         forcePathStyle: true,
-        credentials: { accessKeyId: process.env.S3_ACCESS_KEY_ID || '', secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '' },
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+          // Supabase session-token auth: access key = project ref, secret = anon key, session token = service role key.
+          ...(process.env.S3_SESSION_TOKEN ? { sessionToken: process.env.S3_SESSION_TOKEN } : {}),
+        },
       },
     }),
   ],
