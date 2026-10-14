@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { MobileMenu } from '@/components/shell/MobileMenu'
 import { NavLinks } from '@/components/shell/NavLinks'
 import type { Site } from '@/data/types'
 
@@ -30,19 +31,26 @@ export function Sidebar({ site }: { site: Site }) {
   )
 }
 
+/** Phone chrome: a slim top bar with the wordmark, and a bottom tab bar so every section is one tap away. */
 export function Topbar({ site }: { site: Site }) {
+  const primary = site.nav.slice(0, 5)
+  const extra = site.nav.slice(5)
   return (
-    <div className="topbar" style={{ viewTransitionName: 'site-topbar' }}>
-      <Link href="/" className="wordmark" aria-label={`${site.displayName}, home`}>
-        {site.displayName}
-        <span className="dot">.</span>
-      </Link>
-      <details>
-        <summary>Menu</summary>
-        <nav className="menu" aria-label="Primary">
-          <NavLinks items={site.nav} />
-        </nav>
-      </details>
-    </div>
+    <>
+      <div className="topbar" style={{ viewTransitionName: 'site-topbar' }}>
+        <Link href="/" className="wordmark" aria-label={`${site.displayName}, home`}>
+          {site.displayName}
+          <span className="dot">.</span>
+        </Link>
+        {extra.length > 0 && (
+          <MobileMenu>
+            <NavLinks items={extra} />
+          </MobileMenu>
+        )}
+      </div>
+      <nav className="tabbar" aria-label="Sections" style={{ viewTransitionName: 'site-tabbar' }}>
+        <NavLinks items={primary} />
+      </nav>
+    </>
   )
 }
