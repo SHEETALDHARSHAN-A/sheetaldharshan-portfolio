@@ -1,40 +1,41 @@
-'use client'
+import { Fragment } from 'react'
+import { ConversationPlayer } from '@/components/home/ConversationPlayer'
+import { InlineText } from '@/components/home/InlineText'
+import { ChoiceInline } from '@/components/home/ChoiceLink'
+import type { Conversation as ConversationData } from '@/data/types'
 
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import type { ConversationMessage } from '@/data/site'
+const plainLength = (text: string) => text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').length
 
-export function Conversation({ messages }: { messages: ConversationMessage[] }) {
-  const [visibleCount, setVisibleCount] = useState(1)
-  const [typing, setTyping] = useState(true)
-
-  useEffect(() => {
-    if (visibleCount >= messages.length) {
-      setTyping(false)
-      return
+/**
+ * Homepage conversation. Server-rendered bubbles in the reference structure
+ * (bubble > loading dots + message, followed by a line break). The client player
+ * reveals them one by one; without JavaScript every bubble is simply visible.
+ */
+export function Conversation({ data }: { data: ConversationData }) {
+  const bubbles: { id: string; length: number; node: React.ReactNode; typing?: number }[] = []
+  for (const message of data.messages) {
+    bubbles.push({ id: message.id, length: plainLength(message.content), node: <InlineText text={message.content} />, typing: message.revealDelay || undefined })
+    if (message.choices.length > 0) {
+      bubbles.push({ id: `${message.id}-choices`, length: message.choices.reduce((n, c) => n + c.label.length + 2, 0), node: <ChoiceInline choices={message.choices} /> })
     }
-    setTyping(true)
-    const timer = window.setTimeout(() => setVisibleCount((count) => count + 1), messages[visibleCount]?.delay ?? 800)
-    return () => window.clearTimeout(timer)
-  }, [messages, visibleCount])
+  }
 
   return (
-    <section className="conversation" aria-label="Introduction">
-      <div className="conversation-topline"><span>01</span><span>INTRODUCTION</span><span className="topline-rule" /></div>
-      <div className="conversation-stream">
-        {messages.slice(0, visibleCount).map((message) => (
-          <div className={`message-wrap ${message.tone ?? ''}`} key={message.id}>
-            <div className="message-bubble">{message.content}</div>
-            {message.links && (
-              <div className="conversation-actions">
-                {message.links.map((link) => <Link key={link.href} href={link.href}>{link.label}<span aria-hidden="true">↗</span></Link>)}
-              </div>
-            )}
+    <div className="jg-messages" data-preset={data.animationPreset} data-typing={data.typingIndicator}>
+      {bubbles.map((bubble) => (
+        <Fragment key={bubble.id}>
+          <div className="jg-bubble jg-left" data-length={bubble.length} data-typing-ms={bubble.typing ?? ''}>
+            <span className="jg-loading" aria-hidden="true">
+              <b>•</b>
+              <b>•</b>
+              <b>•</b>
+            </span>
+            <span className="jg-message">{bubble.node}</span>
           </div>
-        ))}
-        {typing && <div className="typing" aria-label="Typing"><span /><span /><span /></div>}
-      </div>
-      <p className="conversation-footnote">A small introduction, rendered one message at a time.</p>
-    </section>
+          <br />
+        </Fragment>
+      ))}
+      <ConversationPlayer preset={data.animationPreset} typing={data.typingIndicator} startDelay={data.startDelay} />
+    </div>
   )
 }

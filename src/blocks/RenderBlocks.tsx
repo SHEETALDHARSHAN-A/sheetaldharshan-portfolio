@@ -2,50 +2,33 @@ import React, { Fragment } from 'react'
 
 import type { Page } from '@/payload-types'
 
-import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 
-const blockComponents = {
-  archive: ArchiveBlock,
-  content: ContentBlock,
-  cta: CallToActionBlock,
-  formBlock: FormBlock,
-  mediaBlock: MediaBlock,
-}
+type LayoutBlock = NonNullable<Page['layout']>[number]
 
-export const RenderBlocks: React.FC<{
-  blocks: Page['layout'][0][]
-}> = (props) => {
-  const { blocks } = props
-
-  const hasBlocks = blocks && Array.isArray(blocks) && blocks.length > 0
-
-  if (hasBlocks) {
-    return (
-      <Fragment>
-        {blocks.map((block, index) => {
-          const { blockType } = block
-
-          if (blockType && blockType in blockComponents) {
-            const Block = blockComponents[blockType]
-
-            if (Block) {
-              return (
-                <div className="my-16" key={index}>
-                  {/* @ts-expect-error there may be some mismatch between the expected types here */}
-                  <Block {...block} disableInnerContainer />
-                </div>
-              )
-            }
-          }
-          return null
-        })}
-      </Fragment>
-    )
-  }
-
-  return null
+/** Renders the template-era layout blocks (content, cta, form, media). Project-style blocks are handled by RenderProjectBlocks. */
+export const RenderBlocks: React.FC<{ blocks: LayoutBlock[] }> = ({ blocks }) => {
+  if (!Array.isArray(blocks) || blocks.length === 0) return null
+  return (
+    <Fragment>
+      {blocks.map((block, index) => {
+        const key = block.id ?? `${block.blockType}-${index}`
+        switch (block.blockType) {
+          case 'content':
+            return <div className="my-16" key={key}><ContentBlock {...block} /></div>
+          case 'cta':
+            return <div className="my-16" key={key}><CallToActionBlock {...block} /></div>
+          case 'formBlock':
+            return <div className="my-16" key={key}><FormBlock {...(block as unknown as Parameters<typeof FormBlock>[0])} /></div>
+          case 'mediaBlock':
+            return <div className="my-16" key={key}><MediaBlock {...block} disableInnerContainer /></div>
+          default:
+            return null
+        }
+      })}
+    </Fragment>
+  )
 }

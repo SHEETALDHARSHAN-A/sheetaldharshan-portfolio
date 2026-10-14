@@ -1,61 +1,46 @@
 # sheetaldharshan.me
 
-Personal portfolio, project showcase, and publishing platform for Sheetaldharshan A.
-
-The project is a single Next.js App Router application with Payload CMS mounted at `/admin`, PostgreSQL persistence, Lexical rich text, draft/version workflows, and a deliberately editorial public frontend. The visual language combines a sequenced conversation on the homepage with an interactive project explorer.
+Personal portfolio, project showcase and publishing platform for Sheetaldharshan A. One Next.js application with Payload CMS at `/admin` and PostgreSQL behind it. Content, navigation, appearance and pages are managed from the admin; ordinary updates never need a code change.
 
 ## Stack
+Next.js 16 (App Router) · React 19 · TypeScript · Payload CMS 3.90 · PostgreSQL · Lexical rich text · anime.js (homepage motion) · Tailwind v4 utilities + CSS custom properties · pnpm · Playwright + Vitest · Vercel-compatible.
 
-- Next.js 16 + React 19 + TypeScript
-- Payload CMS 3.90 with PostgreSQL adapter
-- Tailwind CSS and CSS variables
-- Lexical rich text editor
-- pnpm
-- Playwright, Vitest, and Vercel-compatible deployment
+## Prerequisites
+Node 20+, pnpm 9+, PostgreSQL 14+ reachable from `DATABASE_URL`.
 
 ## Local setup
-
-```bash
-cp .env.example .env
+```sh
+cp .env.example .env        # fill in DATABASE_URL, PAYLOAD_SECRET, PREVIEW_SECRET
 pnpm install
-pnpm dev
+pnpm seed                   # verified starter content (safe to re-run)
+pnpm dev                    # http://localhost:3000 and http://localhost:3000/admin
 ```
-
-Open [http://localhost:3000](http://localhost:3000) for the website and [http://localhost:3000/admin](http://localhost:3000/admin) for Payload. The first visit to `/admin` creates the initial administrator. Do not commit `.env` or real credentials.
-
-The public visual shell has a verified fallback dataset in `src/data/site.ts` so it can be inspected before PostgreSQL is provisioned. Payload collections and globals are ready in `src/collections` and `src/globals`; use the admin panel for persisted content once `DATABASE_URL` is available.
+The first visit to `/admin` asks you to create the administrator. No credentials are hardcoded anywhere.
 
 ## Commands
-
-```bash
-pnpm dev
-pnpm exec tsc --noEmit
-pnpm lint
-pnpm exec next build --webpack
-pnpm test:int
-pnpm test:e2e
+```sh
+pnpm dev            # development server
+pnpm typecheck      # tsc --noEmit
+pnpm lint           # eslint
+pnpm build          # production build
+pnpm start          # serve the production build
+pnpm seed           # seed or refresh the verified content
+pnpm test:int       # vitest integration tests (needs the database)
+pnpm test:e2e       # playwright end-to-end tests (starts or reuses the dev server)
 pnpm payload generate:types
-pnpm payload migrate:create
-pnpm payload migrate
+pnpm payload migrate:create && pnpm payload migrate
 ```
 
-The template ESLint command currently trips a circular-config error in the installed ESLint 9 compatibility layer; TypeScript and the production webpack build are passing. See the implementation notes in `docs/` for the current scope and next integration steps.
-
-## CMS workflow
-
-- Edit homepage conversation messages under the Homepage global.
-- Create reviewed Projects and Publications with draft/version support.
-- Use Posts for articles; drafts are not public.
-- Use Appearance for whitelisted design presets rather than arbitrary CSS.
-- Keep incomplete or confidential material unpublished.
+## How it is organised
+See `docs/architecture.md`. Short version: pages under `src/app/(frontend)` read Payload through `src/data/content.ts`; the homepage is a server-rendered conversation animated by `src/components/home/ConversationPlayer.tsx`; projects use `src/components/projects/ProjectExplorer.tsx`; CMS blocks render through `src/components/blocks/RenderProjectBlocks.tsx`.
 
 ## Documentation
+- [Reference analysis](docs/reference-analysis.md) · [Design spec](docs/design-spec.md) · [Animation spec](docs/animation-spec.md)
+- [Architecture](docs/architecture.md) · [CMS schema](docs/cms-schema.md) · [Implementation plan and status](docs/implementation-plan.md)
+- [Admin guide](docs/admin-guide.md) · [Deployment](docs/deployment.md) · [Visual QA report](docs/visual-qa-report.md)
 
-- [Reference analysis](docs/reference-analysis.md)
-- [Design spec](docs/design-spec.md)
-- [Animation spec](docs/animation-spec.md)
-- [Architecture](docs/architecture.md)
-- [CMS schema](docs/cms-schema.md)
-- [Implementation plan](docs/implementation-plan.md)
-- [Admin guide](docs/admin-guide.md)
-- [Deployment](docs/deployment.md)
+## Content rules
+Only verified, public information goes into the CMS. Private company work is summarised at a high level with no links. Drafts stay private until published. The seed in `src/seed/data.ts` is the reviewed baseline.
+
+## Licence and third-party notes
+Application code is the owner's. The homepage reproduces the measurements and timing of juliangarnier.com (CC BY-NC 4.0) in an independent implementation; no file, image or text from that repository is included. anime.js is MIT. Fonts: Inter and Barlow Condensed (Google Fonts, OFL), Geist (Vercel, OFL).

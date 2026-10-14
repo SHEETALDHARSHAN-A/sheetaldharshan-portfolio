@@ -1,52 +1,62 @@
 import type { Metadata } from 'next'
-
-import { cn } from '@/utilities/ui'
+import { Barlow_Condensed, Inter } from 'next/font/google'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
+import { draftMode } from 'next/headers'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
-import { SiteFooter } from '@/components/site/SiteFooter'
-import { SiteHeader } from '@/components/site/SiteHeader'
-import { Providers } from '@/providers'
-import { InitTheme } from '@/providers/Theme/InitTheme'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { draftMode } from 'next/headers'
-
-import './globals.css'
+import { getAppearance, getSite } from '@/data/content'
+import { themeAttributes } from '@/styles/theme'
+import { cn } from '@/utilities/ui'
 import { getServerSideURL } from '@/utilities/getURL'
 
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const barlow = Barlow_Condensed({ subsets: ['latin'], variable: '--font-barlow', weight: ['300', '400', '500', '600', '700'], display: 'swap' })
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { isEnabled } = await draftMode()
+  const [{ isEnabled }, theme] = await Promise.all([draftMode(), getAppearance()])
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(inter.variable, barlow.variable, GeistSans.variable, GeistMono.variable)}
+      lang="en"
+      suppressHydrationWarning
+      {...themeAttributes(theme)}
+    >
       <head>
-        <InitTheme />
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <link href="/rss.xml" rel="alternate" title="Blog RSS" type="application/rss+xml" />
       </head>
       <body>
-        <Providers>
-          <AdminBar
-            adminBarProps={{
-              preview: isEnabled,
-            }}
-          />
-
-          <div className="site-shell">
-            <SiteHeader />
-            <main>{children}</main>
-            <SiteFooter />
-          </div>
-        </Providers>
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <AdminBar adminBarProps={{ preview: isEnabled }} />
+        {children}
       </body>
     </html>
   )
 }
 
-export const metadata: Metadata = {
-  metadataBase: new URL(getServerSideURL()),
-  openGraph: mergeOpenGraph(),
-  twitter: { card: 'summary_large_image' },
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite()
+  return {
+    metadataBase: new URL(getServerSideURL()),
+    title: { default: `${site.displayName} · ${site.tagline}`, template: `%s · ${site.displayName}` },
+    description: site.description,
+    openGraph: {
+      type: 'website',
+      siteName: site.displayName,
+      title: site.displayName,
+      description: site.description,
+      images: site.ogImage ? [{ url: site.ogImage.url }] : [{ url: '/og-default.png' }],
+    },
+    twitter: { card: 'summary_large_image' },
+    alternates: { types: { 'application/rss+xml': '/rss.xml' } },
+  }
 }

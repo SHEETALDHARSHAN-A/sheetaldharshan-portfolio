@@ -1,7 +1,20 @@
 # Animation spec
 
-- Conversation messages reveal in sequence with a short upward fade.
-- A three-dot typing indicator appears between messages.
-- Project selection updates the stage immediately through a native button interaction.
-- All motion is decorative; the content remains available when animation is reduced or disabled.
-- No third-party reference assets or executable CMS-authored code are used.
+## Homepage conversation (`src/components/home/ConversationPlayer.tsx`)
+Port of the reference sequence with anime.js v4:
+
+1. Wait `startDelay` (CMS, default 400 ms).
+2. For each bubble: show it, measure the message (capped to the viewport), fix the bubble to 0 × 2.25em, then `animate` width `0ch → 4em`, marginTop `2.5em → 0`, marginLeft `-2.5em → 0`, 800 ms, the reference's own easeOutElastic (2016 anime.js, elasticity 50: period = 95 % of duration, one slow overshoot), ported as `legacyOutElastic`. Loop scale `1.05 ↔ .95` (1100 ms, inOutQuad). Dots slide in (`translateX -2em → 0`, scale `.5 → 1`, 400 ms) and pulse (scale `1 → 1.25`, opacity `.5 → 1`, 300 ms, 100 ms stagger).
+3. After the typing time (CMS override, or `characters × 20 ms + 500 ms`; `snappy` uses 10 ms per character): stop the loops, shrink the dots out (300 ms), stretch the bubble to the message size (800 ms, same legacy elastic), fade the text in (300 ms) when the dot animation passes 65 %. The previous bubble loses its squared corner; the last one keeps it.
+4. Next bubble after `characters × 20 ms + random(900, 1200) ms`. If the newest bubble is below the fold the container scrolls to it (750 ms).
+
+Fallbacks: `prefers-reduced-motion`, the Appearance "reduced" intensity, or the `instant` preset show every bubble at once. Without JavaScript the server-rendered bubbles are visible and the dots are hidden (`html.js` gate in globals.css).
+
+## Inner pages
+- Page transitions (`src/components/shell/PageTransition.tsx`, every inner page): on arrival the visual comes first and the cards or text follow. Everything travels left to right. First load of /projects: the left panel first (wordmark at 0 ms, nav items from 160 ms in 70 ms steps, links at 560 ms), then the visual wipes in from the left at 560 ms, then the cards slide in from the left one by one, top to bottom, from 1500 ms in 140 ms steps, and the Open button last. Project page: the hero fades and settles (720 ms), then the info column and the blocks rise in from 560 ms with 60–80 ms steps. Other pages: the photo or cover first, then each block from 520 ms. On any internal link click the current page exits first: cards and text slide out to the right in sequence (480 ms, 50 ms stagger), the visual follows 260–320 ms later, then the route changes (900 ms on the explorer, 760 ms on a project page, 520 ms elsewhere). Modifier clicks, external links, admin links and reduced motion skip it.
+- Project visuals wipe in from the left edge: `clip-path: inset(0 100% 0 0) → inset(0)` over 820 ms with cubic-bezier(.77,0,.18,1), while the incoming image settles from a 6 % leftward offset. The previous visual stays beneath until the wipe completes. After settling, the visual zooms once from 1.0 to 1.08 over 11 s with a soft ease-out and stops. The stage uses the high-resolution still (3840 × 2400 JPEG), not the loop.
+- Row to card, staggered and without any text resizing: the row grows from 56 to 76 px and the slate card layer fades in (320 ms); the number rolls like a clock, one step per digit (the previous digit slides up, the new one rises in, 640 ms), the first digit first and the second 160 ms later; the thumbnail squeezes from 100 px to a 6 px sliver and moves beside the large number (420 ms, from 60 ms); the small tab title fades out while the large title and category cross-fade and slide up (from 160 ms) and the accent arrow slides in (from 260 ms). Release runs the same transitions back with no delays.
+- The play overlay button scales 8 % on hover; the video host is loaded only on click.
+- Hover states use 200 ms colour and transform transitions. Durations scale with the Appearance speed preset (`--speed`).
+- All inner-page motion is decorative and disabled under `prefers-reduced-motion`.
+- No scroll-driven animation and no Three.js: nothing in the brief justified the cost.

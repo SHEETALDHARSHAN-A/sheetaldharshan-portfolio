@@ -1,0 +1,132 @@
+import { test, expect } from '@playwright/test'
+
+const base = 'http://localhost:3000'
+
+test.describe('Public site', () => {
+  test('homepage loads and shows the conversation', async ({ page }) => {
+    await page.goto(base)
+    await expect(page.locator('.jg-messages')).toBeVisible()
+    await expect(page.locator('.jg-bubble.jg-shown').first()).toBeVisible({ timeout: 10000 })
+    // Content is editable in the admin, so only assert that the first bubble carries text.
+    await expect(page.locator('.jg-bubble .jg-message').first()).not.toHaveText('')
+  })
+
+  test('conversation reveals messages in sequence and keeps the last bubble cornered', async ({ page }) => {
+    await page.goto(base)
+    const bubbles = page.locator('.jg-bubble')
+    const total = await bubbles.count()
+    expect(total).toBeGreaterThan(3)
+    await expect(page.locator('.jg-bubble.jg-shown')).toHaveCount(total, { timeout: 60000 })
+    await expect(page.locator('.jg-bubble.jg-shown:not(.is-loading)')).toHaveCount(total, { timeout: 20000 })
+    await expect(bubbles.last()).toHaveClass(/cornered/)
+    await expect(bubbles.first()).not.toHaveClass(/cornered/)
+  })
+
+  test('homepage links navigate', async ({ page }) => {
+    await page.goto(base)
+    await expect(page.locator('.jg-bubble.jg-shown:not(.is-loading)')).toHaveCount(await page.locator('.jg-bubble').count(), { timeout: 60000 })
+    const projectsLink = page.locator('.jg-bubble a[href="/projects"]').first()
+    await expect(projectsLink).toBeVisible()
+    await projectsLink.click()
+    await expect(page).toHaveURL(/\/projects$/)
+  })
+
+  test('reduced motion shows every message immediately', async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: 'reduce' })
+    const page = await context.newPage()
+    await page.goto(base)
+    const total = await page.locator('.jg-bubble').count()
+    await expect(page.locator('.jg-bubble.jg-shown:not(.is-loading)')).toHaveCount(total, { timeout: 5000 })
+    await context.close()
+  })
+
+  test('projects explorer lists published projects and selection updates the stage', async ({ page }) => {
+    await page.goto(`${base}/projects`)
+    const rows = page.locator('.project-row')
+    expect(await rows.count()).toBeGreaterThanOrEqual(2)
+    await expect(page.locator('.stage-card .t')).toHaveText(await rows.nth(0).locator('.t').evaluate((el) => el.childNodes[0]?.textContent?.trim() ?? ''))
+    await rows.nth(1).hover()
+    const secondTitle = await rows.nth(1).locator('.t').evaluate((el) => el.childNodes[0]?.textContent?.trim() ?? '')
+    await expect(page.locator('.stage-card .t')).toHaveText(secondTitle)
+    await expect(page.locator('.stage-media.active')).toHaveCount(1)
+  })
+
+  test('dynamic project route works and drafts are private', async ({ page }) => {
+    await page.goto(`${base}/projects/exasol-studio`)
+    await expect(page.locator('h1')).toContainText('Exasol Studio')
+    const missing = await page.goto(`${base}/projects/e2e-this-project-does-not-exist`)
+    expect(missing?.status()).toBe(404)
+  })
+
+  test('blog listing, search and draft privacy', async ({ page }) => {
+    await page.goto(`${base}/blog`)
+    await expect(page.locator('h1')).toContainText('Notes')
+    await page.fill('input[name="q"]', 'zzz-no-such-note')
+    await page.click('.search-form button')
+    await expect(page.locator('.empty')).toContainText('Nothing matched')
+    const missing = await page.goto(`${base}/blog/e2e-this-note-does-not-exist`)
+    expect(missing?.status()).toBe(404)
+  })
+
+  test('about, research and contact render CMS content', async ({ page }) => {
+    await page.goto(`${base}/about`)
+    await expect(page.locator('.about-intro p').first()).toContainText('software engineer')
+    await page.goto(`${base}/research`)
+    await expect(page.locator('.pub h2')).toContainText('Autonomous Hiring Intelligence')
+    await page.goto(`${base}/contact`)
+    await expect(page.locator('.contact-links a', { hasText: 'LinkedIn' })).toBeVisible()
+  })
+
+  test('system routes and SEO metadata', async ({ page, request }) => {
+    const sitemap = await request.get(`${base}/sitemap.xml`)
+    expect(sitemap.ok()).toBeTruthy()
+    expect(await sitemap.text()).toContain('/projects/exasol-studio')
+    const rss = await request.get(`${base}/rss.xml`)
+    expect(rss.headers()['content-type']).toContain('rss')
+    const robots = await request.get(`${base}/robots.txt`)
+    expect(await robots.text()).toContain('Disallow: /admin')
+    await page.goto(`${base}/projects/exasol-studio`)
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/projects\/exasol-studio$/)
+    expect(await page.locator('script[type="application/ld+json"]').count()).toBeGreaterThan(0)
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /Exasol Studio/)
+  })
+
+  test('reserved paths are not served as CMS pages and 404 works', async ({ page }) => {
+    const res = await page.goto(`${base}/this-page-does-not-exist`)
+    expect(res?.status()).toBe(404)
+    await expect(page.locator('.notfound h1')).toHaveText('404')
+  })
+
+  test('mobile layout: top bar menu and horizontal project list', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } })
+    const page = await context.newPage()
+    await page.goto(`${base}/projects`)
+    await expect(page.locator('.topbar')).toBeVisible()
+    await expect(page.locator('.sidebar')).toBeHidden()
+    await page.locator('.topbar summary').click()
+    await expect(page.locator('.topbar .menu')).toBeVisible()
+    const width = await page.evaluate(() => document.documentElement.scrollWidth)
+    expect(width).toBeLessThanOrEqual(390)
+    await context.close()
+  })
+
+  test('keyboard navigation reaches the project rows and the skip link', async ({ page }) => {
+    await page.goto(`${base}/projects`, { waitUntil: 'networkidle' })
+    await expect(page.locator('.project-row').first()).toBeVisible()
+    let skip = false
+    // The Next dev overlay sits in the tab order and Chrome may resume from the active row, so allow wrap-around.
+    for (let i = 0; i < 8 && !skip; i += 1) {
+      await page.keyboard.press('Tab')
+      skip = await page.evaluate(() => document.activeElement?.classList.contains('skip-link') ?? false)
+    }
+    expect(skip).toBeTruthy()
+    let reached = false
+    for (let i = 0; i < 20 && !reached; i += 1) {
+      await page.keyboard.press('Tab')
+      reached = await page.evaluate(() => !!document.activeElement?.closest('.project-row'))
+    }
+    expect(reached).toBeTruthy()
+    await page.keyboard.press('ArrowDown')
+    await expect(page.locator('.project-row.active')).toHaveCount(1)
+  })
+})

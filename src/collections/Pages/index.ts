@@ -2,11 +2,18 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { Archive } from '../../blocks/ArchiveBlock/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
 import { FormBlock } from '../../blocks/Form/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { Prose } from '../../blocks/Prose/config'
+import { Gallery } from '../../blocks/Gallery/config'
+import { Features } from '../../blocks/Features/config'
+import { Links } from '../../blocks/Links/config'
+import { Timeline } from '../../blocks/Timeline/config'
+import { Embed } from '../../blocks/Embed/config'
+import { Code } from '../../blocks/Code/config'
+import { RESERVED_SLUGS } from '../../utilities/reservedSlugs'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -72,7 +79,7 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
+              blocks: [Prose, MediaBlock, Gallery, Code, Features, Links, Timeline, Embed, Content, CallToAction, FormBlock],
               required: true,
               admin: {
                 initCollapsed: true,
@@ -117,10 +124,24 @@ export const Pages: CollectionConfig<'pages'> = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'showInNavigation',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { position: 'sidebar', description: 'Also list this page in the sidebar navigation.' },
+    },
     slugField(),
   ],
   hooks: {
     afterChange: [revalidatePage],
+    beforeValidate: [
+      ({ data }) => {
+        if (data?.slug && RESERVED_SLUGS.includes(String(data.slug).toLowerCase())) {
+          throw new Error(`"${data.slug}" is a reserved path. Choose another slug.`)
+        }
+        return data
+      },
+    ],
     beforeChange: [populatePublishedAt],
     afterDelete: [revalidateDelete],
   },
