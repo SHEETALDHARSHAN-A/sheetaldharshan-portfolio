@@ -460,7 +460,7 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
   .project-row .tab .tab-text { display: grid; gap: 3px; min-width: 0; }
   .project-row .tab .t { font-size: 18px; font-weight: 600; line-height: 1.1; }
   .project-row .tab .k { display: block; font-family: var(--font-sans); font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--muted); }
-  .project-row .tab .tab-arrow { display: block; flex: none; font-family: var(--font-sans); font-size: 22px; line-height: 1; color: #ff3d00; }
+  .project-row .tab .tab-arrow { display: block; flex: none; font-family: var(--font-sans); font-size: 22px; line-height: 1; color: var(--accent); }
   .project-row .card { display: none; }
   .project-row.active { height: auto; }
   .project-row.active .thumb { width: 100%; height: auto; margin: 0; }
