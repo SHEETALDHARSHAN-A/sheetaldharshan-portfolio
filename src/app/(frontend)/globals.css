@@ -240,9 +240,7 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .yk-intro .project-row { animation: row-in 560ms var(--ease-out) both; animation-delay: calc(var(--cards-delay, 1250ms) + var(--i, 0) * 140ms); }
 .yk-intro .stage-media.active { animation-delay: var(--stage-delay, 560ms); }
 /* arriving by navigation: the page itself slides in, so the visual is present from the first frame and the cards follow at once */
-html[data-navigated] .yk-intro { --stage-delay: 0ms; --cards-delay: 640ms; }
-html[data-navigated] .yk-intro .project-row { animation-delay: calc(var(--cards-delay) + var(--i, 0) * 110ms); }
-html[data-navigated] .yk-intro .yk-open { animation-delay: 900ms; }
+/* Arriving by navigation plays the same sequence as the first load (the sidebar is anchored, so it does not re-animate). */
 html[data-navigated] .page > * { animation-delay: 60ms; }
 html[data-navigated] .page > *:nth-child(2) { animation-delay: 140ms; } html[data-navigated] .page > *:nth-child(3) { animation-delay: 220ms; } html[data-navigated] .page > *:nth-child(n + 4) { animation-delay: 300ms; }
 html[data-navigated] .about-photo, html[data-navigated] .article-cover { animation: none !important; }
