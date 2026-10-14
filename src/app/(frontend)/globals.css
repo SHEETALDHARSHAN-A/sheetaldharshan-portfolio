@@ -185,9 +185,9 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .yk-stage { position: absolute; inset: 0; overflow: hidden; background: var(--bg-elevated); }
 .stage-media { position: absolute; inset: 0; opacity: 0; z-index: 0; pointer-events: none; }
 .stage-media img, .stage-media video { width: 100%; height: 100%; object-fit: cover; }
-.stage-media.active { opacity: 1; z-index: 2; clip-path: inset(0 0 0 0); animation: wipe-in calc(820ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both; }
+.stage-media.active { opacity: 1; z-index: 2; clip-path: inset(0 0 0 0); animation: wipe-in calc(600ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both; }
 /* The leaving visual keeps the identical animation declaration so it holds its current zoom under the wipe instead of snapping back. */
-.stage-media.active img, .stage-media.active video, .stage-media.active .stage-placeholder, .stage-media.leaving img, .stage-media.leaving video, .stage-media.leaving .stage-placeholder { animation: wipe-settle calc(820ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both, kenburns 14s cubic-bezier(0.25, 0.4, 0.3, 1) calc(820ms * var(--speed)) forwards; transform-origin: 58% 50%; will-change: transform; }
+.stage-media.active img, .stage-media.active video, .stage-media.active .stage-placeholder, .stage-media.leaving img, .stage-media.leaving video, .stage-media.leaving .stage-placeholder { animation: wipe-settle calc(600ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both, kenburns 14s cubic-bezier(0.25, 0.4, 0.3, 1) calc(600ms * var(--speed)) forwards; transform-origin: 58% 50%; will-change: transform; }
 .stage-media.leaving { opacity: 1; z-index: 1; }
 @keyframes wipe-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes wipe-settle { from { transform: translateX(-6%); } to { transform: none; } }
@@ -237,18 +237,18 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 @keyframes roll-up { from { transform: translateY(0); } to { transform: translateY(-1em); } }
 @keyframes row-in { from { opacity: 0; transform: translateX(-48px); } to { opacity: 1; transform: none; } }
 /* load order: left panel → visual → cards top to bottom */
-.yk-intro .project-row { animation: row-in 560ms var(--ease-out) both; animation-delay: calc(var(--cards-delay, 1500ms) + var(--i, 0) * 140ms); }
+.yk-intro .project-row { animation: row-in 560ms var(--ease-out) both; animation-delay: calc(var(--cards-delay, 1250ms) + var(--i, 0) * 140ms); }
 .yk-intro .stage-media.active { animation-delay: var(--stage-delay, 560ms); }
 /* arriving by navigation: the page itself slides in, so the visual is present from the first frame and the cards follow at once */
-html[data-navigated] .yk-intro { --stage-delay: 0ms; --cards-delay: 860ms; }
+html[data-navigated] .yk-intro { --stage-delay: 0ms; --cards-delay: 640ms; }
 html[data-navigated] .yk-intro .project-row { animation-delay: calc(var(--cards-delay) + var(--i, 0) * 110ms); }
-html[data-navigated] .yk-intro .yk-open { animation-delay: 1100ms; }
+html[data-navigated] .yk-intro .yk-open { animation-delay: 900ms; }
 html[data-navigated] .page > * { animation-delay: 60ms; }
 html[data-navigated] .page > *:nth-child(2) { animation-delay: 140ms; } html[data-navigated] .page > *:nth-child(3) { animation-delay: 220ms; } html[data-navigated] .page > *:nth-child(n + 4) { animation-delay: 300ms; }
 html[data-navigated] .about-photo, html[data-navigated] .article-cover { animation: none !important; }
 html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, html[data-navigated] .sidebar-foot, html[data-navigated] .topbar { animation: none; }
-.yk-intro .stage-media.active img, .yk-intro .stage-media.active video, .yk-intro .stage-media.active .stage-placeholder, .yk-intro .stage-media.leaving img, .yk-intro .stage-media.leaving video, .yk-intro .stage-media.leaving .stage-placeholder { animation-delay: var(--stage-delay, 560ms), calc(var(--stage-delay, 560ms) + 820ms); }
-.yk-intro .yk-open { animation: el-in 500ms var(--ease-out) both; animation-delay: 1500ms; }
+.yk-intro .stage-media.active img, .yk-intro .stage-media.active video, .yk-intro .stage-media.active .stage-placeholder, .yk-intro .stage-media.leaving img, .yk-intro .stage-media.leaving video, .yk-intro .stage-media.leaving .stage-placeholder { animation-delay: var(--stage-delay, 560ms), calc(var(--stage-delay, 560ms) + 600ms); }
+.yk-intro .yk-open { animation: el-in 500ms var(--ease-out) both; animation-delay: 1250ms; }
 .sidebar .wordmark { animation: el-in 560ms var(--ease-out) both; }
 .sidebar-nav a { animation: el-in 480ms var(--ease-out) both; animation-delay: 160ms; }
 .sidebar-nav a:nth-child(2) { animation-delay: 230ms; } .sidebar-nav a:nth-child(3) { animation-delay: 300ms; } .sidebar-nav a:nth-child(4) { animation-delay: 370ms; } .sidebar-nav a:nth-child(5) { animation-delay: 440ms; } .sidebar-nav a:nth-child(n + 6) { animation-delay: 510ms; }
