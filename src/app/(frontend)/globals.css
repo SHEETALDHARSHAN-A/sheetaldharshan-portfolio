@@ -451,8 +451,12 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
   .yk { height: auto; min-height: 0; display: grid; grid-template-rows: 58vw auto; }
   .yk-stage { position: relative; inset: auto; height: 58vw; max-height: 420px; }
   .yk-list { position: relative; inset: auto; padding: 10px var(--gutter) 18px; justify-content: flex-start; pointer-events: auto; overflow: visible; }
-  .project-row { --n-w: 40px; --thumb-w: 88px; --row-h: 50px; --card-h: 72px; --card-num-w: 64px; --sliver-w: 5px; }
+  .project-row { --n-w: 40px; --thumb-w: 88px; --row-h: 50px; --card-h: 92px; --card-num-w: 64px; --sliver-w: 5px; }
   .project-row .card { min-width: 0; width: 100%; padding-right: 14px; }
+  .project-row .card-t { font-size: 18px; line-height: 21px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+  .project-row .card-k { font-size: 12px; }
+  .project-row .roll { font-size: 40px; }
+  .project-row.active .thumb { height: var(--card-h); }
   .project-row .n { font-size: 15px; }
   .project-row .tab { padding: 0 16px; white-space: normal; min-width: 0; flex: 1; }
   .project-row .tab .t { font-size: 15px; }
