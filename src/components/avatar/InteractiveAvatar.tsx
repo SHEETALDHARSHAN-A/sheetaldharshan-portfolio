@@ -10,44 +10,48 @@ export { setExpression } from './expressions'
 
 export type AvatarHandle = { setExpression: (expression: Expression, options?: { hold?: boolean; duration?: number }) => void }
 
-const TRANSIENT: Partial<Record<Expression, number>> = { happy: 1400, excited: 1600, wave: 1900, curious: 1800 }
-const MAX_EYE = 4.2 // px the pupils may travel
-const MAX_TILT = 6 // degrees of head tilt
-const MAX_SHIFT = 3 // px of head drift
+const TRANSIENT: Partial<Record<Expression, number>> = { happy: 1400, excited: 1500, wave: 1900, curious: 1300, surprised: 900 }
+const SLEEP_AFTER = 30000
 
 /**
- * An original Memoji-style 2.5D avatar drawn in inline SVG (~6 KB, no images, no WebGL).
- * Idle: random blinks, breathing, occasional smile. Eyes and head follow the pointer with
- * eased interpolation in a requestAnimationFrame loop that only runs while something moves.
- * Hover: curious. Click: happy bounce. Reacts to route changes and typing. Pauses offscreen,
- * when the tab is hidden, and under prefers-reduced-motion.
+ * A chibi, Memoji-style avatar in inline SVG (about 7 KB gzipped, no images or WebGL).
+ * The head is built from parallax layers (ears, skull, hair, face) that slide by different
+ * amounts, so it appears to turn in 3D toward the cursor; the pupils track it too. It reacts to
+ * the page: hovering links makes it curious, clicking makes it excited, typing makes it think,
+ * route changes and long inactivity have their own faces. Animation work happens only while the
+ * pointer is moving, and stops offscreen, in hidden tabs and under reduced motion.
  */
 export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; className?: string; label?: string }>(function InteractiveAvatar(
-  { size = 160, className, label = 'Animated avatar of Sheetaldharshan' },
+  { size = 150, className, label = 'Animated avatar of Sheetaldharshan' },
   ref,
 ) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const headRef = useRef<SVGGElement>(null)
-  const pupilsRef = useRef<SVGGElement>(null)
   const [expression, setExpr] = useState<Expression>('idle')
   const [blink, setBlink] = useState(false)
   const [bounce, setBounce] = useState(0)
   const resetTimer = useRef<number | undefined>(undefined)
-  const state = useRef({ tx: 0, ty: 0, x: 0, y: 0, raf: 0, visible: true, reduced: false, held: false })
+  const sleepTimer = useRef<number | undefined>(undefined)
+  const s = useRef({ tx: 0, ty: 0, x: 0, y: 0, raf: 0, visible: true, reduced: false, held: false, expr: 'idle' as Expression })
   const pathname = usePathname()
 
   const apply = useCallback((next: Expression, options: { hold?: boolean; duration?: number } = {}) => {
     window.clearTimeout(resetTimer.current)
-    state.current.held = !!options.hold
+    s.current.held = !!options.hold
+    s.current.expr = next
     setExpr(next)
     if (next === 'happy' || next === 'excited') setBounce((n) => n + 1)
     const ms = options.duration ?? TRANSIENT[next]
-    if (!options.hold && ms) resetTimer.current = window.setTimeout(() => setExpr('idle'), ms)
+    if (!options.hold && ms) {
+      resetTimer.current = window.setTimeout(() => {
+        s.current.expr = 'idle'
+        setExpr('idle')
+      }, ms)
+    }
   }, [])
 
   useImperativeHandle(ref, () => ({ setExpression: apply }), [apply])
 
-  // Programmatic API: window event from setExpression()
+  /* programmatic API */
   useEffect(() => {
     const onEvent = (e: Event) => {
       const d = (e as CustomEvent<{ expression: Expression; hold?: boolean; duration?: number }>).detail
@@ -57,114 +61,126 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
     return () => window.removeEventListener(AVATAR_EVENT, onEvent)
   }, [apply])
 
-  // Site reactions: projects → excited, contact → wave, a project page → curious
+  /* route reactions */
   useEffect(() => {
     if (!pathname) return
     if (pathname === '/projects') apply('excited')
-    else if (pathname.startsWith('/projects/')) apply('curious')
+    else if (pathname.startsWith('/projects/')) apply('curious', { duration: 1600 })
     else if (pathname === '/contact') apply('wave')
+    else if (pathname.startsWith('/blog')) apply('thinking', { duration: 1600 })
+    else if (pathname === '/about') apply('happy')
   }, [pathname, apply])
 
-  // Typing anywhere on the page → thinking; leaving the field → idle
+  /* page reactions: hover links, click anything, type, go idle */
   useEffect(() => {
-    const isField = (t: EventTarget | null) => t instanceof HTMLElement && (t.matches('input, textarea, [contenteditable="true"]'))
-    const onIn = (e: FocusEvent) => isField(e.target) && apply('thinking', { hold: true })
-    const onOut = (e: FocusEvent) => isField(e.target) && apply('idle')
-    document.addEventListener('focusin', onIn)
-    document.addEventListener('focusout', onOut)
+    const interactive = 'a[href], button, summary, .project-row, input, textarea'
+    const field = 'input, textarea, [contenteditable="true"]'
+    let lastHover: Element | null = null
+    const wake = () => {
+      window.clearTimeout(sleepTimer.current)
+      if (s.current.expr === 'sleepy') apply('surprised')
+      sleepTimer.current = window.setTimeout(() => !s.current.held && apply('sleepy', { hold: true }), SLEEP_AFTER)
+    }
+    const onOver = (e: PointerEvent) => {
+      const el = (e.target as Element | null)?.closest?.(interactive) ?? null
+      if (el && el !== lastHover && !rootRef.current?.contains(el) && !s.current.held && s.current.expr === 'idle') apply('curious', { duration: 900 })
+      lastHover = el
+    }
+    const onClick = (e: MouseEvent) => {
+      if (rootRef.current?.contains(e.target as Node)) return
+      const el = (e.target as Element | null)?.closest?.('a[href], button, .project-row')
+      if (el && !s.current.held) apply('excited', { duration: 900 })
+    }
+    const onKey = (e: KeyboardEvent) => {
+      wake()
+      if ((e.target as Element | null)?.matches?.(field)) apply('thinking', { hold: true })
+    }
+    const onFocusOut = (e: FocusEvent) => (e.target as Element | null)?.matches?.(field) && apply('idle')
+    window.addEventListener('pointerover', onOver, { passive: true })
+    window.addEventListener('click', onClick, true)
+    window.addEventListener('keydown', onKey)
+    document.addEventListener('focusout', onFocusOut)
+    window.addEventListener('pointermove', wake, { passive: true })
+    window.addEventListener('scroll', wake, { passive: true, capture: true })
+    wake()
     return () => {
-      document.removeEventListener('focusin', onIn)
-      document.removeEventListener('focusout', onOut)
+      window.removeEventListener('pointerover', onOver)
+      window.removeEventListener('click', onClick, true)
+      window.removeEventListener('keydown', onKey)
+      document.removeEventListener('focusout', onFocusOut)
+      window.removeEventListener('pointermove', wake)
+      window.removeEventListener('scroll', wake, true)
+      window.clearTimeout(sleepTimer.current)
     }
   }, [apply])
 
-  // Random blinks (sometimes double) and the occasional idle smile
+  /* blinks */
   useEffect(() => {
-    let blinkTimer: number
-    let smileTimer: number
-    const scheduleBlink = () => {
-      blinkTimer = window.setTimeout(() => {
-        if (state.current.visible) {
+    let t: number
+    const loop = () => {
+      t = window.setTimeout(() => {
+        if (s.current.visible && s.current.expr !== 'sleepy') {
           setBlink(true)
-          window.setTimeout(() => setBlink(false), 130)
-          if (Math.random() < 0.2) window.setTimeout(() => { setBlink(true); window.setTimeout(() => setBlink(false), 120) }, 260)
+          window.setTimeout(() => setBlink(false), 120)
+          if (Math.random() < 0.22) window.setTimeout(() => { setBlink(true); window.setTimeout(() => setBlink(false), 110) }, 240)
         }
-        scheduleBlink()
-      }, 2400 + Math.random() * 3800)
+        loop()
+      }, 2200 + Math.random() * 3600)
     }
-    const scheduleSmile = () => {
-      smileTimer = window.setTimeout(() => {
-        if (state.current.visible && !state.current.held) setExpr((e) => (e === 'idle' ? 'happy' : e))
-        window.setTimeout(() => setExpr((e) => (e === 'happy' && !state.current.held ? 'idle' : e)), 1500)
-        scheduleSmile()
-      }, 9000 + Math.random() * 7000)
-    }
-    scheduleBlink()
-    scheduleSmile()
-    return () => {
-      window.clearTimeout(blinkTimer)
-      window.clearTimeout(smileTimer)
-    }
+    loop()
+    return () => window.clearTimeout(t)
   }, [])
 
-  // Pointer tracking: eased, rAF only while moving, paused offscreen / hidden / reduced motion
+  /* pointer → --x/--y (−1..1), eased in a rAF loop that runs only while settling */
   useEffect(() => {
-    const s = state.current
+    const st = s.current
     const root = rootRef.current
     if (!root) return
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    s.reduced = media.matches || document.documentElement.dataset.motion === 'reduced'
-    const onMedia = () => (s.reduced = media.matches)
+    st.reduced = media.matches || document.documentElement.dataset.motion === 'reduced'
+    const onMedia = () => (st.reduced = media.matches)
     media.addEventListener('change', onMedia)
-
     const render = () => {
-      s.x += (s.tx - s.x) * 0.14
-      s.y += (s.ty - s.y) * 0.14
-      if (pupilsRef.current) pupilsRef.current.style.transform = `translate(${(s.x * MAX_EYE).toFixed(2)}px, ${(s.y * MAX_EYE).toFixed(2)}px)`
-      if (headRef.current) headRef.current.style.transform = `translate(${(s.x * MAX_SHIFT).toFixed(2)}px, ${(s.y * MAX_SHIFT * 0.6).toFixed(2)}px) rotate(${(s.x * MAX_TILT).toFixed(2)}deg)`
-      if (Math.abs(s.tx - s.x) > 0.002 || Math.abs(s.ty - s.y) > 0.002) s.raf = requestAnimationFrame(render)
-      else s.raf = 0
+      st.x += (st.tx - st.x) * 0.12
+      st.y += (st.ty - st.y) * 0.12
+      root.style.setProperty('--x', st.x.toFixed(3))
+      root.style.setProperty('--y', st.y.toFixed(3))
+      st.raf = Math.abs(st.tx - st.x) > 0.002 || Math.abs(st.ty - st.y) > 0.002 ? requestAnimationFrame(render) : 0
     }
     const kick = () => {
-      if (!s.raf && s.visible && !s.reduced) s.raf = requestAnimationFrame(render)
+      if (!st.raf && st.visible && !st.reduced) st.raf = requestAnimationFrame(render)
     }
     let last = 0
     const onMove = (e: PointerEvent) => {
       const now = performance.now()
-      if (now - last < 16) return // ~60 Hz throttle
+      if (now - last < 16) return
       last = now
       const r = root.getBoundingClientRect()
-      const cx = r.left + r.width / 2
-      const cy = r.top + r.height * 0.45
-      const dx = (e.clientX - cx) / Math.max(240, window.innerWidth * 0.5)
-      const dy = (e.clientY - cy) / Math.max(240, window.innerHeight * 0.5)
-      s.tx = Math.max(-1, Math.min(1, dx))
-      s.ty = Math.max(-1, Math.min(1, dy))
+      const dx = (e.clientX - (r.left + r.width / 2)) / Math.max(260, window.innerWidth * 0.45)
+      const dy = (e.clientY - (r.top + r.height * 0.42)) / Math.max(260, window.innerHeight * 0.45)
+      st.tx = Math.max(-1, Math.min(1, dx))
+      st.ty = Math.max(-1, Math.min(1, dy))
       kick()
     }
     const onLeave = () => {
-      s.tx = 0
-      s.ty = 0
+      st.tx = 0
+      st.ty = 0
       kick()
     }
     window.addEventListener('pointermove', onMove, { passive: true })
-    document.addEventListener('pointerleave', onLeave)
-
-    const io = new IntersectionObserver(([entry]) => {
-      s.visible = entry.isIntersecting && document.visibilityState === 'visible'
-      root.dataset.paused = s.visible ? 'false' : 'true'
-    })
-    io.observe(root)
-    const onVis = () => {
-      s.visible = document.visibilityState === 'visible'
-      root.dataset.paused = s.visible ? 'false' : 'true'
+    document.documentElement.addEventListener('pointerleave', onLeave)
+    const setVisible = (v: boolean) => {
+      st.visible = v
+      root.dataset.paused = v ? 'false' : 'true'
     }
+    const io = new IntersectionObserver(([en]) => setVisible(en.isIntersecting && document.visibilityState === 'visible'))
+    io.observe(root)
+    const onVis = () => setVisible(document.visibilityState === 'visible')
     document.addEventListener('visibilitychange', onVis)
-
     return () => {
-      cancelAnimationFrame(s.raf)
+      cancelAnimationFrame(st.raf)
       window.removeEventListener('pointermove', onMove)
-      document.removeEventListener('pointerleave', onLeave)
+      document.documentElement.removeEventListener('pointerleave', onLeave)
       document.removeEventListener('visibilitychange', onVis)
       media.removeEventListener('change', onMedia)
       io.disconnect()
@@ -180,129 +196,154 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
       data-expression={expression}
       data-blink={blink ? 'true' : 'false'}
       data-paused="false"
-      style={{ width: size, height: size * 1.1 }}
-      onPointerEnter={() => !state.current.held && expression === 'idle' && apply('curious', { duration: 99999 })}
-      onPointerLeave={() => !state.current.held && expression === 'curious' && apply('idle')}
+      style={{ width: size, height: size }}
+      onPointerEnter={() => !s.current.held && apply('curious', { duration: 99999 })}
+      onPointerLeave={() => !s.current.held && s.current.expr === 'curious' && apply('idle')}
       onClick={() => apply('happy')}
       role="img"
       aria-label={label}
     >
-      <svg viewBox="0 0 200 220" className={styles.svg} key={bounce} data-bounce={bounce > 0 ? 'true' : 'false'} aria-hidden="true">
+      <svg viewBox="0 0 200 200" className={styles.svg} key={bounce} data-bounce={bounce > 0 ? 'true' : 'false'} aria-hidden="true">
         <defs>
-          <radialGradient id="av-skin" cx="42%" cy="34%" r="72%">
-            <stop offset="0" stopColor="#b98262" />
-            <stop offset=".55" stopColor="#97654a" />
-            <stop offset="1" stopColor="#6e4733" />
+          <radialGradient id="mj-skin" cx="38%" cy="30%" r="80%">
+            <stop offset="0" stopColor="#d9a07c" />
+            <stop offset=".5" stopColor="#b47a58" />
+            <stop offset="1" stopColor="#8a573d" />
           </radialGradient>
-          <radialGradient id="av-hair" cx="40%" cy="30%" r="75%">
-            <stop offset="0" stopColor="#3a2a22" />
-            <stop offset=".6" stopColor="#1c1411" />
-            <stop offset="1" stopColor="#0f0b09" />
+          <radialGradient id="mj-ear" cx="40%" cy="40%" r="70%">
+            <stop offset="0" stopColor="#c48a68" />
+            <stop offset="1" stopColor="#8f5c41" />
           </radialGradient>
-          <linearGradient id="av-hood" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#2b2d33" />
-            <stop offset="1" stopColor="#111216" />
+          <radialGradient id="mj-hair" cx="35%" cy="25%" r="85%">
+            <stop offset="0" stopColor="#5a4033" />
+            <stop offset=".45" stopColor="#2c1f19" />
+            <stop offset="1" stopColor="#140e0b" />
+          </radialGradient>
+          <radialGradient id="mj-curl" cx="35%" cy="30%" r="70%">
+            <stop offset="0" stopColor="#6a4c3d" />
+            <stop offset=".6" stopColor="#2a1d17" />
+            <stop offset="1" stopColor="#170f0c" />
+          </radialGradient>
+          <radialGradient id="mj-iris" cx="38%" cy="32%" r="75%">
+            <stop offset="0" stopColor="#8a5a34" />
+            <stop offset=".55" stopColor="#4a2a16" />
+            <stop offset="1" stopColor="#1e1008" />
+          </radialGradient>
+          <linearGradient id="mj-hood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#3a3d46" />
+            <stop offset="1" stopColor="#15161b" />
           </linearGradient>
-          <radialGradient id="av-iris" cx="40%" cy="35%" r="70%">
-            <stop offset="0" stopColor="#6b4428" />
-            <stop offset="1" stopColor="#2a170c" />
-          </radialGradient>
-          <radialGradient id="av-shadow" cx="50%" cy="50%" r="50%">
-            <stop offset="0" stopColor="#000" stopOpacity=".35" />
-            <stop offset="1" stopColor="#000" stopOpacity="0" />
+          <linearGradient id="mj-stubble" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#3b261b" stopOpacity="0" />
+            <stop offset=".35" stopColor="#3b261b" stopOpacity=".38" />
+            <stop offset="1" stopColor="#2a1a12" stopOpacity=".55" />
+          </linearGradient>
+          <radialGradient id="mj-gloss" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stopColor="#fff" stopOpacity=".42" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0" />
           </radialGradient>
         </defs>
 
         <g className={styles.breathe}>
-          {/* hoodie and shoulders */}
-          <path d="M28 220c0-34 26-58 72-58s72 24 72 58z" fill="url(#av-hood)" />
-          <path d="M76 168c6 12 15 18 24 18s18-6 24-18" fill="none" stroke="#3a3d45" strokeWidth="5" strokeLinecap="round" />
-          <path d="M88 182v22M112 182v22" stroke="#d9d9d4" strokeWidth="2.4" strokeLinecap="round" />
-          <circle cx="88" cy="205" r="2.4" fill="#d9d9d4" />
-          <circle cx="112" cy="205" r="2.4" fill="#d9d9d4" />
-          {/* neck */}
-          <path d="M84 150h32v20c0 6-7 10-16 10s-16-4-16-10z" fill="#7d523b" />
-          <ellipse cx="100" cy="152" rx="20" ry="5" fill="url(#av-shadow)" />
+          {/* small body */}
+          <g className={styles.body}>
+            <path d="M40 200c2-26 26-44 60-44s58 18 60 44z" fill="url(#mj-hood)" />
+            <path d="M78 160c6 9 13 13 22 13s16-4 22-13" fill="none" stroke="#4b4f5a" strokeWidth="5" strokeLinecap="round" />
+            <path d="M90 172v16M110 172v16" stroke="#e8e6e0" strokeWidth="2.6" strokeLinecap="round" />
+            <circle cx="90" cy="190" r="2.6" fill="#e8e6e0" /><circle cx="110" cy="190" r="2.6" fill="#e8e6e0" />
+            <path d="M88 148h24v12c0 5-6 8-12 8s-12-3-12-8z" fill="#9a6447" />
+          </g>
 
-          {/* head (follows the pointer) */}
-          <g ref={headRef} className={styles.head}>
-            {/* ears */}
-            <ellipse cx="44" cy="102" rx="9" ry="13" fill="#8a5a41" />
-            <ellipse cx="156" cy="102" rx="9" ry="13" fill="#8a5a41" />
-            <ellipse cx="45" cy="103" rx="4.5" ry="7" fill="#6e4733" />
-            <ellipse cx="155" cy="103" rx="4.5" ry="7" fill="#6e4733" />
-            {/* face */}
-            <path d="M46 92c0-32 24-52 54-52s54 20 54 52c0 34-20 62-54 62S46 126 46 92z" fill="url(#av-skin)" />
-            {/* short beard and moustache */}
-            <path d="M52 108c4 28 22 46 48 46s44-18 48-46c-6 12-14 20-22 22-8 2-14-4-26-4s-18 6-26 4c-8-2-16-10-22-22z" fill="#1d1410" opacity=".88" />
-            <path d="M82 124c6-5 12-6 18-3 6-3 12-2 18 3-6 1-12 2-18 0-6 2-12 1-18 0z" fill="#1d1410" />
-            {/* cheeks */}
-            <ellipse className={styles.cheek} cx="68" cy="116" rx="9" ry="5" fill="#c86b5a" />
-            <ellipse className={styles.cheek} cx="132" cy="116" rx="9" ry="5" fill="#c86b5a" />
+          {/* head: parallax layers turn it toward the cursor */}
+          <g className={styles.head}>
+            <g className={styles.ears}>
+              <ellipse cx="33" cy="98" rx="11" ry="14" fill="url(#mj-ear)" />
+              <ellipse cx="167" cy="98" rx="11" ry="14" fill="url(#mj-ear)" />
+              <ellipse cx="34" cy="99" rx="5" ry="7.5" fill="#8a573d" opacity=".55" />
+              <ellipse cx="166" cy="99" rx="5" ry="7.5" fill="#8a573d" opacity=".55" />
+            </g>
+            <g className={styles.skull}>
+              <ellipse cx="100" cy="96" rx="67" ry="64" fill="url(#mj-skin)" />
+              <ellipse cx="78" cy="66" rx="28" ry="16" fill="url(#mj-gloss)" />
+              {/* soft stubble on the jaw */}
+              <path d="M40 104c4 32 28 54 60 54s56-22 60-54c-8 18-26 30-60 30S48 122 40 104z" fill="url(#mj-stubble)" />
+            </g>
 
-            {/* eyes */}
-            <g className={styles.eyes}>
-              <g className={styles.eye}>
-                <ellipse cx="78" cy="100" rx="11" ry="10" fill="#f6f2ec" />
+            <g className={styles.face}>
+              <ellipse className={styles.cheek} cx="58" cy="118" rx="12" ry="7" fill="#e07a6a" />
+              <ellipse className={styles.cheek} cx="142" cy="118" rx="12" ry="7" fill="#e07a6a" />
+
+              <g className={styles.eyes}>
+                <ellipse cx="74" cy="101" rx="15" ry="16.5" fill="#fbf8f4" />
+                <ellipse cx="126" cy="101" rx="15" ry="16.5" fill="#fbf8f4" />
+                <g className={styles.pupils}>
+                  <circle cx="74" cy="103" r="10.5" fill="url(#mj-iris)" />
+                  <circle cx="126" cy="103" r="10.5" fill="url(#mj-iris)" />
+                  <circle cx="74" cy="103" r="5" fill="#0c0604" />
+                  <circle cx="126" cy="103" r="5" fill="#0c0604" />
+                  <circle cx="78" cy="98" r="3.4" fill="#fff" />
+                  <circle cx="130" cy="98" r="3.4" fill="#fff" />
+                  <circle cx="70.5" cy="107" r="1.5" fill="#fff" opacity=".8" />
+                  <circle cx="122.5" cy="107" r="1.5" fill="#fff" opacity=".8" />
+                </g>
+                <rect className={styles.lid} x="57" y="83" width="34" height="36" rx="16" fill="#bf8463" />
+                <rect className={styles.lid} x="109" y="83" width="34" height="36" rx="16" fill="#bf8463" />
               </g>
-              <g className={styles.eye}>
-                <ellipse cx="122" cy="100" rx="11" ry="10" fill="#f6f2ec" />
+
+              <path className={`${styles.brow} ${styles.browL}`} d="M60 80c6-6 16-7 26-3" fill="none" stroke="#2a1b14" strokeWidth="6.5" strokeLinecap="round" />
+              <path className={`${styles.brow} ${styles.browR}`} d="M114 77c10-4 20-3 26 3" fill="none" stroke="#2a1b14" strokeWidth="6.5" strokeLinecap="round" />
+
+              <ellipse cx="100" cy="117" rx="6" ry="4" fill="#9a6447" opacity=".7" />
+              <ellipse cx="98.5" cy="115.5" rx="2" ry="1.2" fill="#fff" opacity=".35" />
+
+              {/* moustache, soft */}
+              <path d="M86 127c5-3 10-3 14-1 4-2 9-2 14 1-5 2-10 2-14 1-4 1-9 1-14-1z" fill="#3b261b" opacity=".6" />
+
+              <path className={`${styles.mouth} ${styles.mIdle}`} d="M89 134c6 4 16 4 22 0" fill="none" stroke="#6b2f26" strokeWidth="3.4" strokeLinecap="round" />
+              <g className={`${styles.mouth} ${styles.mHappy}`}>
+                <path d="M84 131c4 15 28 15 32 0z" fill="#5a1d18" />
+                <path d="M87 131.5h26c-1 3-5 4.5-13 4.5s-12-1.5-13-4.5z" fill="#fff" />
+                <ellipse cx="100" cy="141" rx="7" ry="3.5" fill="#e66f68" />
               </g>
-              <g ref={pupilsRef} className={styles.pupils}>
-                <circle cx="78" cy="101" r="6.2" fill="url(#av-iris)" />
-                <circle cx="122" cy="101" r="6.2" fill="url(#av-iris)" />
-                <circle cx="78" cy="101" r="3" fill="#0d0705" />
-                <circle cx="122" cy="101" r="3" fill="#0d0705" />
-                <circle cx="80" cy="98.6" r="1.7" fill="#fff" />
-                <circle cx="124" cy="98.6" r="1.7" fill="#fff" />
+              <g className={`${styles.mouth} ${styles.mExcited}`}>
+                <ellipse cx="100" cy="137" rx="10" ry="10" fill="#5a1d18" />
+                <ellipse cx="100" cy="142" rx="6.5" ry="3.8" fill="#e66f68" />
               </g>
-              {/* eyelids for blinking (cover the eye from the top) */}
-              <rect className={styles.lid} x="65" y="88" width="26" height="24" rx="11" fill="#8f5f45" />
-              <rect className={styles.lid} x="109" y="88" width="26" height="24" rx="11" fill="#8f5f45" />
+              <ellipse className={`${styles.mouth} ${styles.mSurprised}`} cx="100" cy="136" rx="5.5" ry="6.5" fill="#5a1d18" />
+              <path className={`${styles.mouth} ${styles.mThinking}`} d="M93 137c5-3 11-3 16 0" fill="none" stroke="#6b2f26" strokeWidth="3.4" strokeLinecap="round" />
+              <ellipse className={`${styles.mouth} ${styles.mCurious}`} cx="102" cy="135" rx="4" ry="3.6" fill="#5a1d18" />
+              <path className={`${styles.mouth} ${styles.mSleepy}`} d="M93 135c4 2 10 2 14 0" fill="none" stroke="#6b2f26" strokeWidth="3" strokeLinecap="round" />
             </g>
 
-            {/* eyebrows */}
-            <path className={`${styles.brow} ${styles.browL}`} d="M65 86c5-5 13-6 22-3" fill="none" stroke="#1a110d" strokeWidth="5" strokeLinecap="round" />
-            <path className={`${styles.brow} ${styles.browR}`} d="M113 83c9-3 17-2 22 3" fill="none" stroke="#1a110d" strokeWidth="5" strokeLinecap="round" />
-
-            {/* nose */}
-            <path d="M97 104c-2 7-4 11-1 13 2 1 6 1 8 0" fill="none" stroke="#6a432f" strokeWidth="2.4" strokeLinecap="round" />
-
-            {/* mouths: one per expression, cross-faded */}
-            <path className={`${styles.mouth} ${styles.mIdle}`} d="M88 131c7 4 17 4 24 0" fill="none" stroke="#c98a7a" strokeWidth="3" strokeLinecap="round" />
-            <g className={`${styles.mouth} ${styles.mHappy}`}>
-              <path d="M84 129c4 11 28 11 32 0z" fill="#3b1612" />
-              <path d="M87 129.5h26c-1 3-4 4-13 4s-12-1-13-4z" fill="#fbf7f2" />
-            </g>
-            <g className={`${styles.mouth} ${styles.mExcited}`}>
-              <ellipse cx="100" cy="133" rx="9" ry="8" fill="#3b1612" />
-              <path d="M93 136c4-3 10-3 14 0-2 3-12 3-14 0z" fill="#c45a4f" />
-            </g>
-            <path className={`${styles.mouth} ${styles.mThinking}`} d="M92 133c5-2 12-3 18 1" fill="none" stroke="#c98a7a" strokeWidth="3" strokeLinecap="round" />
-            <path className={`${styles.mouth} ${styles.mCurious}`} d="M90 131c6 3 14 3 21-1" fill="none" stroke="#c98a7a" strokeWidth="3" strokeLinecap="round" />
-
-            {/* curly hair: a cloud of curls over the crown */}
-            <g fill="url(#av-hair)">
-              <path d="M44 88c-6-30 16-58 56-60 40 2 62 30 56 60-6-12-14-20-24-24-10 6-22 8-32 6-10 2-22 0-32-6-10 4-18 12-24 24z" />
-              <circle cx="58" cy="54" r="15" /><circle cx="76" cy="40" r="16" /><circle cx="98" cy="34" r="17" />
-              <circle cx="121" cy="38" r="16" /><circle cx="140" cy="52" r="15" /><circle cx="150" cy="70" r="12" />
-              <circle cx="50" cy="72" r="12" /><circle cx="66" cy="30" r="10" /><circle cx="88" cy="22" r="11" />
-              <circle cx="112" cy="22" r="11" /><circle cx="133" cy="30" r="10" /><circle cx="84" cy="58" r="10" />
-              <circle cx="104" cy="54" r="11" /><circle cx="122" cy="58" r="10" />
-            </g>
-            <g fill="none" stroke="#4a372d" strokeWidth="2" strokeLinecap="round" opacity=".55">
-              <path d="M70 34c4-4 9-4 12 0" /><path d="M93 26c4-4 9-4 12 0" /><path d="M116 30c4-4 9-4 12 0" />
-              <path d="M54 50c3-4 8-5 11-2" /><path d="M136 46c3-3 8-2 10 2" /><path d="M98 48c4-3 8-3 11 1" />
+            {/* curly hair, soft and rounded */}
+            <g className={styles.hair}>
+              <path d="M33 92c-4-40 26-66 67-66s71 26 67 66c-6-14-16-24-30-30-12 8-26 10-37 8-11 2-25 0-37-8-14 6-24 16-30 30z" fill="url(#mj-hair)" />
+              <g fill="url(#mj-curl)">
+                <circle cx="44" cy="62" r="17" /><circle cx="64" cy="40" r="19" /><circle cx="90" cy="28" r="20" />
+                <circle cx="116" cy="29" r="20" /><circle cx="140" cy="40" r="19" /><circle cx="158" cy="62" r="17" />
+                <circle cx="76" cy="58" r="13" /><circle cx="100" cy="52" r="14" /><circle cx="124" cy="58" r="13" />
+                <circle cx="38" cy="82" r="12" /><circle cx="163" cy="82" r="12" />
+              </g>
+              <g fill="#fff" opacity=".12">
+                <ellipse cx="60" cy="33" rx="7" ry="4" /><ellipse cx="86" cy="20" rx="7" ry="4" /><ellipse cx="112" cy="21" rx="7" ry="4" />
+                <ellipse cx="137" cy="33" rx="7" ry="4" /><ellipse cx="97" cy="46" rx="5" ry="3" />
+              </g>
             </g>
           </g>
 
           {/* waving hand */}
           <g className={styles.hand}>
-            <path d="M158 220c2-22 6-38 14-50" stroke="#1a1b20" strokeWidth="16" strokeLinecap="round" fill="none" />
+            <path d="M156 200c2-18 6-30 12-40" stroke="#2a2c33" strokeWidth="15" strokeLinecap="round" fill="none" />
             <g className={styles.palm}>
-              <ellipse cx="174" cy="160" rx="13" ry="15" fill="#97654a" />
-              <path d="M164 150c-1-10 2-16 5-16s4 5 4 14M171 147c0-11 2-17 5-17s4 6 3 16M178 149c1-10 4-15 7-14s3 6 1 15M184 154c3-7 6-9 8-8s2 5-1 11" stroke="#97654a" strokeWidth="6.5" strokeLinecap="round" fill="none" />
+              <circle cx="170" cy="150" r="13" fill="#c48a68" />
+              <path d="M161 141c-1-9 2-14 5-14s4 5 3 12M168 138c0-10 2-15 5-15s4 5 3 14M175 140c1-9 4-13 7-12s3 5 0 13M181 145c3-6 6-8 8-7s2 5-2 10" stroke="#c48a68" strokeWidth="6.5" strokeLinecap="round" fill="none" />
             </g>
+          </g>
+
+          {/* sleepy z */}
+          <g className={styles.zzz} fill="#9aa4b8" fontFamily="system-ui, sans-serif" fontWeight="700">
+            <text x="150" y="40" fontSize="14">z</text>
+            <text x="160" y="28" fontSize="11">z</text>
           </g>
         </g>
       </svg>

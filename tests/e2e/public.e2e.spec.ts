@@ -60,7 +60,7 @@ test.describe('Public site', () => {
 
   test('blog listing, search and draft privacy', async ({ page }) => {
     await page.goto(`${base}/blog`)
-    await expect(page.locator('h1')).toContainText('Notes')
+    await expect(page.locator('h1')).toContainText('Writing')
     await page.fill('input[name="q"]', 'zzz-no-such-note')
     await page.click('.search-form button')
     await expect(page.locator('.empty')).toContainText('Nothing matched')

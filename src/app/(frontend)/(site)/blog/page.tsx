@@ -5,7 +5,7 @@ import { formatDate, getCategories, getPosts } from '@/data/content'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = { title: 'Notes', description: 'Technical notes on backend systems, AI agents, developer tools and databases.', alternates: { canonical: '/blog' } }
+export const metadata: Metadata = { title: 'Writing', description: 'Technical writing on backend systems, AI agents, developer tools and databases.', alternates: { canonical: '/blog' } }
 
 type Props = { searchParams: Promise<{ q?: string; category?: string }> }
 
@@ -18,15 +18,15 @@ export default async function BlogPage({ searchParams }: Props) {
     <PageFrame>
     <div className="page">
       <header className="page-head">
-        <h1 className="h1-accent">Notes and questions</h1>
+        <h1 className="h1-accent">Writing</h1>
         <p>Technical writing on backend systems, AI agents, developer tools and the decisions that make them reliable.</p>
       </header>
 
       <form action="/blog" className="search-form" method="get" role="search">
         <label className="sr-only" htmlFor="q">
-          Search notes
+          Search writing
         </label>
-        <input defaultValue={query ?? ''} id="q" name="q" placeholder="Search notes" type="search" />
+        <input defaultValue={query ?? ''} id="q" name="q" placeholder="Search posts" type="search" />
         {category && <input name="category" type="hidden" value={category} />}
         <button className="btn ghost" type="submit">
           Search
@@ -47,7 +47,7 @@ export default async function BlogPage({ searchParams }: Props) {
       )}
 
       {posts.length === 0 ? (
-        <div className="empty">{query ? `Nothing matched "${query}".` : 'The first note is still being written. Drafts stay private until they are published.'}</div>
+        <div className="empty">{query ? `Nothing matched "${query}".` : 'The first post is still being written. Drafts stay private until they are published.'}</div>
       ) : (
         <div className="post-list">
           {posts.map((post) => (
