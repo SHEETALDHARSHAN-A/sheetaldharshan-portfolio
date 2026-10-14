@@ -471,7 +471,9 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
   .case-info .case-back { order: -1; width: auto; align-self: flex-start; margin: 0 0 22px; padding: 0; border-top: 0; }
   .topbar .menu { right: 0; top: calc(100% + 8px); min-width: 230px; }
   .about { grid-template-columns: minmax(0, 1fr); }
-  .about-photo { position: relative; order: -1; max-width: 360px; margin-bottom: 8px; }
+  .about-photo { position: relative; top: auto; order: -1; width: min(100%, 340px); aspect-ratio: 1 / 1; margin: 0 auto 20px; }
+  .about { gap: 0; }
+  .page-head { margin-bottom: 18px; }
   .post-item, .entry, .timeline li, .feature-list li, .tech-groups .g { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .case-meta dd { overflow-wrap: anywhere; }
   .case-info h1 { overflow-wrap: anywhere; }
