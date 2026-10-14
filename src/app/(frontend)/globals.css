@@ -481,6 +481,11 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 ::view-transition-old(.card-out) { animation: 520ms cubic-bezier(0.6, 0, 0.2, 1) both vt-card-out; }
 ::view-transition-old(card-1) { animation-delay: 60ms; } ::view-transition-old(card-2) { animation-delay: 120ms; } ::view-transition-old(card-3) { animation-delay: 180ms; } ::view-transition-old(card-4) { animation-delay: 240ms; } ::view-transition-old(card-5) { animation-delay: 300ms; } ::view-transition-old(card-6) { animation-delay: 360ms; } ::view-transition-old(card-7) { animation-delay: 420ms; } ::view-transition-old(card-8) { animation-delay: 480ms; } ::view-transition-old(card-9) { animation-delay: 540ms; } ::view-transition-old(card-10) { animation-delay: 600ms; } ::view-transition-old(card-11) { animation-delay: 660ms; }
 ::view-transition-group(stage), ::view-transition-group(*.card-out) { z-index: 50; }
+/* back from a project: the text column pulls out to the right first, the hero follows */
+::view-transition-old(.info-out) { animation: 480ms cubic-bezier(0.6, 0, 0.2, 1) both vt-out-right; }
+::view-transition-old(.body-out) { animation: 640ms cubic-bezier(0.6, 0, 0.2, 1) 220ms both vt-out-right; }
+::view-transition-group(case-info), ::view-transition-group(case-body) { z-index: 50; }
+::view-transition-new(.nav-back) { animation-delay: 120ms; }
 @keyframes vt-out-left { to { transform: translateX(-100%); opacity: 0.7; } }
 @keyframes vt-in-right { from { transform: translateX(12%); opacity: 0.85; } to { transform: none; opacity: 1; } }
 @keyframes vt-out-right { to { transform: translateX(100%); opacity: 0.7; } }
