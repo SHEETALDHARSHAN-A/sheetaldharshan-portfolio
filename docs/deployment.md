@@ -16,6 +16,11 @@ Live project: **Portfolio** (`itfzpetffxsglwfmnghl`, ap-south-1, org "my"). Migr
 
 Supabase's free tier pauses projects after a week without traffic; the first request afterwards is slow while it resumes. Upgrade or keep a ping if that matters.
 
+## Performance setup
+- Functions run in Mumbai (`vercel.json` regions `bom1`), next to the Supabase database; cross-region calls were the main source of slow pages.
+- Public pages are prerendered and cached (`revalidate = 300`); publishing in the admin revalidates the affected paths immediately.
+- Media is served directly from Supabase's public CDN (`S3_PUBLIC_URL`) and resized to AVIF/WebP by Next's image optimizer; the first visible image loads with high fetch priority.
+
 ## Production architecture
 - **App**: Next.js 16 + Payload on Vercel (Node 20+). One deployment serves the site, `/admin` and `/api`.
 - **Database**: Supabase Postgres (session pooler). Any managed Postgres works the same way.

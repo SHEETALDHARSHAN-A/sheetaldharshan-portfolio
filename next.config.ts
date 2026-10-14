@@ -23,7 +23,9 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/file/**',
       },
     ],
-    qualities: [100],
+    formats: ['image/avif', 'image/webp'],
+    qualities: [75, 85],
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       { protocol: 'https', hostname: '*.supabase.co' },
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {

@@ -26,7 +26,7 @@ export function Picture({
   const src = chosen?.url ?? media.url
   const width = chosen?.width ?? media.width ?? 1600
   const height = chosen?.height ?? media.height ?? 1000
-  return <Image alt={media.alt} className={className} height={height} priority={priority} quality={100} sizes={sizes} src={src} unoptimized={unoptimized || size === 'original'} width={width} />
+  return <Image alt={media.alt} className={className} height={height} priority={priority} quality={85} sizes={sizes} src={src} unoptimized={unoptimized} width={width} fetchPriority={priority ? 'high' : undefined} />
 }
 
 export function MediaAny({ media, className, sizes }: { media: MediaRef; className?: string; sizes?: string }) {

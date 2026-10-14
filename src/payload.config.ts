@@ -86,7 +86,15 @@ export default buildConfig({
     // Supabase Storage through its S3-compatible endpoint. Enabled when S3_BUCKET is set.
     s3Storage({
       enabled: !!process.env.S3_BUCKET,
-      collections: { media: { prefix: 'media' } },
+      collections: {
+        media: {
+          prefix: 'media',
+          // Serve files straight from Supabase's public CDN instead of proxying them through the app.
+          disablePayloadAccessControl: true,
+          generateFileURL: ({ filename, prefix }) =>
+            `${process.env.S3_PUBLIC_URL || ''}/${[prefix, filename].filter(Boolean).join('/')}`,
+        },
+      },
       bucket: process.env.S3_BUCKET || '',
       config: {
         endpoint: process.env.S3_ENDPOINT,

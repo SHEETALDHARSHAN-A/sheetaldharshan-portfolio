@@ -152,7 +152,7 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
               {/* Row layer: number, thumbnail, tab. The thumbnail squeezes into the sliver on the card. */}
               <span className="n">{number}</span>
               <span className="thumb">
-                {item.thumbnail ? <Picture media={item.thumbnail} size="small" sizes="148px" /> : item.heroImage ? <Picture media={item.heroImage} size="small" sizes="148px" /> : <span className="thumb-blank" data-accent={item.accent} />}
+                {item.thumbnail ? <Picture media={item.thumbnail} size="small" sizes="(max-width: 960px) 100vw, 120px" priority /> : item.heroImage ? <Picture media={item.heroImage} size="small" sizes="(max-width: 960px) 100vw, 120px" priority /> : <span className="thumb-blank" data-accent={item.accent} />}
               </span>
               <span className="tab">
                 <span className="tab-text">

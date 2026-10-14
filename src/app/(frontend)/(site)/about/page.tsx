@@ -8,7 +8,7 @@ import { Picture } from '@/components/Media/Picture'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { formatMonth, getAbout, getCertifications, getEducation, getExperience, getProjects, getPublications, getSite } from '@/data/content'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export async function generateMetadata(): Promise<Metadata> {
   const about = await getAbout()

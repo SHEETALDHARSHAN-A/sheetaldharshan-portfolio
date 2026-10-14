@@ -18,4 +18,5 @@ Fallbacks: `prefers-reduced-motion`, the Appearance "reduced" intensity, or the 
 - The play overlay button scales 8 % on hover; the video host is loaded only on click.
 - Hover states use 200 ms colour and transform transitions. Durations scale with the Appearance speed preset (`--speed`).
 - All inner-page motion is decorative and disabled under `prefers-reduced-motion`.
+- Navigation never waits on a blank screen: `loading.tsx` shows a shimmering placeholder of the explorer (and of a generic page) the instant a link is clicked.
 - No scroll-driven animation and no Three.js: nothing in the brief justified the cost.

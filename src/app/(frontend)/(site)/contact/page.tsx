@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { getSite } from '@/data/content'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = { title: 'Contact', description: 'How to reach Sheetaldharshan.', alternates: { canonical: '/contact' } }
 

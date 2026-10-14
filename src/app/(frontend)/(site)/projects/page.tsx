@@ -4,7 +4,7 @@ import { ProjectGrid } from '@/components/projects/ProjectGrid'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { getAppearance, getProjects } from '@/data/content'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Projects',

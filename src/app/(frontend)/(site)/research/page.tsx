@@ -3,7 +3,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { getPublications, getSite } from '@/data/content'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = { title: 'Research', description: 'Publications and research by Sheetaldharshan A.', alternates: { canonical: '/research' } }
 

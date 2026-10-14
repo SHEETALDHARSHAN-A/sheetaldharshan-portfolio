@@ -12,7 +12,13 @@ import { draftMode } from 'next/headers'
 
 type Props = { params: Promise<{ slug: string }> }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const projects = await getProjects()
+  return projects.map((project) => ({ slug: project.slug }))
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params

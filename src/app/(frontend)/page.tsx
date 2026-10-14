@@ -6,7 +6,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { getHomepage, getSite } from '@/data/content'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export default async function HomePage() {
   const [conversation, site, { isEnabled: draft }] = await Promise.all([getHomepage(), getSite(), draftMode()])

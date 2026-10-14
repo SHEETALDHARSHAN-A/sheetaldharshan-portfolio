@@ -289,6 +289,16 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .project-card h2 { font-family: var(--font-condensed); font-size: 20px; text-transform: uppercase; letter-spacing: 0.05em; margin: 6px 0 6px; font-weight: 500; }
 .project-card p { color: var(--muted); font-size: 14px; margin: 0; }
 
+/* loading placeholders */
+@keyframes sk-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+.sk-block, .sk-line, .stage-skeleton, .skeleton-row .thumb { background: linear-gradient(90deg, #111 0%, #1c1c1e 50%, #111 100%); background-size: 800px 100%; animation: sk-shimmer 1.2s linear infinite; border-radius: 4px; }
+.stage-skeleton { position: absolute; inset: 0; border-radius: 0; }
+.skeleton-row .tab { min-width: 220px; }
+.skeleton-row .sk-line { display: block; width: 140px; height: 12px; }
+.skeleton-row .n { color: transparent; }
+.yk-loading .project-row { animation: none; }
+.stage-media img { background: #0b0f14; }
+
 /* ------------------------------------------------------------------ project detail (case study) */
 .case { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100dvh; min-width: 0; background: var(--bg); }
 .case-body > .case-hero, .case-body > .media-figure:first-child { animation: visual-in 720ms var(--ease-out) both; }
