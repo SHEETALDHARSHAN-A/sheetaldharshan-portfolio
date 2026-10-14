@@ -21,7 +21,7 @@ export function NavLinks({ items }: { items: NavItem[] }) {
           )
         }
         return (
-          <Link key={item.href} href={item.href} aria-current={current ? 'page' : undefined}>
+          <Link key={item.href} href={item.href} aria-current={current ? 'page' : undefined} transitionTypes={['nav-back']}>
             <span className="n">{number}</span>
             <span>{item.label}</span>
           </Link>

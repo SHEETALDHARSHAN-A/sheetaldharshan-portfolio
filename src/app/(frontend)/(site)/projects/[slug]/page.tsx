@@ -6,6 +6,7 @@ import { PlayOverlay } from '@/components/projects/PlayOverlay'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { MediaAny, Picture } from '@/components/Media/Picture'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { getProject, getProjects, getSite } from '@/data/content'
 import { draftMode } from 'next/headers'
 
@@ -41,6 +42,7 @@ export default async function ProjectPage({ params }: Props) {
   ].filter((link): link is { label: string; href: string } => !!link)
 
   return (
+    <PageFrame>
     <article className={`case ${project.layoutPreset === 'article' ? 'article' : ''}`}>
       {draft && <LivePreviewListener />}
       <JsonLd
@@ -102,7 +104,7 @@ export default async function ProjectPage({ params }: Props) {
             </div>
           )}
         </dl>
-        <Link className="case-back" href="/projects">
+        <Link className="case-back" href="/projects" transitionTypes={['nav-back']}>
           ← Back to projects
         </Link>
       </aside>
@@ -141,7 +143,7 @@ export default async function ProjectPage({ params }: Props) {
         )}
 
         {next && next.slug !== project.slug && (
-          <Link className="case-next" href={`/projects/${next.slug}`}>
+          <Link className="case-next" href={`/projects/${next.slug}`} transitionTypes={['nav-forward']}>
             <span className="thumb">{next.thumbnail ? <Picture media={next.thumbnail} size="small" sizes="110px" /> : next.heroImage ? <Picture media={next.heroImage} size="small" sizes="110px" /> : <span className="thumb-blank" data-accent={next.accent} />}</span>
             <span>
               <span className="eyebrow muted">Next project</span>
@@ -151,5 +153,6 @@ export default async function ProjectPage({ params }: Props) {
         )}
       </div>
     </article>
+    </PageFrame>
   )
 }

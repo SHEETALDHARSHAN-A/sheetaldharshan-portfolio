@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { getSite } from '@/data/content'
 
 export const dynamic = 'force-dynamic'
@@ -8,6 +9,7 @@ export const metadata: Metadata = { title: 'Contact', description: 'How to reach
 export default async function ContactPage() {
   const site = await getSite()
   return (
+    <PageFrame>
     <div className="page">
       <header className="page-head">
         <span className="eyebrow">Contact</span>
@@ -42,5 +44,6 @@ export default async function ContactPage() {
         </section>
       </div>
     </div>
+    </PageFrame>
   )
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { getPublications, getSite } from '@/data/content'
 
 export const dynamic = 'force-dynamic'
@@ -9,6 +10,7 @@ export const metadata: Metadata = { title: 'Research', description: 'Publication
 export default async function ResearchPage() {
   const [publications, site] = await Promise.all([getPublications(), getSite()])
   return (
+    <PageFrame>
     <div className="page">
       <header className="page-head">
         <span className="eyebrow">Research</span>
@@ -61,5 +63,6 @@ export default async function ResearchPage() {
       )}
       <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 30 }}>{site.fullName}</p>
     </div>
+    </PageFrame>
   )
 }

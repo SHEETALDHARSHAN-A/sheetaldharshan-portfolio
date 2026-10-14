@@ -6,6 +6,7 @@ import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderProjectBlocks } from '@/components/blocks/RenderProjectBlocks'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { getPage } from '@/data/content'
 import { isReservedSlug } from '@/utilities/reservedSlugs'
 
@@ -32,6 +33,7 @@ export default async function CmsPage({ params }: Props) {
   const templateBlocks = (page.layout ?? []).filter((block) => !['prose', 'mediaBlock', 'gallery', 'code', 'features', 'links', 'timeline', 'embed'].includes(block.blockType))
 
   return (
+    <PageFrame>
     <div className="page page-narrow">
       {draft && <LivePreviewListener />}
       <header className="page-head">
@@ -43,5 +45,6 @@ export default async function CmsPage({ params }: Props) {
         {templateBlocks.length > 0 && <RenderBlocks blocks={templateBlocks as never} />}
       </div>
     </div>
+    </PageFrame>
   )
 }

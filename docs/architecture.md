@@ -16,7 +16,7 @@ src/
   components/home            Conversation (server) + ConversationPlayer (client, anime.js)
   components/projects        ProjectExplorer (client), ProjectGrid
   components/blocks          RenderProjectBlocks (whitelisted block renderer)
-  components/shell           Sidebar, Topbar, NavLinks, PageTransition (exit-then-navigate on internal links)
+  components/shell           Sidebar, Topbar, NavLinks, PageFrame (React ViewTransition wrapper), NavFlag
   data/                      content.ts (loaders → view models), types.ts, media.ts
   styles/theme.ts            Appearance whitelist → data attributes
   hooks/revalidate.ts        afterChange hooks → revalidatePath

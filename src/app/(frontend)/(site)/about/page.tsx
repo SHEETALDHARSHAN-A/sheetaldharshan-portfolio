@@ -5,6 +5,7 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Picture } from '@/components/Media/Picture'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { formatMonth, getAbout, getCertifications, getEducation, getExperience, getProjects, getPublications, getSite } from '@/data/content'
 
 export const dynamic = 'force-dynamic'
@@ -26,6 +27,7 @@ export default async function AboutPage() {
   ])
 
   return (
+    <PageFrame>
     <div className="page">
       {draft && <LivePreviewListener />}
       <header className="page-head">
@@ -151,5 +153,6 @@ export default async function AboutPage() {
         </div>
       </div>
     </div>
+    </PageFrame>
   )
 }

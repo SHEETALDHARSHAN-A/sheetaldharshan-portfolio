@@ -25,7 +25,7 @@ export function InlineText({ text }: { text: string }) {
     if (isSafeHref(href)) {
       parts.push(
         href.startsWith('/') ? (
-          <Link className="inline-link" href={href} key={`l${i++}`}>
+          <Link className="inline-link" href={href} key={`l${i++}`} transitionTypes={['nav-forward']}>
             {label}
           </Link>
         ) : (

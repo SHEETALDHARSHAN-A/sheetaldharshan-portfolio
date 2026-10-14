@@ -7,6 +7,7 @@ import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Picture } from '@/components/Media/Picture'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { formatDate, getPost, getSite } from '@/data/content'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -32,6 +33,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound()
 
   return (
+    <PageFrame>
     <div className="page">
       {draft && <LivePreviewListener />}
       <JsonLd
@@ -81,5 +83,6 @@ export default async function BlogPostPage({ params }: Props) {
         )}
       </article>
     </div>
+    </PageFrame>
   )
 }

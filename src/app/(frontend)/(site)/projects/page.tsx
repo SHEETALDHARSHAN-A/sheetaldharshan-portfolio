@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ProjectExplorer } from '@/components/projects/ProjectExplorer'
 import { ProjectGrid } from '@/components/projects/ProjectGrid'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { getAppearance, getProjects } from '@/data/content'
 
 export const dynamic = 'force-dynamic'
@@ -28,15 +29,21 @@ export default async function ProjectsPage() {
 
   if (theme.projectDisplayStyle === 'grid') {
     return (
-      <div className="page">
-        <header className="page-head">
-          <span className="eyebrow">Projects</span>
-          <h1>Things I have built</h1>
-        </header>
-        <ProjectGrid projects={projects} />
-      </div>
+      <PageFrame>
+        <div className="page">
+          <header className="page-head">
+            <span className="eyebrow">Projects</span>
+            <h1>Things I have built</h1>
+          </header>
+          <ProjectGrid projects={projects} />
+        </div>
+      </PageFrame>
     )
   }
 
-  return <ProjectExplorer projects={projects} />
+  return (
+    <PageFrame>
+      <ProjectExplorer projects={projects} />
+    </PageFrame>
+  )
 }

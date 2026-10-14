@@ -3,6 +3,7 @@ import { draftMode } from 'next/headers'
 import { Conversation } from '@/components/home/Conversation'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { getHomepage, getSite } from '@/data/content'
 
 export const dynamic = 'force-dynamic'
@@ -10,6 +11,7 @@ export const dynamic = 'force-dynamic'
 export default async function HomePage() {
   const [conversation, site, { isEnabled: draft }] = await Promise.all([getHomepage(), getSite(), draftMode()])
   return (
+    <PageFrame>
     <main className="jg" id="main">
       {draft && <LivePreviewListener />}
       <JsonLd
@@ -27,6 +29,7 @@ export default async function HomePage() {
       <h1 className="sr-only">{site.fullName}</h1>
       <Conversation data={conversation} />
     </main>
+    </PageFrame>
   )
 }
 

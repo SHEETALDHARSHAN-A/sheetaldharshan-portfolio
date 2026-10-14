@@ -3,7 +3,12 @@ import { Fragment } from 'react'
 import type { Choice } from '@/data/types'
 
 function ChoiceAnchor({ choice }: { choice: Choice }) {
-  if (choice.href.startsWith('/')) return <Link href={choice.href}>{choice.label}</Link>
+  if (choice.href.startsWith('/'))
+    return (
+      <Link href={choice.href} transitionTypes={['nav-forward']}>
+        {choice.label}
+      </Link>
+    )
   return (
     <a href={choice.href} rel="noreferrer" target={choice.newTab ? '_blank' : undefined}>
       {choice.label}

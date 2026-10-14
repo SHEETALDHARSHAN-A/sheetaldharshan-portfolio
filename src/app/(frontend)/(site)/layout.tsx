@@ -1,5 +1,5 @@
 import React from 'react'
-import { PageTransition } from '@/components/shell/PageTransition'
+import { NavFlag } from '@/components/shell/NavFlag'
 import { Sidebar, Topbar } from '@/components/shell/Sidebar'
 import { getSite } from '@/data/content'
 
@@ -11,7 +11,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <div className="main">
         <Topbar site={site} />
         <main id="main">
-          <PageTransition>{children}</PageTransition>
+          <NavFlag />
+          {children}
         </main>
       </div>
     </div>

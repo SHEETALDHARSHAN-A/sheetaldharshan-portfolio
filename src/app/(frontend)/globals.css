@@ -73,7 +73,7 @@
 
 /* ------------------------------------------------------------------ base */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--bg); }
 body {
   margin: 0;
   background: var(--bg);
@@ -236,6 +236,11 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 /* load order: left panel → visual → cards top to bottom */
 .yk-intro .project-row { animation: row-in 560ms var(--ease-out) both; animation-delay: calc(1500ms + var(--i, 0) * 140ms); }
 .yk-intro .stage-media.active { animation-delay: 560ms; }
+html[data-navigated] .yk-intro .project-row { animation-delay: calc(420ms + var(--i, 0) * 110ms); }
+html[data-navigated] .yk-intro .stage-media.active { animation-delay: 0ms; }
+html[data-navigated] .yk-intro .stage-media.active img, html[data-navigated] .yk-intro .stage-media.active video, html[data-navigated] .yk-intro .stage-media.active .stage-placeholder { animation-delay: 0ms, 820ms; }
+html[data-navigated] .yk-intro .yk-open { animation-delay: 700ms; }
+html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, html[data-navigated] .sidebar-foot, html[data-navigated] .topbar { animation: none; }
 .yk-intro .stage-media.active img, .yk-intro .stage-media.active video, .yk-intro .stage-media.active .stage-placeholder, .yk-intro .stage-media.leaving img, .yk-intro .stage-media.leaving video, .yk-intro .stage-media.leaving .stage-placeholder { animation-delay: 560ms, 1380ms; }
 .yk-intro .yk-open { animation: el-in 500ms var(--ease-out) both; animation-delay: 1500ms; }
 .sidebar .wordmark { animation: el-in 560ms var(--ease-out) both; }
@@ -246,17 +251,6 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 @keyframes row-out { to { opacity: 0; transform: translateX(110%); } }
 @keyframes stage-out { to { transform: translateX(100%); opacity: 0.6; } }
 @keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.08); } }
-/* exits: cards and text first, the visual follows */
-html[data-leaving] .project-row { animation: row-out 480ms cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 50ms); pointer-events: none; }
-html[data-leaving] .yk-stage { animation: stage-out 560ms cubic-bezier(0.6, 0, 0.2, 1) 320ms both; }
-html[data-leaving] .yk-open { opacity: 0; transition: opacity 200ms ease; }
-html[data-leaving] .case-info > * { animation: el-out 420ms cubic-bezier(0.6, 0, 0.2, 1) both; }
-html[data-leaving] .case-info > *:nth-child(2) { animation-delay: 40ms; } html[data-leaving] .case-info > *:nth-child(3) { animation-delay: 80ms; } html[data-leaving] .case-info > *:nth-child(4) { animation-delay: 120ms; } html[data-leaving] .case-info > *:nth-child(n + 5) { animation-delay: 160ms; }
-html[data-leaving] .case-body > *:not(.case-hero) { animation: el-out 420ms cubic-bezier(0.6, 0, 0.2, 1) 60ms both; }
-html[data-leaving] .case-body > .case-hero, html[data-leaving] .case-body > .media-figure:first-child { animation: stage-out 520ms cubic-bezier(0.6, 0, 0.2, 1) 260ms both; }
-html[data-leaving] .page > * { animation: el-out 420ms cubic-bezier(0.6, 0, 0.2, 1) both; }
-html[data-leaving] .page > *:nth-child(2) { animation-delay: 50ms; } html[data-leaving] .page > *:nth-child(3) { animation-delay: 100ms; } html[data-leaving] .page > *:nth-child(n + 4) { animation-delay: 150ms; }
-html[data-leaving] .about-photo, html[data-leaving] .article-cover { animation: stage-out 520ms cubic-bezier(0.6, 0, 0.2, 1) 260ms both; }
 @keyframes el-out { to { opacity: 0; transform: translateX(60px); } }
 @keyframes el-in { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
 @keyframes visual-in { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
@@ -292,12 +286,12 @@ html[data-leaving] .about-photo, html[data-leaving] .article-cover { animation: 
 /* ------------------------------------------------------------------ project detail (case study) */
 .case { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100dvh; min-width: 0; }
 .case-body > .case-hero, .case-body > .media-figure:first-child { animation: visual-in 720ms var(--ease-out) both; }
-.case-body > *:not(.case-hero):not(.media-figure:first-child) { animation: el-in 560ms var(--ease-out) both; animation-delay: 640ms; }
-.case-body > *:nth-child(3) { animation-delay: 720ms; } .case-body > *:nth-child(4) { animation-delay: 800ms; } .case-body > *:nth-child(n + 5) { animation-delay: 880ms; }
-.case-info > * { animation: el-in 520ms var(--ease-out) both; animation-delay: 560ms; }
-.case-info > *:nth-child(2) { animation-delay: 620ms; } .case-info > *:nth-child(3) { animation-delay: 680ms; } .case-info > *:nth-child(4) { animation-delay: 740ms; } .case-info > *:nth-child(n + 5) { animation-delay: 800ms; }
-.page > * { animation: el-in 560ms var(--ease-out) both; animation-delay: 520ms; }
-.page > *:nth-child(2) { animation-delay: 600ms; } .page > *:nth-child(3) { animation-delay: 680ms; } .page > *:nth-child(n + 4) { animation-delay: 760ms; }
+.case-body > *:not(.case-hero):not(.media-figure:first-child) { animation: el-in 560ms var(--ease-out) both; animation-delay: 380ms; }
+.case-body > *:nth-child(3) { animation-delay: 460ms; } .case-body > *:nth-child(4) { animation-delay: 540ms; } .case-body > *:nth-child(n + 5) { animation-delay: 620ms; }
+.case-info > * { animation: el-in 520ms var(--ease-out) both; animation-delay: 300ms; }
+.case-info > *:nth-child(2) { animation-delay: 360ms; } .case-info > *:nth-child(3) { animation-delay: 420ms; } .case-info > *:nth-child(4) { animation-delay: 480ms; } .case-info > *:nth-child(n + 5) { animation-delay: 540ms; }
+.page > * { animation: el-in 560ms var(--ease-out) both; animation-delay: 260ms; }
+.page > *:nth-child(2) { animation-delay: 340ms; } .page > *:nth-child(3) { animation-delay: 420ms; } .page > *:nth-child(n + 4) { animation-delay: 500ms; }
 .about-photo, .article-cover { animation: visual-in 720ms var(--ease-out) both !important; animation-delay: 0ms !important; }
 .case-info, .case-body { min-width: 0; }
 .case-info { position: sticky; top: 0; align-self: start; max-height: 100dvh; overflow-y: auto; padding: 30px 26px 30px 24px; border-right: 1px solid var(--line); scrollbar-width: thin; }
@@ -466,9 +460,33 @@ html[data-leaving] .about-photo, html[data-leaving] .article-cover { animation: 
 @media (max-width: 560px) {
 }
 
+/* ------------------------------------------------------------------ page turns (View Transitions)
+   Old and new pages animate at the same time: nothing is ever shown empty. nav-forward is a page
+   turn to the left (cards pull back one by one, the visual follows, the next page comes from the
+   right); nav-back is the opposite. The sidebar is anchored. */
+::view-transition { pointer-events: none; }
+::view-transition-group(site-sidebar), ::view-transition-group(site-topbar) { animation: none; z-index: 100; }
+::view-transition-old(site-sidebar), ::view-transition-old(site-topbar) { display: none; }
+::view-transition-new(site-sidebar), ::view-transition-new(site-topbar) { animation: none; }
+::view-transition-old(.nav-forward) { animation: 620ms cubic-bezier(0.6, 0, 0.2, 1) both vt-out-left; }
+::view-transition-new(.nav-forward) { animation: 620ms cubic-bezier(0.2, 0.6, 0.2, 1) both vt-in-right; }
+::view-transition-old(.nav-back) { animation: 620ms cubic-bezier(0.6, 0, 0.2, 1) both vt-out-right; }
+::view-transition-new(.nav-back) { animation: 620ms cubic-bezier(0.2, 0.6, 0.2, 1) both vt-in-left; }
+::view-transition-old(.stage-out) { animation: 680ms cubic-bezier(0.6, 0, 0.2, 1) 280ms both vt-out-left; }
+::view-transition-new(.nav-forward) { animation-delay: 160ms; }
+::view-transition-old(.card-out) { animation: 520ms cubic-bezier(0.6, 0, 0.2, 1) both vt-card-out; }
+::view-transition-old(card-1) { animation-delay: 60ms; } ::view-transition-old(card-2) { animation-delay: 120ms; } ::view-transition-old(card-3) { animation-delay: 180ms; } ::view-transition-old(card-4) { animation-delay: 240ms; } ::view-transition-old(card-5) { animation-delay: 300ms; } ::view-transition-old(card-6) { animation-delay: 360ms; } ::view-transition-old(card-7) { animation-delay: 420ms; } ::view-transition-old(card-8) { animation-delay: 480ms; } ::view-transition-old(card-9) { animation-delay: 540ms; } ::view-transition-old(card-10) { animation-delay: 600ms; } ::view-transition-old(card-11) { animation-delay: 660ms; }
+::view-transition-group(stage), ::view-transition-group(*.card-out) { z-index: 50; }
+@keyframes vt-out-left { to { transform: translateX(-100%); opacity: 0.7; } }
+@keyframes vt-in-right { from { transform: translateX(12%); opacity: 0.85; } to { transform: none; opacity: 1; } }
+@keyframes vt-out-right { to { transform: translateX(100%); opacity: 0.7; } }
+@keyframes vt-in-left { from { transform: translateX(-12%); opacity: 0.85; } to { transform: none; opacity: 1; } }
+@keyframes vt-card-out { to { transform: translateX(-110%); opacity: 0; } }
+
 /* ------------------------------------------------------------------ reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .stage-media.active, .stage-media.active img, .stage-media.active video, .stage-media.active .stage-placeholder, .project-row, .yk-open, .sidebar .wordmark, .sidebar-nav a, .sidebar-foot, .topbar, .case-info > *, .case-body > *, .page > *, .about-photo, .article-cover, html[data-leaving] * { animation-duration: 1ms !important; animation-delay: 0ms !important; }
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) { animation-duration: 0s !important; animation-delay: 0s !important; }
+  .stage-media.active, .stage-media.active img, .stage-media.active video, .stage-media.active .stage-placeholder, .project-row, .yk-open, .sidebar .wordmark, .sidebar-nav a, .sidebar-foot, .topbar, .case-info > *, .case-body > *, .page > *, .about-photo, .article-cover { animation-duration: 1ms !important; animation-delay: 0ms !important; }
   .project-row, .project-row .n, .project-row .thumb, .project-row .tab, .project-row .card, .project-row .card-text, .project-row .card-arrow { transition: none; }
   .project-row .roll-digit { animation-duration: 1ms; }
   html { scroll-behavior: auto; }

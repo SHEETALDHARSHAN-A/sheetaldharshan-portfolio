@@ -4,7 +4,7 @@ import type { Site } from '@/data/types'
 
 export function Sidebar({ site }: { site: Site }) {
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" style={{ viewTransitionName: 'site-sidebar' }}>
       <Link href="/" className="wordmark" aria-label={`${site.displayName}, home`}>
         {site.displayName}
         <span className="dot">.</span>
@@ -32,7 +32,7 @@ export function Sidebar({ site }: { site: Site }) {
 
 export function Topbar({ site }: { site: Site }) {
   return (
-    <div className="topbar">
+    <div className="topbar" style={{ viewTransitionName: 'site-topbar' }}>
       <Link href="/" className="wordmark" aria-label={`${site.displayName}, home`}>
         {site.displayName}
         <span className="dot">.</span>

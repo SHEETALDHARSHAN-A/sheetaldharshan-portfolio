@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { PageFrame } from '@/components/shell/PageFrame'
 import { formatDate, getCategories, getPosts } from '@/data/content'
 
 export const dynamic = 'force-dynamic'
@@ -14,6 +15,7 @@ export default async function BlogPage({ searchParams }: Props) {
   const [posts, categories] = await Promise.all([getPosts({ query, category }), getCategories()])
 
   return (
+    <PageFrame>
     <div className="page">
       <header className="page-head">
         <span className="eyebrow">Notes</span>
@@ -58,7 +60,7 @@ export default async function BlogPage({ searchParams }: Props) {
               </div>
               <div>
                 <h2>
-                  <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                  <Link href={`/blog/${post.slug}`} transitionTypes={['nav-forward']}>{post.title}</Link>
                 </h2>
                 {post.excerpt && <p>{post.excerpt}</p>}
               </div>
@@ -67,5 +69,6 @@ export default async function BlogPage({ searchParams }: Props) {
         </div>
       )}
     </div>
+    </PageFrame>
   )
 }
