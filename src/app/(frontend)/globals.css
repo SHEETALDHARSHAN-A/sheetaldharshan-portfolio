@@ -238,16 +238,15 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 @keyframes roll-up { from { transform: translateY(0); } to { transform: translateY(-1em); } }
 @keyframes row-in { from { opacity: 0; transform: translateX(-48px); } to { opacity: 1; transform: none; } }
 /* load order: left panel → visual → cards top to bottom */
-.yk-intro .project-row { animation: row-in 560ms var(--ease-out) both; animation-delay: calc(var(--cards-delay, 1250ms) + var(--i, 0) * 140ms); }
-.yk-intro .stage-media.active { animation-delay: var(--stage-delay, 560ms); }
+.yk-intro .project-row { animation: row-in 420ms var(--ease-out) both; animation-delay: calc(var(--cards-delay, 520ms) + var(--i, 0) * 80ms); }
+.yk-intro .stage-media.active { animation-delay: var(--stage-delay, 200ms); }
 /* arriving by navigation: the page itself slides in, so the visual is present from the first frame and the cards follow at once */
 /* Arriving by navigation: same image-then-cards sequence, started while the old page is still sliding away so no frame is empty. */
-html[data-navigated] .yk-intro { --stage-delay: 0ms; --cards-delay: 760ms; }
-html[data-navigated] .page > * { animation-delay: 60ms; }
-html[data-navigated] .page > *:nth-child(2) { animation-delay: 140ms; } html[data-navigated] .page > *:nth-child(3) { animation-delay: 220ms; } html[data-navigated] .page > *:nth-child(n + 4) { animation-delay: 300ms; }
+html[data-navigated] .yk-intro { --stage-delay: 0ms; --cards-delay: 360ms; }
+
 html[data-navigated] .about-photo, html[data-navigated] .article-cover { animation: none !important; }
 html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, html[data-navigated] .sidebar-foot, html[data-navigated] .topbar { animation: none; }
-.yk-intro .stage-media.active img, .yk-intro .stage-media.active video, .yk-intro .stage-media.active .stage-placeholder, .yk-intro .stage-media.leaving img, .yk-intro .stage-media.leaving video, .yk-intro .stage-media.leaving .stage-placeholder { animation-delay: var(--stage-delay, 560ms), calc(var(--stage-delay, 560ms) + 600ms); }
+.yk-intro .stage-media.active img, .yk-intro .stage-media.active video, .yk-intro .stage-media.active .stage-placeholder, .yk-intro .stage-media.leaving img, .yk-intro .stage-media.leaving video, .yk-intro .stage-media.leaving .stage-placeholder { animation-delay: var(--stage-delay, 200ms), calc(var(--stage-delay, 200ms) + 600ms); }
 .yk-intro .yk-open { animation: el-in 500ms var(--ease-out) both; animation-delay: 1250ms; }
 .sidebar .wordmark { animation: el-in 560ms var(--ease-out) both; }
 .sidebar-nav a { animation: el-in 480ms var(--ease-out) both; animation-delay: 160ms; }
@@ -256,6 +255,9 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .topbar { animation: el-in 480ms var(--ease-out) both; }
 @keyframes row-out { to { opacity: 0; transform: translateX(110%); } }
 @keyframes stage-out { to { transform: translateX(100%); opacity: 0.6; } }
+/* hold every stage animation until its picture has loaded */
+.stage-media.active:not([data-ready]), .stage-media.active:not([data-ready]) img { animation-play-state: paused !important; }
+.yk-intro:not(.yk-ready) .project-row { animation-play-state: paused; }
 @keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.08); } }
 @keyframes el-out { to { opacity: 0; transform: translateX(60px); } }
 @keyframes el-in { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
@@ -289,6 +291,12 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .project-card h2 { font-family: var(--font-condensed); font-size: 20px; text-transform: uppercase; letter-spacing: 0.05em; margin: 6px 0 6px; font-weight: 500; }
 .project-card p { color: var(--muted); font-size: 14px; margin: 0; }
 
+/* progressive project hero */
+.hero-progressive { position: relative; background-size: cover; background-position: center; aspect-ratio: 16 / 10; }
+.hero-progressive::before { content: ''; position: absolute; inset: 0; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.hero-progressive img { position: relative; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 420ms ease; }
+.hero-progressive img.is-ready { opacity: 1; }
+
 /* loading placeholders */
 @keyframes sk-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
 .sk-block, .sk-line, .stage-skeleton, .skeleton-row .thumb { background: linear-gradient(90deg, #111 0%, #1c1c1e 50%, #111 100%); background-size: 800px 100%; animation: sk-shimmer 1.2s linear infinite; border-radius: 4px; }
@@ -302,12 +310,12 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 /* ------------------------------------------------------------------ project detail (case study) */
 .case { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100dvh; min-width: 0; background: var(--bg); }
 .case-body > .case-hero, .case-body > .media-figure:first-child { animation: visual-in 720ms var(--ease-out) both; }
-.case-body > *:not(.case-hero):not(.media-figure:first-child) { animation: el-in 560ms var(--ease-out) both; animation-delay: 380ms; }
-.case-body > *:nth-child(3) { animation-delay: 460ms; } .case-body > *:nth-child(4) { animation-delay: 540ms; } .case-body > *:nth-child(n + 5) { animation-delay: 620ms; }
-.case-info > * { animation: el-in 520ms var(--ease-out) both; animation-delay: 300ms; }
-.case-info > *:nth-child(2) { animation-delay: 360ms; } .case-info > *:nth-child(3) { animation-delay: 420ms; } .case-info > *:nth-child(4) { animation-delay: 480ms; } .case-info > *:nth-child(n + 5) { animation-delay: 540ms; }
-.page > * { animation: el-in 560ms var(--ease-out) both; animation-delay: 260ms; }
-.page > *:nth-child(2) { animation-delay: 340ms; } .page > *:nth-child(3) { animation-delay: 420ms; } .page > *:nth-child(n + 4) { animation-delay: 500ms; }
+.case-body > *:not(.case-hero):not(.media-figure:first-child) { animation: el-in 380ms var(--ease-out) both; animation-delay: 140ms; }
+.case-body > *:nth-child(3) { animation-delay: 180ms; } .case-body > *:nth-child(4) { animation-delay: 220ms; } .case-body > *:nth-child(n + 5) { animation-delay: 260ms; }
+.case-info > * { animation: el-in 360ms var(--ease-out) both; animation-delay: 80ms; }
+.case-info > *:nth-child(2) { animation-delay: 110ms; } .case-info > *:nth-child(3) { animation-delay: 140ms; } .case-info > *:nth-child(4) { animation-delay: 170ms; } .case-info > *:nth-child(n + 5) { animation-delay: 200ms; }
+.page > * { animation: el-in 380ms var(--ease-out) both; animation-delay: 60ms; }
+.page > *:nth-child(2) { animation-delay: 110ms; } .page > *:nth-child(3) { animation-delay: 160ms; } .page > *:nth-child(n + 4) { animation-delay: 210ms; }
 .about-photo, .article-cover { animation: visual-in 720ms var(--ease-out) both !important; animation-delay: 0ms !important; }
 .case-info, .case-body { min-width: 0; }
 .case-info { position: sticky; top: 0; align-self: start; max-height: 100dvh; overflow-y: auto; padding: 30px 26px 30px 24px; border-right: 1px solid var(--line); scrollbar-width: thin; }
@@ -503,10 +511,10 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 ::view-transition-new(site-sidebar), ::view-transition-new(site-topbar), ::view-transition-new(site-tabbar) { animation: none; }
 /* The leaving page is always painted above the arriving one, so it visibly slides away and reveals the next page. */
 ::view-transition-group(.nav-forward-out), ::view-transition-group(.nav-back-out) { z-index: 90; }
-::view-transition-old(.nav-forward-out) { animation: 640ms cubic-bezier(0.6, 0, 0.2, 1) both vt-out-left; }
-::view-transition-new(.nav-forward-in) { animation: 620ms cubic-bezier(0.2, 0.6, 0.2, 1) 120ms both vt-in-right; }
-::view-transition-old(.nav-back-out) { animation: 640ms cubic-bezier(0.6, 0, 0.2, 1) both vt-out-right; }
-::view-transition-new(.nav-back-in) { animation: 620ms cubic-bezier(0.2, 0.6, 0.2, 1) 120ms both vt-in-left; }
+::view-transition-old(.nav-forward-out) { animation: 380ms cubic-bezier(0.6, 0, 0.2, 1) both vt-out-left; }
+::view-transition-new(.nav-forward-in) { animation: 380ms cubic-bezier(0.2, 0.6, 0.2, 1) 40ms both vt-in-right; }
+::view-transition-old(.nav-back-out) { animation: 380ms cubic-bezier(0.6, 0, 0.2, 1) both vt-out-right; }
+::view-transition-new(.nav-back-in) { animation: 380ms cubic-bezier(0.2, 0.6, 0.2, 1) 40ms both vt-in-left; }
 ::view-transition-old(root) { animation: none; }
 @keyframes vt-out-left { to { transform: translateX(-100%); } }
 @keyframes vt-in-right { from { transform: translateX(12%); opacity: 0.85; } to { transform: none; opacity: 1; } }

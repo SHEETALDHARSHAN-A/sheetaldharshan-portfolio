@@ -36,11 +36,35 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
   const [active, setActive] = useState(0)
   const [previous, setPrevious] = useState<number | null>(null)
   const [intro, setIntro] = useState(true)
+  const [loaded, setLoaded] = useState<Record<number, boolean>>({})
+
+  // The wipe and the cards wait until the active picture has actually loaded (with a safety timeout),
+  // so the animation never finishes over an empty stage.
+  useEffect(() => {
+    const medias = stageRef.current?.querySelectorAll<HTMLElement>('.stage-media') ?? []
+    const cleanups: (() => void)[] = []
+    medias.forEach((media, index) => {
+      const img = media.querySelector('img')
+      const mark = () => setLoaded((prev) => (prev[index] ? prev : { ...prev, [index]: true }))
+      if (!img || (img.complete && img.naturalWidth > 0)) return mark()
+      img.addEventListener('load', mark, { once: true })
+      img.addEventListener('error', mark, { once: true })
+      cleanups.push(() => {
+        img.removeEventListener('load', mark)
+        img.removeEventListener('error', mark)
+      })
+    })
+    const fallback = window.setTimeout(() => setLoaded((prev) => ({ ...prev, [active]: true })), 2500)
+    return () => {
+      cleanups.forEach((fn) => fn())
+      window.clearTimeout(fallback)
+    }
+  }, [active])
   const listRef = useRef<HTMLDivElement>(null)
 
   // Page-load choreography: left panel, then the visual, then the cards one by one.
   useEffect(() => {
-    const timer = window.setTimeout(() => setIntro(false), 2600 + projects.length * 140)
+    const timer = window.setTimeout(() => setIntro(false), 4500 + projects.length * 140)
     return () => window.clearTimeout(timer)
   }, [projects.length])
 
@@ -101,14 +125,14 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
   const rollFrom = previous === null ? '00' : pad(previous + 1)
 
   return (
-    <section className={`yk${intro ? ' yk-intro' : ''}`} aria-label="Project explorer">
+    <section className={`yk${intro ? ' yk-intro' : ''}${loaded[active] ? ' yk-ready' : ''}`} aria-label="Project explorer">
       <div className="yk-stage" aria-live="polite" ref={stageRef}>
         {projects.map((item, index) => {
           const state = index === active ? 'active' : index === previous ? 'leaving' : 'idle'
           return (
-            <div className={`stage-media ${state}`} key={item.id} aria-hidden={index !== active} data-accent={item.accent}>
+            <div className={`stage-media ${state}`} key={item.id} aria-hidden={index !== active} data-accent={item.accent} data-ready={loaded[index] ? '' : undefined}>
               {item.heroImage ? (
-                <Picture media={item.heroImage} size="original" sizes="(max-width: 960px) 100vw, 85vw" priority={index === 0} />
+                <Picture media={item.heroImage} size="original" sizes="(max-width: 960px) 100vw, 85vw" priority={index === 0} eager />
               ) : item.heroVideo ? (
                 <video autoPlay loop muted playsInline preload={index === active ? 'auto' : 'metadata'} src={item.heroVideo.url} />
               ) : (

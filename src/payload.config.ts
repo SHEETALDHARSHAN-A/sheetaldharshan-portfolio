@@ -70,7 +70,8 @@ export default buildConfig({
     },
     migrationDir: path.resolve(dirname, 'migrations'),
     // Production never pushes schema changes; it runs the committed migrations.
-    push: process.env.NODE_ENV !== 'production',
+    // Dev push only against a local database; shared databases (Supabase) change through migrations.
+    push: process.env.NODE_ENV !== 'production' && !/supabase\.(co|com)/.test(process.env.DATABASE_URL || ''),
   }),
   collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),

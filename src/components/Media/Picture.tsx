@@ -14,6 +14,7 @@ export function Picture({
   priority = false,
   className,
   unoptimized = false,
+  eager = false,
 }: {
   media: MediaRef
   size?: Size
@@ -21,12 +22,13 @@ export function Picture({
   priority?: boolean
   className?: string
   unoptimized?: boolean
+  eager?: boolean
 }) {
   const chosen = size === 'original' ? undefined : media.sizes?.[size]
   const src = chosen?.url ?? media.url
   const width = chosen?.width ?? media.width ?? 1600
   const height = chosen?.height ?? media.height ?? 1000
-  return <Image alt={media.alt} className={className} height={height} priority={priority} quality={85} sizes={sizes} src={src} unoptimized={unoptimized} width={width} fetchPriority={priority ? 'high' : undefined} />
+  return <Image alt={media.alt} className={className} height={height} priority={priority} quality={85} sizes={sizes} src={src} unoptimized={unoptimized} width={width} fetchPriority={priority ? 'high' : undefined} loading={priority ? undefined : eager ? 'eager' : undefined} />
 }
 
 export function MediaAny({ media, className, sizes }: { media: MediaRef; className?: string; sizes?: string }) {

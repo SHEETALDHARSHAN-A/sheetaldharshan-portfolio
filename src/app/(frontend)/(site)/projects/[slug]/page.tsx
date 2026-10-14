@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RenderProjectBlocks } from '@/components/blocks/RenderProjectBlocks'
 import { PlayOverlay } from '@/components/projects/PlayOverlay'
+import { HeroImage } from '@/components/projects/HeroImage'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { MediaAny, Picture } from '@/components/Media/Picture'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -126,9 +127,7 @@ export default async function ProjectPage({ params }: Props) {
             <video autoPlay loop muted playsInline poster={project.heroImage?.url} src={project.heroVideo.url} />
           </div>
         ) : project.heroImage ? (
-          <div className="case-hero">
-            <Picture media={project.heroImage} priority size="xlarge" sizes="(max-width: 960px) 100vw, 70vw" />
-          </div>
+          <HeroImage media={project.heroImage} title={project.title} />
         ) : (
           <div className="case-hero placeholder" data-accent={project.accent}>
             <span className="mark">{project.title}</span>
