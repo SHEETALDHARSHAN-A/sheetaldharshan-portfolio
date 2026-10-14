@@ -229,7 +229,7 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .project-row[data-accent='orange'] { --tint: #ff5a1f; }
 .project-row[data-accent='violet'] { --tint: #a78bfa; }
 .project-row[data-accent='neutral'] { --tint: #9a9a9a; }
-.project-row .card-arrow { color: var(--tint); }
+.project-row .card-arrow { color: #ff3d00; }
 .project-row .card-n { width: var(--card-num-w); flex: none; display: flex; align-items: center; justify-content: flex-start; padding-left: 12px; }
 .project-row .roll { display: inline-flex; height: 1em; overflow: hidden; font-family: var(--font-condensed); font-weight: 300; font-size: 44px; line-height: 1; color: var(--card-text); letter-spacing: -0.01em; }
 .project-row .roll-digit { display: block; width: 0.52em; animation: roll-up 640ms cubic-bezier(0.22, 0.8, 0.2, 1) both; }
@@ -264,7 +264,7 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .project-row .card-text { display: grid; gap: 2px; margin-left: calc(var(--sliver-w) + 22px); margin-right: 56px; opacity: 0; transform: translateY(10px); transition: opacity 280ms ease, transform 420ms var(--ease-out); }
 .project-row .card-t { font-family: 'Barlow Condensed', var(--font-condensed), system-ui, sans-serif; font-size: 32px; font-weight: 600; line-height: 35px; letter-spacing: 0.01em; text-transform: uppercase; color: var(--card-text); white-space: nowrap; }
 .project-row .card-k { font-family: var(--font-sans); font-size: 14px; line-height: 1.2; color: var(--card-sub); }
-.project-row .card-arrow { margin-left: auto; font-family: var(--font-sans); font-size: 22px; line-height: 1; color: var(--tint); opacity: 0; transform: translateX(-10px); transition: opacity 240ms ease, transform 420ms var(--ease-out); }
+.project-row .card-arrow { margin-left: auto; font-family: var(--font-sans); font-size: 22px; line-height: 1; color: #ff3d00; opacity: 0; transform: translateX(-10px); transition: opacity 240ms ease, transform 420ms var(--ease-out); }
 /* active state */
 .project-row.active { height: var(--card-h); }
 .project-row.active .n { opacity: 0; }
