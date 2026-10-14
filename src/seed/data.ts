@@ -86,6 +86,7 @@ export const experience = [
   {
     role: 'AI Intern',
     company: 'Prayag.AI',
+    companyUrl: 'https://prayag.ai',
     location: 'Palakkad, India',
     startDate: '2025-06-01',
     endDate: '2026-06-01',
