@@ -42,7 +42,7 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <PageFrame>
+    <PageFrame slideIn={false}>
       <ProjectExplorer projects={projects} />
     </PageFrame>
   )

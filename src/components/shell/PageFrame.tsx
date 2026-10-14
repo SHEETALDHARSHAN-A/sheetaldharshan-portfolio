@@ -7,10 +7,12 @@ const leaving = { 'nav-forward': 'nav-forward-out', 'nav-back': 'nav-back-out', 
  * Wraps a page's content in a directional view transition. Links tagged `nav-forward` slide the
  * old page out to the left while the new one arrives from the right (a page turn); `nav-back`
  * does the opposite. Old and new run at the same time, so the screen is never empty.
+ * `slideIn={false}` keeps the exit but lets the page appear in place (the projects page uses
+ * its own fill-and-cards entrance instead).
  */
-export function PageFrame({ children }: { children: React.ReactNode }) {
+export function PageFrame({ children, slideIn = true }: { children: React.ReactNode; slideIn?: boolean }) {
   return (
-    <ViewTransition default="none" enter={entering} exit={leaving}>
+    <ViewTransition default="none" enter={slideIn ? entering : 'none'} exit={leaving}>
       {children}
     </ViewTransition>
   )
