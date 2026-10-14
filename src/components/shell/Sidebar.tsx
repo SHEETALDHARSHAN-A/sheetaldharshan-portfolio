@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { InteractiveAvatar } from '@/components/avatar/InteractiveAvatar'
 import { MobileMenu } from '@/components/shell/MobileMenu'
 import { NavLinks } from '@/components/shell/NavLinks'
 import type { Site } from '@/data/types'
@@ -10,6 +11,9 @@ export function Sidebar({ site }: { site: Site }) {
         {site.displayName}
         <span className="dot">.</span>
       </Link>
+      <div className="sidebar-avatar">
+        <InteractiveAvatar size={148} />
+      </div>
       <div>
         <nav className="sidebar-nav" aria-label="Primary">
           <NavLinks items={site.nav} />

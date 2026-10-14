@@ -16,3 +16,12 @@ Exactly the reference measurements (see reference-analysis.md). Scoped to `.jg` 
 
 ## Appearance presets
 Theme, accent, font, heading scale, spacing, radius, link style, bubble style, animation intensity, animation speed and project display style map to `data-*` attributes on `<html>`. Only whitelisted values apply (`src/styles/theme.ts`).
+
+## Avatar
+`src/components/avatar/InteractiveAvatar.tsx` is an original Memoji-style 2.5D avatar drawn in inline SVG, modelled on the owner (curly hair, short beard, black hoodie). About 6.4 KB gzipped including styles; no images, no WebGL, no animation library.
+- Idle: random blinks (sometimes double), breathing, an occasional smile.
+- Pointer: pupils and head follow the cursor with eased interpolation; the rAF loop runs only while something is moving and is throttled to ~60 Hz.
+- Hover: curious (eyebrows up, wider eyes). Click: happy with a squash-and-stretch bounce.
+- Site reactions: /projects → excited, a project page → curious, /contact → waves, focusing any input → thinking.
+- API: `setExpression('happy' | 'curious' | 'thinking' | 'excited' | 'wave' | 'idle', { hold?, duration? })` from `components/avatar/expressions`, or a ref handle.
+- Pauses when offscreen or the tab is hidden; respects prefers-reduced-motion. Lives in the desktop sidebar between the wordmark and the navigation.
