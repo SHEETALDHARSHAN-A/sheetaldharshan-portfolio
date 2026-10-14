@@ -1,6 +1,7 @@
 import { ViewTransition } from 'react'
 
-const directional = { 'nav-forward': 'nav-forward', 'nav-back': 'nav-back', default: 'none' } as const
+const entering = { 'nav-forward': 'nav-forward-in', 'nav-back': 'nav-back-in', default: 'none' } as const
+const leaving = { 'nav-forward': 'nav-forward-out', 'nav-back': 'nav-back-out', default: 'none' } as const
 
 /**
  * Wraps a page's content in a directional view transition. Links tagged `nav-forward` slide the
@@ -9,7 +10,7 @@ const directional = { 'nav-forward': 'nav-forward', 'nav-back': 'nav-back', defa
  */
 export function PageFrame({ children }: { children: React.ReactNode }) {
   return (
-    <ViewTransition default="none" enter={directional} exit={directional}>
+    <ViewTransition default="none" enter={entering} exit={leaving}>
       {children}
     </ViewTransition>
   )

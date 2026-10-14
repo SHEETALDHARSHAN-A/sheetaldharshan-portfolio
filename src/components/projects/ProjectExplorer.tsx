@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ViewTransition, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ProjectSummary } from '@/data/types'
 import { Picture } from '@/components/Media/Picture'
 
@@ -40,7 +40,7 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
 
   // Page-load choreography: left panel, then the visual, then the cards one by one.
   useEffect(() => {
-    const timer = window.setTimeout(() => setIntro(false), 1900 + projects.length * 140)
+    const timer = window.setTimeout(() => setIntro(false), 2600 + projects.length * 140)
     return () => window.clearTimeout(timer)
   }, [projects.length])
 
@@ -102,7 +102,6 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
 
   return (
     <section className={`yk${intro ? ' yk-intro' : ''}`} aria-label="Project explorer">
-      <ViewTransition name="stage" default="none" exit={{ 'nav-forward': 'stage-out', default: 'none' }}>
       <div className="yk-stage" aria-live="polite" ref={stageRef}>
         {projects.map((item, index) => {
           const state = index === active ? 'active' : index === previous ? 'leaving' : 'idle'
@@ -121,7 +120,6 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
           )
         })}
       </div>
-      </ViewTransition>
 
       <div className="yk-list" ref={listRef} onKeyDown={onKey} role="list">
         {projects.map((item, index) => {
@@ -129,8 +127,8 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
           const current = index === active
           const category = item.category ?? item.kindLabel
           return (
-            <ViewTransition key={item.id} name={`card-${index}`} default="none" exit={{ 'nav-forward': 'card-out', default: 'none' }}>
             <Link
+              key={item.id}
               href={`/projects/${item.slug}`}
               transitionTypes={['nav-forward']}
               className={`project-row${current ? ' active' : ''}`}
@@ -160,7 +158,6 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
                 <span className="t">{item.title}</span>
               </span>
             </Link>
-            </ViewTransition>
           )
         })}
       </div>

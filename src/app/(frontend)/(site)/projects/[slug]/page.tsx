@@ -9,7 +9,6 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { getProject, getProjects, getSite } from '@/data/content'
 import { draftMode } from 'next/headers'
-import { ViewTransition } from 'react'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -57,7 +56,6 @@ export default async function ProjectPage({ params }: Props) {
           ...(project.githubUrl ? { codeRepository: project.githubUrl } : {}),
         }}
       />
-      <ViewTransition name="case-info" default="none" exit={{ 'nav-back': 'info-out', default: 'none' }}>
       <aside className="case-info">
         <span className="eyebrow">{project.category ?? project.kindLabel}</span>
         <h1>{project.title}</h1>
@@ -110,9 +108,7 @@ export default async function ProjectPage({ params }: Props) {
           ← Back to projects
         </Link>
       </aside>
-      </ViewTransition>
 
-      <ViewTransition name="case-body" default="none" exit={{ 'nav-back': 'body-out', default: 'none' }}>
       <div className="case-body">
         {project.demoVideoUrl ? (
           <PlayOverlay image={project.heroImage} title={project.title} url={project.demoVideoUrl} video={project.heroVideo} />
@@ -156,7 +152,6 @@ export default async function ProjectPage({ params }: Props) {
           </Link>
         )}
       </div>
-      </ViewTransition>
     </article>
     </PageFrame>
   )
