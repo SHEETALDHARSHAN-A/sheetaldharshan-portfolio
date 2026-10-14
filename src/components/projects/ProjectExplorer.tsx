@@ -44,13 +44,39 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
     return () => window.clearTimeout(timer)
   }, [projects.length])
 
-  const select = useCallback((index: number) => {
-    setActive((current) => {
-      if (current === index) return current
-      setPrevious(current)
-      return index
-    })
+  const stageRef = useRef<HTMLDivElement>(null)
+
+  /** Freeze the outgoing visual at its current zoom so it cannot move under the wipe. */
+  const freezeCurrent = useCallback((index: number) => {
+    const media = stageRef.current?.querySelectorAll<HTMLElement>('.stage-media')[index]
+    const visual = media?.querySelector<HTMLElement>('img, video, .stage-placeholder')
+    if (!visual) return
+    const transform = getComputedStyle(visual).transform
+    visual.style.animation = 'none'
+    visual.style.transform = transform === 'none' ? '' : transform
   }, [])
+
+  const select = useCallback(
+    (index: number) => {
+      setActive((current) => {
+        if (current === index) return current
+        freezeCurrent(current)
+        setPrevious(current)
+        return index
+      })
+    },
+    [freezeCurrent],
+  )
+
+  // The incoming visual always starts from the zoomed-out state: clear any frozen inline styles.
+  useEffect(() => {
+    const media = stageRef.current?.querySelectorAll<HTMLElement>('.stage-media')[active]
+    const visual = media?.querySelector<HTMLElement>('img, video, .stage-placeholder')
+    if (visual) {
+      visual.style.animation = ''
+      visual.style.transform = ''
+    }
+  }, [active])
 
   const onKey = useCallback(
     (event: React.KeyboardEvent) => {
@@ -76,7 +102,7 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
 
   return (
     <section className={`yk${intro ? ' yk-intro' : ''}`} aria-label="Project explorer">
-      <div className="yk-stage" aria-live="polite">
+      <div className="yk-stage" aria-live="polite" ref={stageRef}>
         {projects.map((item, index) => {
           const state = index === active ? 'active' : index === previous ? 'leaving' : 'idle'
           return (

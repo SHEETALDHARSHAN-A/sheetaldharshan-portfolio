@@ -184,7 +184,7 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .stage-media img, .stage-media video { width: 100%; height: 100%; object-fit: cover; }
 .stage-media.active { opacity: 1; z-index: 2; clip-path: inset(0 0 0 0); animation: wipe-in calc(820ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both; }
 /* The leaving visual keeps the identical animation declaration so it holds its current zoom under the wipe instead of snapping back. */
-.stage-media.active img, .stage-media.active video, .stage-media.active .stage-placeholder, .stage-media.leaving img, .stage-media.leaving video, .stage-media.leaving .stage-placeholder { animation: wipe-settle calc(820ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both, kenburns 11s cubic-bezier(0.25, 0.4, 0.3, 1) calc(820ms * var(--speed)) forwards; transform-origin: 58% 50%; will-change: transform; }
+.stage-media.active img, .stage-media.active video, .stage-media.active .stage-placeholder, .stage-media.leaving img, .stage-media.leaving video, .stage-media.leaving .stage-placeholder { animation: wipe-settle calc(820ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both, kenburns 14s cubic-bezier(0.25, 0.4, 0.3, 1) calc(820ms * var(--speed)) forwards; transform-origin: 58% 50%; will-change: transform; }
 .stage-media.leaving { opacity: 1; z-index: 1; }
 @keyframes wipe-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes wipe-settle { from { transform: translateX(-6%); } to { transform: none; } }
