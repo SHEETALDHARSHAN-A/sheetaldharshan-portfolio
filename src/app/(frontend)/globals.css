@@ -471,6 +471,10 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
    turn to the left (cards pull back one by one, the visual follows, the next page comes from the
    right); nav-back is the opposite. The sidebar is anchored. */
 ::view-transition { pointer-events: none; }
+/* The leaving page stays on top of the arriving one until its exit is done. */
+::view-transition-image-pair(*) { isolation: isolate; }
+::view-transition-old(*) { z-index: 2; mix-blend-mode: normal; }
+::view-transition-new(*) { z-index: 1; mix-blend-mode: normal; }
 ::view-transition-group(site-sidebar), ::view-transition-group(site-topbar) { animation: none; z-index: 100; }
 ::view-transition-old(site-sidebar), ::view-transition-old(site-topbar) { display: none; }
 ::view-transition-new(site-sidebar), ::view-transition-new(site-topbar) { animation: none; }
