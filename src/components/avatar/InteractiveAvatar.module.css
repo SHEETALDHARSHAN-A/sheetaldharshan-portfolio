@@ -69,14 +69,27 @@
   .breathe, .svg[data-bounce='true'], .palm, .zzz { animation: none !important; }
 }
 
-/* full-body variant: the bust body is replaced by the drawn torso, the wave arm comes from the shoulder */
-.root[data-variant='full'] .body { display: none; }
-.root[data-variant='full'] .breathe { transform-origin: 100px 360px; }
+/* full-body variant: head is scaled into a drawn body; arms pose for each expression */
+.root[data-variant='full'] .body, .root[data-variant='full'] .hand { display: none; }
+.root[data-variant='full'] .breathe { transform-origin: 100px 390px; }
 .root[data-variant='full'] .head { transform-origin: 100px 160px; }
-.restArm, .waveArm { transition: opacity 160ms ease; }
-.waveArm { opacity: 0; }
-.root[data-variant='full'][data-expression='wave'] .restArm { opacity: 0; }
-.root[data-variant='full'][data-expression='wave'] .waveArm { opacity: 1; }
-.root[data-variant='full'] .handSleeve { display: none; }
-.root[data-variant='full'] .hand { transform: translate(-4px, 26px); }
-.root[data-variant='full'][data-expression='wave'] .hand { transform: none; }
+
+.arm { transform-box: view-box; transition: transform 420ms cubic-bezier(0.3, 1.4, 0.5, 1), opacity 140ms ease; }
+.armL { transform-origin: 54px 120px; }
+.armR { transform-origin: 146px 120px; }
+.root[data-expression='happy'] .armL { transform: rotate(10deg); }
+.root[data-expression='happy'] .armR { transform: rotate(-10deg); }
+.root[data-expression='excited'] .armL { transform: rotate(30deg); }
+.root[data-expression='excited'] .armR { transform: rotate(-30deg); }
+.root[data-expression='surprised'] .armL { transform: rotate(18deg); }
+.root[data-expression='surprised'] .armR { transform: rotate(-18deg); }
+.root[data-expression='curious'] .armL { transform: rotate(4deg); }
+.root[data-expression='sleepy'] .armL { transform: rotate(-3deg); }
+.root[data-expression='sleepy'] .armR { transform: rotate(3deg); }
+
+.waveArm, .thinkArm { opacity: 0; transition: opacity 160ms ease; }
+.root[data-expression='wave'] .armR, .root[data-expression='thinking'] .armR { opacity: 0; transition: opacity 120ms ease; }
+.root[data-expression='wave'] .waveArm, .root[data-expression='thinking'] .thinkArm { opacity: 1; }
+.fbPalm { transform-box: fill-box; transform-origin: 50% 100%; }
+.root[data-expression='wave'] .fbPalm { animation: wave 420ms ease-in-out 4 alternate; }
+@media (prefers-reduced-motion: reduce) { .fbPalm { animation: none !important; } }

@@ -197,14 +197,14 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
       data-blink={blink ? 'true' : 'false'}
       data-paused="false"
       data-variant={variant}
-      style={{ width: size, height: variant === 'full' ? size * 1.9 : size }}
+      style={{ width: size, height: variant === 'full' ? size * 1.6 : size }}
       onPointerEnter={() => !s.current.held && apply('curious', { duration: 99999 })}
       onPointerLeave={() => !s.current.held && s.current.expr === 'curious' && apply('idle')}
       onClick={() => apply('happy')}
       role="img"
       aria-label={label}
     >
-      <svg viewBox={variant === 'full' ? '0 0 200 380' : '0 0 200 200'} className={styles.svg} key={bounce} data-bounce={bounce > 0 ? 'true' : 'false'} aria-hidden="true">
+      <svg viewBox={variant === 'full' ? '-25 0 250 400' : '0 0 200 200'} className={styles.svg} key={bounce} data-bounce={bounce > 0 ? 'true' : 'false'} aria-hidden="true">
         <defs>
           <radialGradient id="mj-skin" cx="38%" cy="30%" r="80%">
             <stop offset="0" stopColor="#d9a07c" />
@@ -236,8 +236,8 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
           </linearGradient>
           <linearGradient id="mj-stubble" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#3b261b" stopOpacity="0" />
-            <stop offset=".35" stopColor="#3b261b" stopOpacity=".38" />
-            <stop offset="1" stopColor="#2a1a12" stopOpacity=".55" />
+            <stop offset=".3" stopColor="#24160f" stopOpacity=".6" />
+            <stop offset="1" stopColor="#170e09" stopOpacity=".9" />
           </linearGradient>
           <radialGradient id="mj-gloss" cx="50%" cy="50%" r="50%">
             <stop offset="0" stopColor="#fff" stopOpacity=".42" />
@@ -249,43 +249,100 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
           {variant === 'full' && (
             <g className={styles.fullBody}>
               <defs>
-                <linearGradient id="mj-jeans" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#3b4d6e" />
-                  <stop offset="1" stopColor="#24324a" />
+                <linearGradient id="fb-fleece" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="#3a383b" />
+                  <stop offset=".55" stopColor="#262427" />
+                  <stop offset="1" stopColor="#151416" />
                 </linearGradient>
-                <linearGradient id="mj-hoodie" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#3a3d46" />
-                  <stop offset="1" stopColor="#15161b" />
+                <linearGradient id="fb-sleeve" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stopColor="#1b1a1c" />
+                  <stop offset=".45" stopColor="#343235" />
+                  <stop offset="1" stopColor="#1d1c1e" />
+                </linearGradient>
+                <linearGradient id="fb-jogger" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stopColor="#1e1d1f" />
+                  <stop offset=".5" stopColor="#323033" />
+                  <stop offset="1" stopColor="#1c1b1d" />
+                </linearGradient>
+                <linearGradient id="fb-shoe" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#ffffff" />
+                  <stop offset="1" stopColor="#dcdcd8" />
                 </linearGradient>
               </defs>
-              {/* ground shadow */}
-              <ellipse cx="100" cy="372" rx="58" ry="7" fill="#000" opacity=".35" />
-              {/* legs */}
-              <path d="M70 270h28l-2 84H74z" fill="url(#mj-jeans)" />
-              <path d="M102 270h28l-4 84h-22z" fill="url(#mj-jeans)" />
-              <path d="M98 272v60" stroke="#1b2538" strokeWidth="2" opacity=".6" />
-              {/* sneakers */}
-              <path d="M64 352c0-6 6-9 14-9h20c3 0 4 3 4 6v9c0 4-3 7-7 7H70c-4 0-6-3-6-6z" fill="#f2f2ee" />
-              <path d="M102 352c0-3 1-6 4-6h20c8 0 14 3 14 9v4c0 3-2 6-6 6h-25c-4 0-7-3-7-7z" fill="#f2f2ee" />
-              <path d="M64 360h38M102 360h38" stroke="#c9c9c2" strokeWidth="3" />
-              {/* hoodie torso */}
-              <path d="M52 200c0-26 20-40 48-40s48 14 48 40l4 72c0 6-4 10-10 10H58c-6 0-10-4-10-10z" fill="url(#mj-hoodie)" />
-              <path d="M58 262h84v14c0 5-4 8-9 8H67c-5 0-9-3-9-8z" fill="#2a2c33" />
-              <path d="M76 232h48v20c0 4-3 6-6 6H82c-3 0-6-2-6-6z" fill="#2c2f37" opacity=".85" />
-              <path d="M78 164c6 10 13 14 22 14s16-4 22-14" fill="none" stroke="#4b4f5a" strokeWidth="5" strokeLinecap="round" />
-              <path d="M90 176v26M110 176v26" stroke="#e8e6e0" strokeWidth="2.6" strokeLinecap="round" />
-              <circle cx="90" cy="204" r="3" fill="#e8e6e0" /><circle cx="110" cy="204" r="3" fill="#e8e6e0" />
-              {/* left arm resting */}
-              <path d="M56 186c-14 10-18 40-14 74" stroke="url(#mj-hoodie)" strokeWidth="22" strokeLinecap="round" fill="none" />
-              <circle cx="44" cy="266" r="11" fill="#c48a68" />
-              {/* right arm resting (hidden while waving) */}
-              <g className={styles.restArm}>
-                <path d="M144 186c14 10 18 40 14 74" stroke="url(#mj-hoodie)" strokeWidth="22" strokeLinecap="round" fill="none" />
-                <circle cx="156" cy="266" r="11" fill="#c48a68" />
+
+              <ellipse cx="100" cy="391" rx="62" ry="6" fill="#000" opacity=".4" />
+
+              {/* joggers with ribbed cuffs */}
+              <path d="M60 228h40l-3 130H70c-4-40-8-86-10-130z" fill="url(#fb-jogger)" />
+              <path d="M100 228h40c-2 44-6 90-10 130h-27z" fill="url(#fb-jogger)" />
+              <path d="M92 228h16l-4 52h-8z" fill="#1d1c1e" />
+              <path d="M100 236v26M78 288c4 3 10 3 14 0M108 300c4 3 10 3 14 0" stroke="#151416" strokeWidth="1.6" fill="none" strokeLinecap="round" opacity=".7" />
+              <rect x="69" y="350" width="29" height="13" rx="4" fill="#232224" />
+              <rect x="102" y="350" width="29" height="13" rx="4" fill="#232224" />
+              <path d="M74 352v9M79 352v9M84 352v9M89 352v9M94 352v9M107 352v9M112 352v9M117 352v9M122 352v9M127 352v9" stroke="#000" strokeWidth=".8" opacity=".25" />
+
+              {/* white low-top sneakers */}
+              <path d="M66 366c0-4 3-6 7-6h20c3 0 5 2 6 5l2 11c1 5-2 9-7 9H65c-5 0-7-3-6-7z" fill="url(#fb-shoe)" />
+              <path d="M134 366c0-4-3-6-7-6h-20c-3 0-5 2-6 5l-2 11c-1 5 2 9 7 9h29c5 0 7-3 6-7z" fill="url(#fb-shoe)" />
+              <path d="M60 380h40M100 380h40" stroke="#cfcfca" strokeWidth="3" strokeLinecap="round" />
+              <path d="M78 364l8 3M80 368l8 3M122 364l-8 3M120 368l-8 3" stroke="#c4c4bf" strokeWidth="1.3" strokeLinecap="round" />
+
+              {/* arms hang from the shoulders and rotate there for the expressions */}
+              <g className={`${styles.arm} ${styles.armL}`}>
+                <path d="M56 116c-12 4-17 16-18 32l-6 68h23l4-66c1-14-1-26-3-34z" fill="url(#fb-sleeve)" />
+                <rect x="31" y="210" width="25" height="14" rx="5" fill="#1f1e20" />
+                <path d="M35 212v10M40 212v10M45 212v10M50 212v10" stroke="#000" strokeWidth=".8" opacity=".3" />
+                <path d="M33 224c-3 10-2 22 4 28 5 4 12 3 15-2 3-7 3-17 1-26z" fill="url(#mj-ear)" />
+                <path d="M39 238c0 5 1 9 3 12M45 238c0 5 0 9 1 12" stroke="#8a573d" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity=".6" />
               </g>
-              {/* right arm raised from the shoulder (shown while waving) */}
-              <path className={styles.waveArm} d="M146 194c14-2 22-14 23-34" stroke="url(#mj-hoodie)" strokeWidth="20" strokeLinecap="round" fill="none" />
-              <path d="M88 150h24v14c0 5-6 8-12 8s-12-3-12-8z" fill="#9a6447" />
+              <g className={`${styles.arm} ${styles.armR}`}>
+                <path d="M144 116c12 4 17 16 18 32l6 68h-23l-4-66c-1-14 1-26 3-34z" fill="url(#fb-sleeve)" />
+                <rect x="144" y="210" width="25" height="14" rx="5" fill="#1f1e20" />
+                <path d="M150 212v10M155 212v10M160 212v10M165 212v10" stroke="#000" strokeWidth=".8" opacity=".3" />
+                <path d="M167 224c3 10 2 22-4 28-5 4-12 3-15-2-3-7-3-17-1-26z" fill="url(#mj-ear)" />
+                <path d="M161 238c0 5-1 9-3 12M155 238c0 5 0 9-1 12" stroke="#8a573d" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity=".6" />
+              </g>
+
+              {/* hoodie body */}
+              <path d="M62 114c10-6 22-9 38-9s28 3 38 9c8 5 11 14 11 26l-5 82H56l-5-82c0-12 3-21 11-26z" fill="url(#fb-fleece)" />
+              <path d="M62 120c-2 30-3 60-2 96M138 120c2 30 3 60 2 96" stroke="#000" strokeWidth="1.4" fill="none" opacity=".35" />
+              {/* kangaroo pocket */}
+              <path d="M72 170h56l9 38H63z" fill="#2b292c" />
+              <path d="M72 170h56l9 38H63z" fill="none" stroke="#000" strokeWidth="1.2" opacity=".35" />
+              <path d="M72 170l-7 30M128 170l7 30" stroke="#000" strokeWidth="1.5" opacity=".35" />
+              {/* ribbed hem */}
+              <rect x="55" y="214" width="90" height="18" rx="6" fill="#222123" />
+              <path d="M62 216v14M68 216v14M74 216v14M80 216v14M86 216v14M92 216v14M98 216v14M104 216v14M110 216v14M116 216v14M122 216v14M128 216v14M134 216v14M140 216v14" stroke="#000" strokeWidth=".8" opacity=".28" />
+
+              {/* neck and the crossover hood */}
+              <path d="M88 86h24v20c0 6-6 9-12 9s-12-3-12-9z" fill="#9a6447" />
+              <path d="M68 112c2-12 12-20 22-22l10 26 10-26c10 2 20 10 22 22-8 8-20 12-32 12s-24-4-32-12z" fill="#2f2d30" />
+              <path d="M90 90l10 26 10-26" fill="none" stroke="#1a191b" strokeWidth="2" strokeLinejoin="round" />
+              {/* drawstrings with metal eyelets and aglets */}
+              <circle cx="91" cy="120" r="2.4" fill="#a9a9a6" /><circle cx="109" cy="120" r="2.4" fill="#a9a9a6" />
+              <path d="M91 121c-1 10-1 20 0 30M109 121c1 10 1 20 0 30" stroke="#121113" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+              <rect x="89" y="150" width="4" height="8" rx="1.6" fill="#0b0b0c" /><rect x="107" y="150" width="4" height="8" rx="1.6" fill="#0b0b0c" />
+              <path d="M90 151v6M108 151v6" stroke="#fff" strokeWidth=".7" opacity=".35" />
+
+              {/* raised right arm for the wave */}
+              <g className={styles.waveArm}>
+                <path d="M146 124c14 8 22 20 22 34 0-22 2-44 4-58" fill="none" stroke="#141315" strokeWidth="22" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M146 124c14 8 22 20 22 34 0-22 2-44 4-58" fill="none" stroke="url(#fb-sleeve)" strokeWidth="19" strokeLinecap="round" strokeLinejoin="round" />
+                <rect x="162" y="90" width="21" height="11" rx="4" fill="#1f1e20" />
+                <g className={styles.fbPalm}>
+                  <path d="M164 88c-2-6-1-14 2-18M169 86c0-8 1-15 3-19M175 86c1-8 3-14 5-17M180 89c2-5 4-9 7-10" stroke="#c48a68" strokeWidth="5" strokeLinecap="round" fill="none" />
+                  <ellipse cx="173" cy="86" rx="10" ry="8" fill="url(#mj-ear)" />
+                  <path d="M164 86c-4-3-6-6-6-9" stroke="#c48a68" strokeWidth="5" strokeLinecap="round" fill="none" />
+                </g>
+              </g>
+              {/* right hand to the chin while thinking */}
+              <g className={styles.thinkArm}>
+                <path d="M146 124c6 22 8 46 4 64-12-18-24-46-36-74" fill="none" stroke="#141315" strokeWidth="22" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M146 124c6 22 8 46 4 64-12-18-24-46-36-74" fill="none" stroke="url(#fb-sleeve)" strokeWidth="19" strokeLinecap="round" strokeLinejoin="round" />
+                <ellipse cx="111" cy="104" rx="9" ry="8" fill="url(#mj-ear)" />
+                <path d="M104 101c3-2 7-2 10 0M104 106c3-2 7-2 10 0" stroke="#8a573d" strokeWidth="1.2" fill="none" opacity=".6" />
+                <path d="M109 97c-1-5 1-9 4-11" stroke="#c48a68" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+              </g>
             </g>
           )}
 
@@ -298,6 +355,7 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
             <path d="M88 148h24v12c0 5-6 8-12 8s-12-3-12-8z" fill="#9a6447" />
           </g>
 
+          <g transform={variant === 'full' ? 'translate(40 0) scale(0.6)' : undefined}>
           {/* head: parallax layers turn it toward the cursor */}
           <g className={styles.head}>
             <g className={styles.ears}>
@@ -334,16 +392,17 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
                 <rect className={styles.lid} x="109" y="83" width="34" height="36" rx="16" fill="#bf8463" />
               </g>
 
-              <path className={`${styles.brow} ${styles.browL}`} d="M60 80c6-6 16-7 26-3" fill="none" stroke="#2a1b14" strokeWidth="6.5" strokeLinecap="round" />
-              <path className={`${styles.brow} ${styles.browR}`} d="M114 77c10-4 20-3 26 3" fill="none" stroke="#2a1b14" strokeWidth="6.5" strokeLinecap="round" />
+              <path className={`${styles.brow} ${styles.browL}`} d="M60 80c6-6 16-7 26-3" fill="none" stroke="#2a1b14" strokeWidth="7.5" strokeLinecap="round" />
+              <path className={`${styles.brow} ${styles.browR}`} d="M114 77c10-4 20-3 26 3" fill="none" stroke="#2a1b14" strokeWidth="7.5" strokeLinecap="round" />
 
               <ellipse cx="100" cy="117" rx="6" ry="4" fill="#9a6447" opacity=".7" />
               <ellipse cx="98.5" cy="115.5" rx="2" ry="1.2" fill="#fff" opacity=".35" />
 
               {/* moustache, soft */}
-              <path d="M86 127c5-3 10-3 14-1 4-2 9-2 14 1-5 2-10 2-14 1-4 1-9 1-14-1z" fill="#3b261b" opacity=".6" />
+              <path d="M83 128c6-5 12-5 17-2 5-3 11-3 17 2-3 3-8 3-11 2-2 1-4 1-6 1s-4 0-6-1c-3 1-8 1-11-2z" fill="#1c110c" opacity=".85" />
+              <path d="M84 129c-2 8-1 14 2 18M116 129c2 8 1 14-2 18" stroke="#1c110c" strokeWidth="4" strokeLinecap="round" fill="none" opacity=".55" />
 
-              <path className={`${styles.mouth} ${styles.mIdle}`} d="M89 134c6 4 16 4 22 0" fill="none" stroke="#6b2f26" strokeWidth="3.4" strokeLinecap="round" />
+              <path className={`${styles.mouth} ${styles.mIdle}`} d="M88 133c6 3 18 3 24 0-2 6-7 8-12 8s-10-2-12-8z" fill="#c26f68" />
               <g className={`${styles.mouth} ${styles.mHappy}`}>
                 <path d="M84 131c4 15 28 15 32 0z" fill="#5a1d18" />
                 <path d="M87 131.5h26c-1 3-5 4.5-13 4.5s-12-1.5-13-4.5z" fill="#fff" />
@@ -359,8 +418,9 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
               <path className={`${styles.mouth} ${styles.mSleepy}`} d="M93 135c4 2 10 2 14 0" fill="none" stroke="#6b2f26" strokeWidth="3" strokeLinecap="round" />
             </g>
 
-            {/* curly hair, soft and rounded */}
+            {/* curly hair, soft and rounded, faded at the sides */}
             <g className={styles.hair}>
+              <path d="M36 72c-4 10-5 22-2 32 3-3 7-5 11-5-2-9-1-19 3-27zM164 72c4 10 5 22 2 32-3-3-7-5-11-5 2-9 1-19-3-27z" fill="#2a1d17" opacity=".6" />
               <path d="M33 92c-4-40 26-66 67-66s71 26 67 66c-6-14-16-24-30-30-12 8-26 10-37 8-11 2-25 0-37-8-14 6-24 16-30 30z" fill="url(#mj-hair)" />
               <g fill="url(#mj-curl)">
                 <circle cx="44" cy="62" r="17" /><circle cx="64" cy="40" r="19" /><circle cx="90" cy="28" r="20" />
@@ -388,6 +448,7 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
           <g className={styles.zzz} fill="#9aa4b8" fontFamily="system-ui, sans-serif" fontWeight="700">
             <text x="150" y="40" fontSize="14">z</text>
             <text x="160" y="28" fontSize="11">z</text>
+          </g>
           </g>
         </g>
       </svg>
