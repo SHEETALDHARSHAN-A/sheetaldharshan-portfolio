@@ -16,14 +16,8 @@ export const STATES: Record<PetState, { row: number; frames: number; fps: number
   review: { row: 8, frames: 6, fps: 4 },
 }
 
-/**
- * Frame for a gaze direction in degrees (0 = up, clockwise). Rows 9 and 10 hold 16 directions
- * at 22.5° steps. The sheet draws "down" and the two down-left steps as back views, which reads
- * as turning away from the visitor, so those use the front-facing frame or the lowered left profile.
- */
+/** Frame for a gaze direction in degrees (0 = up, clockwise): rows 9 and 10 hold 16 directions at 22.5° steps. */
 export function lookCell(degrees: number): { row: number; col: number } {
   const step = Math.round((((degrees % 360) + 360) % 360) / 22.5) % 16
-  if (step === 8) return { row: 0, col: 0 }
-  if (step === 9 || step === 10) return { row: 10, col: 3 }
   return { row: step < 8 ? 9 : 10, col: step % 8 }
 }
