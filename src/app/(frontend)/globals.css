@@ -507,9 +507,11 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
    turn to the left (cards pull back one by one, the visual follows, the next page comes from the
    right); nav-back is the opposite. The sidebar is anchored. */
 ::view-transition { pointer-events: none; }
-::view-transition-group(site-sidebar), ::view-transition-group(site-topbar), ::view-transition-group(site-tabbar) { animation: none; z-index: 100; }
-::view-transition-old(site-sidebar), ::view-transition-old(site-topbar), ::view-transition-old(site-tabbar) { display: none; }
-::view-transition-new(site-sidebar), ::view-transition-new(site-topbar), ::view-transition-new(site-tabbar) { animation: none; }
+.section[id] { scroll-margin-top: 24px; }
+@media (max-width: 960px) { .section[id] { scroll-margin-top: 76px; } }
+::view-transition-group(site-sidebar), ::view-transition-group(site-topbar), ::view-transition-group(site-tabbar), ::view-transition-group(site-pet) { animation: none; z-index: 100; }
+::view-transition-old(site-sidebar), ::view-transition-old(site-topbar), ::view-transition-old(site-tabbar), ::view-transition-old(site-pet) { display: none; }
+::view-transition-new(site-sidebar), ::view-transition-new(site-topbar), ::view-transition-new(site-tabbar), ::view-transition-new(site-pet) { animation: none; }
 /* The leaving page is always painted above the arriving one, so it visibly slides away and reveals the next page. */
 ::view-transition-group(.nav-forward-out), ::view-transition-group(.nav-back-out) { z-index: 90; }
 ::view-transition-old(.nav-forward-out) { animation: 380ms cubic-bezier(0.6, 0, 0.2, 1) both vt-out-left; }

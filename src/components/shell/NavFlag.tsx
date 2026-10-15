@@ -13,8 +13,11 @@ export function NavFlag() {
       return
     }
     if (pathname !== first.current) document.documentElement.dataset.navigated = '1'
-    // The content column is the scroll container; start each page at its top.
-    document.querySelector('.main')?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+    // The content column is the scroll container; start each page at its top, or at the #section asked for.
+    const hash = decodeURIComponent(window.location.hash.slice(1))
+    const target = hash ? document.getElementById(hash) : null
+    if (target) target.scrollIntoView({ block: 'start' })
+    else document.querySelector('.main')?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
   }, [pathname])
   return null
 }

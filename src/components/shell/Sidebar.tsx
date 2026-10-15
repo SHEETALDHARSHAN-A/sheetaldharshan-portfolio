@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { InteractiveAvatar } from '@/components/avatar/InteractiveAvatar'
 import { MobileMenu } from '@/components/shell/MobileMenu'
 import { NavLinks } from '@/components/shell/NavLinks'
 import type { Site } from '@/data/types'
@@ -11,9 +10,8 @@ export function Sidebar({ site }: { site: Site }) {
         {site.displayName}
         <span className="dot">.</span>
       </Link>
-      <div className="sidebar-avatar">
-        <InteractiveAvatar size={160} variant="full" />
-      </div>
+      {/* The pet (components/pet) lives here; it is positioned over this slot. */}
+      <div className="sidebar-avatar" aria-hidden="true" />
       <div>
         <nav className="sidebar-nav" aria-label="Primary">
           <NavLinks items={site.nav} />

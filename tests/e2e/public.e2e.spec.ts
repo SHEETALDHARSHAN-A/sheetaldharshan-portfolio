@@ -132,4 +132,31 @@ test.describe('Public site', () => {
     await page.keyboard.press('ArrowDown')
     await expect(page.locator('.project-row.active')).toHaveCount(1)
   })
+  test('the pet opens a search bubble with fuzzy results and navigates', async ({ page }) => {
+    await page.goto(`${base}/research`)
+    const pet = page.locator('[data-pet]')
+    await expect(pet).toHaveAttribute('data-ready', 'true', { timeout: 15000 })
+    await pet.click()
+    const input = page.locator('#pet-bubble input')
+    await expect(input).toBeFocused()
+    // A typo still finds the project.
+    await input.fill('exasl studo')
+    await expect(page.locator('#pet-results [role="option"]').first()).toContainText('Exasol Studio', { timeout: 10000 })
+    await input.press('Enter')
+    await expect(page).toHaveURL(/\/projects\/exasol-studio$/)
+    await expect(page.locator('#pet-bubble')).toHaveCount(0)
+    // The keyboard shortcut opens it too, and Escape closes it.
+    await page.keyboard.press('/')
+    await expect(page.locator('#pet-bubble input')).toBeFocused()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('#pet-bubble')).toHaveCount(0)
+  })
+
+  test('search index lists the site content', async ({ request }) => {
+    const res = await request.get(`${base}/search-index.json`)
+    expect(res.ok()).toBeTruthy()
+    const data = (await res.json()) as { docs: { type: string; href: string }[] }
+    expect(data.docs.some((doc) => doc.href === '/projects')).toBeTruthy()
+    expect(data.docs.some((doc) => doc.type === 'project')).toBeTruthy()
+  })
 })

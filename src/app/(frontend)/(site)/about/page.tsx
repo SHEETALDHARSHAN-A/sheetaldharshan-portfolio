@@ -6,6 +6,7 @@ import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Picture } from '@/components/Media/Picture'
 import { PageFrame } from '@/components/shell/PageFrame'
+import { aboutSectionId } from '@/data/types'
 import { formatMonth, getAbout, getCertifications, getEducation, getExperience, getProjects, getPublications, getSite } from '@/data/content'
 
 export const revalidate = 300
@@ -43,7 +44,7 @@ export default async function AboutPage() {
             ))}
           </div>
           {about.sections.map((section, i) => (
-            <section className="section" key={i}>
+            <section className="section" id={aboutSectionId(section)} key={i}>
               <h2>{section.title}</h2>
               {section.kind === 'text' && section.body ? <RichText className="prose" data={section.body as DefaultTypedEditorState} enableGutter={false} enableProse={false} /> : null}
               {section.kind === 'experience' &&

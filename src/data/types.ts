@@ -164,3 +164,25 @@ export type AboutContent = {
   sections: AboutSection[]
   meta: { title?: string; description?: string }
 }
+
+/** Stable anchor for an About section, used by the page and by the site search. */
+export function aboutSectionId(section: AboutSection): string {
+  if (section.kind !== 'text') return section.kind
+  return section.title.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'section'
+}
+
+export type SearchDocType = 'page' | 'project' | 'post' | 'publication' | 'experience' | 'education' | 'certification' | 'skill' | 'link'
+
+/** One searchable entry in /search-index.json. */
+export type SearchDoc = {
+  id: string
+  type: SearchDocType
+  title: string
+  subtitle?: string
+  href: string
+  external?: boolean
+  keywords?: string
+  tags?: string
+  body?: string
+  featured?: boolean
+}

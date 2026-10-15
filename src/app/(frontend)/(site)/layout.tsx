@@ -1,4 +1,5 @@
 import React from 'react'
+import { Pet } from '@/components/pet/Pet'
 import { NavFlag } from '@/components/shell/NavFlag'
 import { Sidebar, Topbar } from '@/components/shell/Sidebar'
 import { getSite } from '@/data/content'
@@ -15,6 +16,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           {children}
         </main>
       </div>
+      <Pet />
     </div>
   )
 }
