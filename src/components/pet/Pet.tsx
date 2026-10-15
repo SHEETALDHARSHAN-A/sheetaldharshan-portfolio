@@ -189,7 +189,7 @@ export function Pet() {
 
   // The only gesture: saying hi when the search opens. Otherwise it rests, looks and strolls.
   const onActivity = useCallback((activity: Activity) => {
-    if (activity === 'opened') ctl.current?.react('waving')
+    if (activity === 'opened') ctl.current?.sayHi()
   }, [])
 
   const go = useCallback(

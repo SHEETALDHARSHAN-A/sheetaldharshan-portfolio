@@ -178,6 +178,38 @@ export class PetController {
     this.play(state, { loops })
   }
 
+  /**
+   * Says hi: raises the hand (frame 1 of the waving row), waves it gently by rocking from the
+   * feet, then lowers it. The row's third frame is an open-palm "what?" gesture, so it is skipped.
+   */
+  sayHi() {
+    if (this.busy === 'drag') return
+    if (this.busy === 'walk') {
+      this.cancelWalk()
+      if (this.atHome) this.offset = clamp(this.pos.x - this.home.x, -this.range, this.range)
+    }
+    window.clearTimeout(this.frameTimer)
+    window.clearTimeout(this.lookTimer)
+    this.current = null
+    this.gaze = null
+    this.busy = 'oneshot'
+    const row = STATES.waving.row
+    this.show(row, 1)
+    if (!this.reduced && typeof this.sprite.animate === 'function') {
+      this.sprite.animate(
+        [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-1.6deg)' }, { transform: 'rotate(1.4deg)' }, { transform: 'rotate(-1.2deg)' }, { transform: 'rotate(0deg)' }],
+        { duration: 1100, easing: 'ease-in-out' },
+      )
+    }
+    this.frameTimer = window.setTimeout(() => {
+      this.show(row, 0)
+      this.frameTimer = window.setTimeout(() => {
+        this.busy = 'none'
+        this.rest()
+      }, 180)
+    }, 1250)
+  }
+
   /** Turns to look at a point on screen; settles back after a short while without movement. */
   lookAt(x: number, y: number) {
     if (this.busy !== 'none' || this.mode !== 'idle' || this.hidden) return
