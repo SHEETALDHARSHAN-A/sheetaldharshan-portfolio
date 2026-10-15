@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { SearchDoc } from '@/data/types'
@@ -35,19 +35,15 @@ function write(key: string, value: { x: number; y: number } | null) {
 
 /**
  * The site's companion: a Codex-style sprite pet that lives in the sidebar (bottom-right on
- * phones). It follows the cursor with its eyes, wanders, can be dragged anywhere, reacts to
- * navigation, and opens a chat bubble with site search when clicked (or with / and ⌘K).
+ * phones). It follows the cursor, strolls now and then, runs when dragged anywhere, and waves
+ * hello as it opens a chat bubble with site search when clicked (or with / and ⌘K).
  */
 export function Pet() {
   const router = useRouter()
-  const pathname = usePathname()
   const elRef = useRef<HTMLButtonElement>(null)
   const ctl = useRef<PetController | null>(null)
   const wasDrag = useRef(false)
-  const lastPath = useRef<string | null>(null)
   const openRef = useRef(false)
-  const lastHop = useRef(0)
-  const lastOutcome = useRef<Activity | null>(null)
   const [mounted, setMounted] = useState(false)
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
@@ -124,15 +120,7 @@ export function Pet() {
     const start = () => {
       if (!alive) return
       setReady(true)
-      let greeted = false
-      try {
-        greeted = window.sessionStorage.getItem('pet:greeted') === '1'
-        window.sessionStorage.setItem('pet:greeted', '1')
-      } catch {
-        /* ignore */
-      }
-      if (greeted) c.rest()
-      else c.react('waving')
+      c.rest()
     }
     img.decode().then(start, start)
 
@@ -178,20 +166,6 @@ export function Pet() {
     if (open && c) setAnchor({ x: c.pos.x, y: c.pos.y, w: c.w, h: c.h })
   }, [open])
 
-  /* reactions to navigation */
-  useEffect(() => {
-    if (!pathname || !ready) return
-    if (lastPath.current === null || lastPath.current === pathname) {
-      lastPath.current = pathname
-      return
-    }
-    lastPath.current = pathname
-    const c = ctl.current
-    if (!c || openRef.current) return
-    // Only the Contact page gets a greeting; elsewhere the pet stays calm.
-    if (pathname === '/contact') c.react('waving')
-  }, [pathname, ready])
-
   /* keyboard: "/" or ⌘K / Ctrl+K opens search */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -211,22 +185,9 @@ export function Pet() {
     ctl.current?.setMode('idle')
   }, [])
 
+  // The only gesture: saying hi when the search opens. Otherwise it rests, looks and strolls.
   const onActivity = useCallback((activity: Activity) => {
-    const c = ctl.current
-    if (!c) return
-    if (activity === 'opened') {
-      c.setMode('waiting')
-      c.react('waving')
-    } else if (activity === 'typing') c.setMode('working')
-    else if (activity === 'waiting') {
-      lastOutcome.current = null
-      c.setMode('waiting')
-    } else if (activity !== lastOutcome.current) {
-      // React once per change of outcome (found ↔ nothing), not after every pause.
-      lastOutcome.current = activity
-      c.setMode('waiting')
-      c.react(activity === 'found' ? 'review' : 'failed')
-    }
+    if (activity === 'opened') ctl.current?.react('waving')
   }, [])
 
   const go = useCallback(
@@ -266,12 +227,7 @@ export function Pet() {
         onPointerCancel={(e) => {
           wasDrag.current = ctl.current?.pointerUp(e.nativeEvent) ?? false
         }}
-        onPointerEnter={(e) => {
-          void loadEngine().catch(() => undefined)
-          if (e.pointerType !== 'mouse' || openRef.current || performance.now() - lastHop.current < 30000) return
-          lastHop.current = performance.now()
-          ctl.current?.react('jumping')
-        }}
+        onPointerEnter={() => void loadEngine().catch(() => undefined)}
         onClick={() => {
           if (wasDrag.current) {
             wasDrag.current = false

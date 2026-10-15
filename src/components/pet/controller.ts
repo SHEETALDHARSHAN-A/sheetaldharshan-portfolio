@@ -39,7 +39,7 @@ export class PetController {
   private wanderTimer = 0
   private walkRaf = 0
   private gaze: { step: number; at: number } | null = null
-  private drag: { id: number; sx: number; sy: number; ox: number; oy: number; lx: number; moved: boolean; dir: number } | null = null
+  private drag: { id: number; sx: number; sy: number; ox: number; oy: number; lx: number; ly: number; moved: boolean; dir: number; run: number; still: number } | null = null
 
   constructor(el: HTMLElement) {
     this.el = el
@@ -164,7 +164,12 @@ export class PetController {
 
   /** A one-off reaction (wave, jump, review…) that returns to the resting loop when done. */
   react(state: PetState, loops = 1) {
-    if (this.busy === 'drag' || this.busy === 'walk') return
+    if (this.busy === 'drag') return
+    if (this.busy === 'walk') {
+      // Stop where it is; a stroll interrupted at home keeps that spot.
+      this.cancelWalk()
+      if (this.atHome) this.offset = clamp(this.pos.x - this.home.x, -this.range, this.range)
+    }
     this.busy = 'oneshot'
     this.play(state, { loops })
   }
@@ -264,8 +269,7 @@ export class PetController {
         const next = (this.offset > 0 ? -1 : 1) * this.range * (0.6 + Math.random() * 0.4)
         this.walkTo(this.home.x + next, this.home.y, () => {
           this.offset = next
-          if (Math.random() < 0.12) this.react('waving')
-          else this.rest()
+          this.rest()
         })
       }
       this.scheduleWander()
@@ -276,7 +280,7 @@ export class PetController {
 
   pointerDown(e: PointerEvent) {
     if (e.button !== 0) return
-    this.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: e.clientX - this.pos.x, oy: e.clientY - this.pos.y, lx: e.clientX, moved: false, dir: 0 }
+    this.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: e.clientX - this.pos.x, oy: e.clientY - this.pos.y, lx: e.clientX, ly: e.clientY, moved: false, dir: 1, run: 0, still: 0 }
     this.el.setPointerCapture?.(e.pointerId)
   }
 
@@ -295,17 +299,19 @@ export class PetController {
     }
     this.place(e.clientX - d.ox, e.clientY - d.oy)
     const vx = e.clientX - d.lx
+    const moved = Math.hypot(vx, e.clientY - d.ly)
     d.lx = e.clientX
-    if (Math.abs(vx) > 0.5) {
-      const dir = vx > 0 ? 1 : -1
-      if (dir !== d.dir) {
-        d.dir = dir
-        this.play(dir > 0 ? 'running-right' : 'running-left')
-      }
-    } else if (!d.dir) {
-      d.dir = 1
-      this.play('running-right')
-    }
+    d.ly = e.clientY
+    if (Math.abs(vx) > 1) d.dir = vx > 0 ? 1 : -1
+    // Running: the legs cycle with how far the pointer travels, so a quick drag is a sprint and
+    // a slow one a jog. When the pointer pauses, the pet stops mid-air on its feet.
+    d.run += moved
+    const gait = STATES[d.dir > 0 ? 'running-right' : 'running-left']
+    window.clearTimeout(this.frameTimer)
+    this.current = null
+    this.show(gait.row, Math.floor(d.run / Math.max(4, this.w * 0.028)) % gait.frames)
+    window.clearTimeout(d.still)
+    d.still = window.setTimeout(() => this.drag?.moved && this.show(STATES.idle.row, 0), 180)
   }
 
   /** Returns true when the gesture was a drag, so the caller can ignore the click that follows. */
@@ -313,6 +319,7 @@ export class PetController {
     const d = this.drag
     if (!d || e.pointerId !== d.id) return false
     this.drag = null
+    window.clearTimeout(d.still)
     this.el.releasePointerCapture?.(e.pointerId)
     if (!d.moved) return false
     this.el.dataset.dragging = 'false'
