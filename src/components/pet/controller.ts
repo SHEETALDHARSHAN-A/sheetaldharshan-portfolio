@@ -25,6 +25,7 @@ export class PetController {
   onDrop?: (atHome: boolean) => void
 
   private el: HTMLElement
+  private sprite: HTMLElement
   private home = { x: 0, y: 0 }
   private range = 0
   private offset = 0
@@ -39,10 +40,13 @@ export class PetController {
   private wanderTimer = 0
   private walkRaf = 0
   private gaze: { step: number; at: number } | null = null
-  private drag: { id: number; sx: number; sy: number; ox: number; oy: number; lx: number; ly: number; moved: boolean; dir: number; run: number; still: number } | null = null
+  private drag: { id: number; sx: number; sy: number; ox: number; oy: number; tx: number; ty: number; moved: boolean; dir: number; phase: number; tilt: number } | null = null
+  private dragRaf = 0
 
-  constructor(el: HTMLElement) {
+  /** `el` is positioned on screen; `sprite` (inside it) shows the frame and leans, bobs and squashes. */
+  constructor(el: HTMLElement, sprite: HTMLElement) {
     this.el = el
+    this.sprite = sprite
   }
 
   /* ------------------------------------------------------------ layout */
@@ -100,7 +104,7 @@ export class PetController {
   /* ------------------------------------------------------------ animation */
 
   private show(row: number, col: number) {
-    this.el.style.backgroundPosition = `${(col / (SHEET.columns - 1)) * 100}% ${(row / (SHEET.rows - 1)) * 100}%`
+    this.sprite.style.backgroundPosition = `${(col / (SHEET.columns - 1)) * 100}% ${(row / (SHEET.rows - 1)) * 100}%`
   }
 
   private play(state: PetState, options: { loops?: number; then?: () => void } = {}) {
@@ -280,38 +284,57 @@ export class PetController {
 
   pointerDown(e: PointerEvent) {
     if (e.button !== 0) return
-    this.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: e.clientX - this.pos.x, oy: e.clientY - this.pos.y, lx: e.clientX, ly: e.clientY, moved: false, dir: 1, run: 0, still: 0 }
+    const ox = e.clientX - this.pos.x
+    const oy = e.clientY - this.pos.y
+    this.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox, oy, tx: this.pos.x, ty: this.pos.y, moved: false, dir: 1, phase: 0, tilt: 0 }
     this.el.setPointerCapture?.(e.pointerId)
   }
 
   pointerMove(e: PointerEvent) {
     const d = this.drag
     if (!d || e.pointerId !== d.id) return
-    if (!d.moved) {
-      if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 6) return
-      d.moved = true
-      this.cancelWalk()
-      window.clearTimeout(this.lookTimer)
-      this.busy = 'drag'
-      this.atHome = false
-      this.el.dataset.dragging = 'true'
-      this.onDragStart?.()
-    }
-    this.place(e.clientX - d.ox, e.clientY - d.oy)
-    const vx = e.clientX - d.lx
-    const moved = Math.hypot(vx, e.clientY - d.ly)
-    d.lx = e.clientX
-    d.ly = e.clientY
-    if (Math.abs(vx) > 1) d.dir = vx > 0 ? 1 : -1
-    // Running: the legs cycle with how far the pointer travels, so a quick drag is a sprint and
-    // a slow one a jog. When the pointer pauses, the pet stops mid-air on its feet.
-    d.run += moved
-    const gait = STATES[d.dir > 0 ? 'running-right' : 'running-left']
+    d.tx = e.clientX - d.ox
+    d.ty = e.clientY - d.oy
+    if (d.moved || Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 6) return
+    d.moved = true
+    this.cancelWalk()
     window.clearTimeout(this.frameTimer)
+    window.clearTimeout(this.lookTimer)
     this.current = null
-    this.show(gait.row, Math.floor(d.run / Math.max(4, this.w * 0.028)) % gait.frames)
-    window.clearTimeout(d.still)
-    d.still = window.setTimeout(() => this.drag?.moved && this.show(STATES.idle.row, 0), 180)
+    this.gaze = null
+    this.busy = 'drag'
+    this.atHome = false
+    this.el.dataset.dragging = 'true'
+    this.onDragStart?.()
+    let last = performance.now()
+    const loop = (now: number) => {
+      const dd = this.drag
+      if (!dd) return
+      const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000))
+      last = now
+      // Carried, not glued: the body trails the pointer a little and catches up.
+      const k = this.reduced ? 1 : 1 - Math.pow(0.00002, dt)
+      const nx = this.pos.x + (dd.tx - this.pos.x) * k
+      const ny = this.pos.y + (dd.ty - this.pos.y) * k
+      const vx = (nx - this.pos.x) / dt
+      const speed = Math.hypot(vx, (ny - this.pos.y) / dt)
+      this.place(nx, ny)
+      if (Math.abs(vx) > 25) dd.dir = vx > 0 ? 1 : -1
+      // Legs keep running while held and sprint as the drag speeds up. Only every other frame of
+      // the stride is used, so the legs snap between wide positions like a runner's, not a stroller's.
+      dd.phase += dt * (7 + Math.min(9, speed / 70))
+      const gait = STATES[dd.dir > 0 ? 'running-right' : 'running-left']
+      this.show(gait.row, (Math.floor(dd.phase) * 2) % gait.frames)
+      if (!this.reduced) {
+        // A runner's forward lean, more with speed, and a bounce on every step.
+        const lean = dd.dir * (7 + Math.min(9, speed / 90))
+        dd.tilt += (lean - dd.tilt) * Math.min(1, dt * 10)
+        const bob = -Math.abs(Math.sin((dd.phase * Math.PI) / 2)) * 6
+        this.sprite.style.transform = `translateY(${bob.toFixed(2)}px) rotate(${dd.tilt.toFixed(2)}deg) scale(1.06)`
+      }
+      this.dragRaf = requestAnimationFrame(loop)
+    }
+    this.dragRaf = requestAnimationFrame(loop)
   }
 
   /** Returns true when the gesture was a drag, so the caller can ignore the click that follows. */
@@ -319,11 +342,12 @@ export class PetController {
     const d = this.drag
     if (!d || e.pointerId !== d.id) return false
     this.drag = null
-    window.clearTimeout(d.still)
+    cancelAnimationFrame(this.dragRaf)
     this.el.releasePointerCapture?.(e.pointerId)
     if (!d.moved) return false
     this.el.dataset.dragging = 'false'
     this.busy = 'none'
+    this.land(d.tilt)
     const nearHome = Math.hypot(this.pos.x - this.home.x, this.pos.y - this.home.y) < Math.max(70, this.w * 0.6)
     if (nearHome) {
       this.offset = clamp(this.pos.x - this.home.x, -this.range, this.range)
@@ -336,10 +360,26 @@ export class PetController {
     return true
   }
 
+  /** A small squash and rebound when set down. */
+  private land(tilt: number) {
+    this.sprite.style.transform = ''
+    if (this.reduced || typeof this.sprite.animate !== 'function') return
+    this.sprite.animate(
+      [
+        { transform: `rotate(${tilt.toFixed(2)}deg) scale(1.06)` },
+        { transform: 'scale(1.09, 0.9)', offset: 0.35 },
+        { transform: 'scale(0.97, 1.04)', offset: 0.7 },
+        { transform: 'none' },
+      ],
+      { duration: 420, easing: 'cubic-bezier(0.3, 0.7, 0.4, 1)' },
+    )
+  }
+
   destroy() {
     window.clearTimeout(this.frameTimer)
     window.clearTimeout(this.lookTimer)
     window.clearTimeout(this.wanderTimer)
     cancelAnimationFrame(this.walkRaf)
+    cancelAnimationFrame(this.dragRaf)
   }
 }

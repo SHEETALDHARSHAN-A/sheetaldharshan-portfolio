@@ -41,6 +41,7 @@ function write(key: string, value: { x: number; y: number } | null) {
 export function Pet() {
   const router = useRouter()
   const elRef = useRef<HTMLButtonElement>(null)
+  const spriteRef = useRef<HTMLSpanElement>(null)
   const ctl = useRef<PetController | null>(null)
   const wasDrag = useRef(false)
   const openRef = useRef(false)
@@ -57,8 +58,9 @@ export function Pet() {
   /* controller, layout, gaze and lifecycle */
   useEffect(() => {
     const el = elRef.current
-    if (!mounted || !el) return
-    const c = new PetController(el)
+    const sprite = spriteRef.current
+    if (!mounted || !el || !sprite) return
+    const c = new PetController(el, sprite)
     ctl.current = c
     const mq = window.matchMedia(MOBILE)
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -218,7 +220,7 @@ export function Pet() {
         aria-expanded={open}
         aria-controls="pet-bubble"
         title="Click to search · drag to move"
-        style={{ backgroundImage: ready ? `url(${SHEET.src})` : undefined, viewTransitionName: 'site-pet' }}
+        style={{ viewTransitionName: 'site-pet' }}
         onPointerDown={(e) => ctl.current?.pointerDown(e.nativeEvent)}
         onPointerMove={(e) => ctl.current?.pointerMove(e.nativeEvent)}
         onPointerUp={(e) => {
@@ -237,7 +239,9 @@ export function Pet() {
           else setOpen(true)
         }}
         onDoubleClick={() => away && ctl.current?.goHome()}
-      />
+      >
+        <span ref={spriteRef} className={styles.sprite} style={{ backgroundImage: ready ? `url(${SHEET.src})` : undefined }} />
+      </button>
       <PetBubble
         open={open}
         anchor={anchor}

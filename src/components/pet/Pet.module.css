@@ -7,10 +7,7 @@
   padding: 0;
   border: 0;
   border-radius: 24px;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-size: 800% 1100%;
-  background-position: 0 0;
+  background: transparent;
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -19,10 +16,22 @@
   opacity: 0;
   transition: opacity 320ms ease;
   will-change: transform;
-  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45));
 }
 .pet[data-ready='true'] { opacity: 1; }
-.pet[data-dragging='true'] { cursor: grabbing; filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.5)); }
+.pet[data-dragging='true'] { cursor: grabbing; }
+.sprite {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-size: 800% 1100%;
+  background-position: 0 0;
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45));
+  transition: filter 200ms ease;
+  pointer-events: none;
+}
+/* Lifted while carried: a deeper shadow under it. */
+.pet[data-dragging='true'] .sprite { filter: drop-shadow(0 22px 16px rgba(0, 0, 0, 0.5)); will-change: transform; }
 .pet:focus-visible { outline: 2px solid var(--accent); outline-offset: -14px; }
 
 /* Chat bubble */
