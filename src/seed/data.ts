@@ -14,10 +14,12 @@ export const homepageMessages = [
     content: 'Want to take a look?',
     style: 'default',
     choices: [
-      { label: "See what I've built", href: '/projects' },
-      { label: "Read what I'm learning", href: '/blog' },
-      { label: 'A little about me', href: '/about' },
-      { label: 'Get in touch', href: '/contact' },
+      // Rendered as one sentence ("A, B, C and D"), so these read as phrases, not buttons.
+      { label: "Things I've built", href: '/projects' },
+      { label: "what I'm writing", href: '/blog' },
+      { label: 'who I am', href: '/about' },
+      { label: 'my research', href: '/research' },
+      { label: 'how to reach me', href: '/contact' },
     ],
   },
 ] as const
