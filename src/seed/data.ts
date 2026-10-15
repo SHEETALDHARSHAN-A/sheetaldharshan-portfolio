@@ -38,7 +38,7 @@ export const siteSettings = {
   fullName: 'Sheetaldharshan A',
   tagline: 'I build developer tools and AI agents that work over real databases.',
   description: 'Software engineer at Exasol. Developer tools and AI agents that work over real databases. Python, FastAPI, MCP, LangGraph, TypeScript, Rust.',
-  canonicalUrl: 'https://sheetaldharshan.me',
+  canonicalUrl: 'https://www.sheetaldharshan.me',
   currentRole: 'Software Engineer at Exasol',
   location: 'Chennai, India',
   socialLinks: [

@@ -109,8 +109,8 @@ export function PetBubble({ open, anchor, mobile, away, onClose, onActivity, onG
       activityRef.current('waiting')
       return
     }
-    activityRef.current('typing')
-    const t = window.setTimeout(() => activityRef.current(found ? 'found' : 'empty'), 550)
+    // Only after a real pause in typing, and only when the outcome changes, so it doesn't flicker per keystroke.
+    const t = window.setTimeout(() => activityRef.current(found ? 'found' : 'empty'), 900)
     return () => window.clearTimeout(t)
   }, [q, found, open, engine])
 

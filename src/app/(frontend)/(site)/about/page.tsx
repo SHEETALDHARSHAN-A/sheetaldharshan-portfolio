@@ -7,13 +7,28 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Picture } from '@/components/Media/Picture'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { aboutSectionId } from '@/data/types'
+import { personSchema } from '@/data/seo'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { formatMonth, getAbout, getCertifications, getEducation, getExperience, getProjects, getPublications, getSite } from '@/data/content'
 
 export const revalidate = 300
 
 export async function generateMetadata(): Promise<Metadata> {
-  const about = await getAbout()
-  return { title: about.meta.title || 'About', description: about.meta.description || undefined, alternates: { canonical: '/about' } }
+  const [about, site] = await Promise.all([getAbout(), getSite()])
+  const description = about.meta.description || about.intro[0] || site.description
+  const photo = about.photo
+  return {
+    title: about.meta.title || 'About',
+    description,
+    alternates: { canonical: '/about' },
+    openGraph: {
+      type: 'profile',
+      url: '/about',
+      title: `About ${site.fullName}`,
+      description,
+      ...(photo ? { images: [{ url: photo.url, width: photo.width, height: photo.height, alt: photo.alt || site.fullName }] } : {}),
+    },
+  }
 }
 
 export default async function AboutPage() {
@@ -30,6 +45,15 @@ export default async function AboutPage() {
   return (
     <PageFrame>
     <div className="page">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'ProfilePage',
+          url: `${site.canonicalUrl}/about`,
+          name: `About ${site.fullName}`,
+          mainEntity: personSchema(site, { photo: about.photo, about, experience: kinds.has('experience') ? experience : await getExperience(), education: kinds.has('education') ? education : await getEducation() }),
+        }}
+      />
       {draft && <LivePreviewListener />}
       <header className="page-head">
         <span className="eyebrow">{about.eyebrow}</span>

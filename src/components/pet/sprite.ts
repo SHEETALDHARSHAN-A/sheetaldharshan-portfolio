@@ -5,15 +5,15 @@ export type PetState = 'idle' | 'running-right' | 'running-left' | 'waving' | 'j
 
 /** Row, frame count and playback speed for each animation. */
 export const STATES: Record<PetState, { row: number; frames: number; fps: number }> = {
-  idle: { row: 0, frames: 6, fps: 5 },
-  'running-right': { row: 1, frames: 8, fps: 12 },
-  'running-left': { row: 2, frames: 8, fps: 12 },
-  waving: { row: 3, frames: 4, fps: 6 },
-  jumping: { row: 4, frames: 5, fps: 9 },
-  failed: { row: 5, frames: 8, fps: 8 },
-  waiting: { row: 6, frames: 6, fps: 4 },
-  running: { row: 7, frames: 6, fps: 7 },
-  review: { row: 8, frames: 6, fps: 6 },
+  idle: { row: 0, frames: 6, fps: 3 },
+  'running-right': { row: 1, frames: 8, fps: 8 },
+  'running-left': { row: 2, frames: 8, fps: 8 },
+  waving: { row: 3, frames: 4, fps: 4 },
+  jumping: { row: 4, frames: 5, fps: 7 },
+  failed: { row: 5, frames: 8, fps: 6 },
+  waiting: { row: 6, frames: 6, fps: 2.5 },
+  running: { row: 7, frames: 6, fps: 4 },
+  review: { row: 8, frames: 6, fps: 4 },
 }
 
 /**

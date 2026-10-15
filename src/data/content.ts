@@ -62,7 +62,8 @@ export const getSite = cache(async (): Promise<Site> => {
     fullName: settings?.fullName || 'Sheetaldharshan A',
     tagline: settings?.tagline || 'I build developer tools and AI agents that work over real databases.',
     description: settings?.description || 'Software engineer at Exasol. Developer tools and AI agents that work over real databases.',
-    canonicalUrl: settings?.canonicalUrl || 'https://sheetaldharshan.me',
+    // The deployed address wins, so sitemap, canonical tags and structured data all name the same host.
+    canonicalUrl: (process.env.NEXT_PUBLIC_SERVER_URL || settings?.canonicalUrl || 'https://www.sheetaldharshan.me').replace(/\/$/, ''),
     currentRole: settings?.currentRole ?? undefined,
     location: settings?.location ?? undefined,
     socialLinks: (settings?.socialLinks ?? []).map((link) => ({ label: link.label, href: link.href })),

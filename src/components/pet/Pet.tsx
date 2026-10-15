@@ -47,6 +47,7 @@ export function Pet() {
   const lastPath = useRef<string | null>(null)
   const openRef = useRef(false)
   const lastHop = useRef(0)
+  const lastOutcome = useRef<Activity | null>(null)
   const [mounted, setMounted] = useState(false)
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
@@ -93,7 +94,9 @@ export function Pet() {
         const slot = document.querySelector('.sidebar-avatar')?.getBoundingClientRect()
         if (slot && slot.width > 0) {
           // The figure fills the middle of its cell, so it can stroll a little past the cell edges.
-          c.setHome(slot.left + (slot.width - c.w) / 2, slot.top + (slot.height - c.h) / 2, Math.max(0, (slot.width - c.w) / 2 + c.w * 0.18))
+          // The figure is about 45% of its cell, so it may stroll until it nearly reaches the sidebar edges.
+          const sidebar = document.querySelector('.sidebar')?.getBoundingClientRect() ?? slot
+          c.setHome(slot.left + (slot.width - c.w) / 2, slot.top + (slot.height - c.h) / 2, Math.max(0, sidebar.width / 2 - c.w * 0.25 - 14))
         }
       }
       c.setWander(!isMobile)
@@ -129,7 +132,7 @@ export function Pet() {
         /* ignore */
       }
       if (greeted) c.rest()
-      else c.react('waving', 2)
+      else c.react('waving')
     }
     img.decode().then(start, start)
 
@@ -137,7 +140,7 @@ export function Pet() {
     const onPointer = (e: PointerEvent) => {
       if (e.pointerType === 'touch') return
       const now = performance.now()
-      if (now - lastLook < 40) return
+      if (now - lastLook < 120) return
       lastLook = now
       c.lookAt(e.clientX, e.clientY)
     }
@@ -185,9 +188,8 @@ export function Pet() {
     lastPath.current = pathname
     const c = ctl.current
     if (!c || openRef.current) return
-    if (pathname === '/contact' || pathname === '/about') c.react('waving', 2)
-    else if (pathname === '/projects' || pathname.startsWith('/projects/')) c.react('jumping')
-    else if (pathname.startsWith('/blog') || pathname === '/research') c.react('review')
+    // Only the Contact page gets a greeting; elsewhere the pet stays calm.
+    if (pathname === '/contact') c.react('waving')
   }, [pathname, ready])
 
   /* keyboard: "/" or ⌘K / Ctrl+K opens search */
@@ -216,20 +218,20 @@ export function Pet() {
       c.setMode('waiting')
       c.react('waving')
     } else if (activity === 'typing') c.setMode('working')
-    else if (activity === 'waiting') c.setMode('waiting')
-    else if (activity === 'found') {
+    else if (activity === 'waiting') {
+      lastOutcome.current = null
       c.setMode('waiting')
-      c.react('review')
-    } else if (activity === 'empty') {
+    } else if (activity !== lastOutcome.current) {
+      // React once per change of outcome (found ↔ nothing), not after every pause.
+      lastOutcome.current = activity
       c.setMode('waiting')
-      c.react('failed')
+      c.react(activity === 'found' ? 'review' : 'failed')
     }
   }, [])
 
   const go = useCallback(
     (doc: SearchDoc) => {
       close()
-      ctl.current?.react('jumping')
       if (doc.external) {
         if (doc.href.startsWith('mailto:')) window.location.href = doc.href
         else window.open(doc.href, '_blank', 'noopener,noreferrer')
@@ -266,7 +268,7 @@ export function Pet() {
         }}
         onPointerEnter={(e) => {
           void loadEngine().catch(() => undefined)
-          if (e.pointerType !== 'mouse' || openRef.current || performance.now() - lastHop.current < 5000) return
+          if (e.pointerType !== 'mouse' || openRef.current || performance.now() - lastHop.current < 30000) return
           lastHop.current = performance.now()
           ctl.current?.react('jumping')
         }}

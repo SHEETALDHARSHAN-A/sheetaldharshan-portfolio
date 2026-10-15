@@ -4,28 +4,18 @@ import { Conversation } from '@/components/home/Conversation'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { PageFrame } from '@/components/shell/PageFrame'
-import { getHomepage, getSite } from '@/data/content'
+import { getAbout, getEducation, getExperience, getHomepage, getSite } from '@/data/content'
+import { defaultTitle, personSchema, websiteSchema } from '@/data/seo'
 
 export const revalidate = 300
 
 export default async function HomePage() {
-  const [conversation, site, { isEnabled: draft }] = await Promise.all([getHomepage(), getSite(), draftMode()])
+  const [conversation, site, about, experience, education, { isEnabled: draft }] = await Promise.all([getHomepage(), getSite(), getAbout(), getExperience(), getEducation(), draftMode()])
   return (
     <PageFrame>
     <main className="jg" id="main">
       {draft && <LivePreviewListener />}
-      <JsonLd
-        data={{
-          '@context': 'https://schema.org',
-          '@type': 'Person',
-          name: site.fullName,
-          alternateName: site.displayName,
-          url: site.canonicalUrl,
-          jobTitle: site.currentRole,
-          description: site.description,
-          sameAs: site.socialLinks.map((link) => link.href),
-        }}
-      />
+      <JsonLd data={{ '@context': 'https://schema.org', '@graph': [websiteSchema(site), personSchema(site, { photo: about.photo, about, experience, education })] }} />
       <h1 className="sr-only">{site.fullName}</h1>
       <Conversation data={conversation} />
     </main>
@@ -36,8 +26,8 @@ export default async function HomePage() {
 export async function generateMetadata(): Promise<Metadata> {
   const [conversation, site] = await Promise.all([getHomepage(), getSite()])
   return {
-    title: { absolute: conversation.meta.title || site.fullName },
-    description: conversation.meta.description || site.tagline,
+    title: { absolute: conversation.meta.title && conversation.meta.title !== site.fullName ? conversation.meta.title : defaultTitle(site) },
+    description: conversation.meta.description || site.description,
     alternates: { canonical: '/' },
   }
 }
