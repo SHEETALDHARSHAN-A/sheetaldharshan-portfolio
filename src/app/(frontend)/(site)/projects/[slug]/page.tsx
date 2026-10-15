@@ -8,6 +8,7 @@ import { HeroImage } from '@/components/projects/HeroImage'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { MediaAny, Picture } from '@/components/Media/Picture'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumbSchema } from '@/data/seo'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { getProject, getProjects, getSite } from '@/data/content'
 import { draftMode } from 'next/headers'
@@ -64,6 +65,7 @@ export default async function ProjectPage({ params }: Props) {
           ...(project.githubUrl ? { codeRepository: project.githubUrl } : {}),
         }}
       />
+      <JsonLd data={breadcrumbSchema(site, [{ name: 'Projects', path: '/projects' }, { name: project.title, path: `/projects/${project.slug}` }])} />
       <aside className="case-info">
         <span className="eyebrow">{project.category ?? project.kindLabel}</span>
         <h1>{project.title}</h1>

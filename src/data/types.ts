@@ -67,6 +67,7 @@ export type ProjectSummary = {
   thumbnail?: MediaRef
   heroImage?: MediaRef
   heroVideo?: MediaRef
+  updatedAt?: string
   githubUrl?: string
   liveDemoUrl?: string
   documentationUrl?: string
@@ -99,6 +100,7 @@ export type PostSummary = {
   categories: string[]
   readingMinutes: number
   cover?: MediaRef
+  updatedAt?: string
 }
 
 export type Post = PostSummary & {

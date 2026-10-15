@@ -7,6 +7,7 @@ import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Picture } from '@/components/Media/Picture'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumbSchema } from '@/data/seo'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { formatDate, getPost, getSite } from '@/data/content'
 
@@ -48,6 +49,7 @@ export default async function BlogPostPage({ params }: Props) {
           ...(post.cover ? { image: post.cover.url } : {}),
         }}
       />
+      <JsonLd data={breadcrumbSchema(site, [{ name: 'Writing', path: '/blog' }, { name: post.title, path: `/blog/${post.slug}` }])} />
       <article>
         <header className="article-head">
           <span className="eyebrow">{post.categories[0] ?? 'Note'}</span>

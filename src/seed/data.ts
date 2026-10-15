@@ -5,8 +5,8 @@
  */
 
 export const homepageMessages = [
-  { content: 'Hey there.', style: 'default' },
-  { content: "I'm Sheetaldharshan.", style: 'default' },
+  { content: 'Hi there 👋.', style: 'default' },
+  { content: "I'm Sheetaldharshan, Sheetal for short.", style: 'default' },
   { content: 'I build developer tools and AI agents that work over real databases.', style: 'default' },
   { content: "I'm currently a software engineer at [Exasol](https://www.exasol.com).", style: 'default' },
   { content: 'Outside work, I build things that make working with data a little easier.', style: 'default' },
@@ -37,7 +37,7 @@ export const siteSettings = {
   displayName: 'Sheetaldharshan',
   fullName: 'Sheetaldharshan A',
   tagline: 'I build developer tools and AI agents that work over real databases.',
-  description: 'Software engineer at Exasol. Developer tools and AI agents that work over real databases. Python, FastAPI, MCP, LangGraph, TypeScript, Rust.',
+  description: 'Sheetal (Sheetaldharshan A) is a software engineer at Exasol in Chennai, India, building developer tools and AI agents that work over real databases.',
   canonicalUrl: 'https://www.sheetaldharshan.me',
   currentRole: 'Software Engineer at Exasol',
   location: 'Chennai, India',
@@ -251,7 +251,7 @@ export const about = {
   eyebrow: 'About',
   title: 'Sheetaldharshan A',
   intro: [
-    'I am a software engineer at Exasol. I build developer tools and AI agents that work over real databases, and I care about the parts most demos skip: the installer that has to work on a stranger’s laptop, the read-only login that cannot be misused, the SQL you get to see before it runs.',
+    'I’m Sheetal (Sheetaldharshan A), a software engineer at Exasol. I build developer tools and AI agents that work over real databases, and I care about the parts most demos skip: the installer that has to work on a stranger’s laptop, the read-only login that cannot be misused, the SQL you get to see before it runs.',
     'Before Exasol I spent a year as an AI intern at Prayag.AI, working on Python backend services, LLM integrations, agent workflows and database-backed applications.',
     'I finished a B.Tech in Information Technology in June 2026. I am interested in backend engineering, AI engineering, developer tools, agentic systems, database technologies and forward-deployed engineering.',
   ].join('\n\n'),

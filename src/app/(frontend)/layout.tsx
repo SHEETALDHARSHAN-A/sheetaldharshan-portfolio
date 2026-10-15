@@ -7,7 +7,7 @@ import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
 import { getAppearance, getSite } from '@/data/content'
-import { defaultTitle, nameVariants } from '@/data/seo'
+import { brandName, defaultTitle, nameVariants } from '@/data/seo'
 import { themeAttributes } from '@/styles/theme'
 import { cn } from '@/utilities/ui'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -52,15 +52,15 @@ export async function generateMetadata(): Promise<Metadata> {
     : { url: '/icon-512.png', width: 512, height: 512, alt: title }
   return {
     metadataBase: new URL(getServerSideURL()),
-    title: { default: title, template: `%s · ${site.fullName}` },
+    title: { default: title, template: `%s · ${brandName(site)}` },
     description: site.description,
-    applicationName: site.fullName,
+    applicationName: brandName(site),
     authors: [{ name: site.fullName, url: site.canonicalUrl }],
     creator: site.fullName,
     keywords: [site.fullName, ...nameVariants(site), site.currentRole, site.location, 'software engineer', 'developer tools', 'AI agents', 'portfolio'].filter(Boolean) as string[],
     // Let search engines show the large image preview and full snippets.
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } },
-    openGraph: { type: 'website', locale: 'en_IN', url: '/', siteName: site.fullName, title, description: site.description, images: [image] },
+    openGraph: { type: 'website', locale: 'en_IN', url: '/', siteName: brandName(site), title, description: site.description, images: [image] },
     twitter: { card: 'summary_large_image', title, description: site.description, images: [image] },
     icons: {
       icon: [

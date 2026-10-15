@@ -7,7 +7,7 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { AboutPhoto } from '@/components/Media/AboutPhoto'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { aboutSectionId } from '@/data/types'
-import { personSchema } from '@/data/seo'
+import { brandName, personSchema } from '@/data/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { BrandIcon } from '@/components/BrandIcon'
 import { formatMonth, getAbout, getCertifications, getEducation, getExperience, getProjects, getPublications, getSite } from '@/data/content'
@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: 'profile',
       url: '/about',
-      title: `About ${site.fullName}`,
+      title: `About ${brandName(site)}`,
       description,
       ...(photo ? { images: [{ url: photo.url, width: photo.width, height: photo.height, alt: photo.alt || site.fullName }] } : {}),
     },
@@ -51,7 +51,7 @@ export default async function AboutPage() {
           '@context': 'https://schema.org',
           '@type': 'ProfilePage',
           url: `${site.canonicalUrl}/about`,
-          name: `About ${site.fullName}`,
+          name: `About ${brandName(site)}`,
           mainEntity: personSchema(site, { photo: about.photo, about, experience: kinds.has('experience') ? experience : await getExperience(), education: kinds.has('education') ? education : await getEducation() }),
         }}
       />

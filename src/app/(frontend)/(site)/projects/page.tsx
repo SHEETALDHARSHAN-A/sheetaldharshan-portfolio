@@ -8,7 +8,7 @@ export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Projects',
-  description: 'Selected developer tools, AI agents and database work by Sheetaldharshan.',
+  description: 'Projects by Sheetal (Sheetaldharshan A): developer tools, AI agents and database work, including the Exasol Personal Local Starter Kit and Exasol Studio.',
   alternates: { canonical: '/projects' },
 }
 
@@ -43,6 +43,7 @@ export default async function ProjectsPage() {
 
   return (
     <PageFrame>
+      <h1 className="sr-only">Projects by Sheetal (Sheetaldharshan A)</h1>
       <ProjectExplorer projects={projects} />
     </PageFrame>
   )

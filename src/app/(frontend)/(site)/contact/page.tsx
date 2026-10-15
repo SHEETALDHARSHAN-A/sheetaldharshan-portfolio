@@ -5,7 +5,11 @@ import { getSite } from '@/data/content'
 
 export const revalidate = 300
 
-export const metadata: Metadata = { title: 'Contact', description: 'How to reach Sheetaldharshan.', alternates: { canonical: '/contact' } }
+export const metadata: Metadata = {
+  title: 'Contact',
+  description: 'Contact Sheetal (Sheetaldharshan A), software engineer at Exasol in Chennai, India: email, GitHub and LinkedIn.',
+  alternates: { canonical: '/contact' },
+}
 
 export default async function ContactPage() {
   const site = await getSite()
