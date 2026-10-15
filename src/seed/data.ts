@@ -6,7 +6,7 @@
 
 export const homepageMessages = [
   { content: 'Hi there 👋.', style: 'default' },
-  { content: "I'm Sheetaldharshan, Sheetal for short.", style: 'default' },
+  { content: "I'm Sheetaldharshan.", style: 'default' },
   { content: 'I build developer tools and AI agents that work over real databases.', style: 'default' },
   { content: "I'm currently a software engineer at [Exasol](https://www.exasol.com).", style: 'default' },
   { content: 'Outside work, I build things that make working with data a little easier.', style: 'default' },
