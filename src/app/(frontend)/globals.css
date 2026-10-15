@@ -421,6 +421,18 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); gap: clamp(24px, 4vw, 60px); align-items: start; }
 .about-photo { position: sticky; top: 30px; aspect-ratio: 4 / 5; border-radius: var(--radius); overflow: hidden; background: var(--bg-elevated); border: 1px solid var(--line); isolation: isolate; }
 .about-photo img { width: 100%; height: 100%; object-fit: cover; }
+/* About portrait: shimmer → blurred preview → sharp photo */
+.photo-progressive { position: absolute; inset: 0; overflow: hidden; background: var(--bg-elevated); }
+.photo-progressive > * { position: absolute; inset: 0; }
+.photo-shimmer { background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.07) 50%, transparent 70%) 0 0 / 250% 100%, radial-gradient(70% 55% at 50% 38%, var(--accent-soft), transparent 70%); animation: photo-shimmer 1.6s ease-in-out infinite; transition: opacity 500ms ease; }
+.photo-progressive[data-ready='true'] .photo-shimmer { opacity: 0; animation: none; }
+.photo-progressive .photo-preview { filter: blur(22px) saturate(1.1); transform: scale(1.12); opacity: 0; transition: opacity 400ms ease; }
+.photo-progressive[data-preview='true'] .photo-preview { opacity: 1; }
+.photo-progressive[data-ready='true'] .photo-preview { opacity: 0; transition-delay: 450ms; }
+.photo-progressive .photo-sharp { opacity: 0; transform: scale(1.04); filter: blur(6px); transition: opacity 700ms var(--ease-out), transform 1100ms var(--ease-out), filter 700ms var(--ease-out); }
+.photo-progressive[data-ready='true'] .photo-sharp { opacity: 1; transform: none; filter: none; }
+@keyframes photo-shimmer { from { background-position: 150% 0, 0 0; } to { background-position: -100% 0, 0 0; } }
+@media (prefers-reduced-motion: reduce) { .photo-shimmer { animation: none; } .photo-progressive .photo-sharp { transform: none; filter: none; } }
 .about-photo .placeholder { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(70% 50% at 50% 40%, var(--accent-soft), transparent 70%); color: var(--faint); font-family: var(--font-condensed); font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; }
 .about-intro p { font-size: clamp(17px, 1.4vw, 20px); color: var(--text-soft); line-height: 1.55; margin: 0 0 1em; max-width: 640px; }
 .section { border-top: 1px solid var(--line); padding: 24px 0; }
@@ -533,3 +545,8 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
   html { scroll-behavior: auto; }
 }
 :root[data-motion='reduced'] .stage-media.active, :root[data-motion='reduced'] .stage-media.active img, :root[data-motion='reduced'] .stage-media.active video { animation-duration: 1ms; }
+
+/* Brand marks next to links (src/config/brands.ts) */
+.brand-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--brand-size, 16px); height: var(--brand-size, 16px); margin-right: 0.42em; vertical-align: -0.18em; line-height: 0; }
+.brand-icon svg, .brand-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.brand-icon.brand-plate { background: #fff; border-radius: 4px; padding: 2px; box-sizing: border-box; }

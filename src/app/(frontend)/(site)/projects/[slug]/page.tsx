@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { BrandIcon } from '@/components/BrandIcon'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RenderProjectBlocks } from '@/components/blocks/RenderProjectBlocks'
@@ -103,6 +104,7 @@ export default async function ProjectPage({ params }: Props) {
                 {links.map((link) => (
                   <div key={link.href}>
                     <a href={link.href} rel="noreferrer" target="_blank">
+                      <BrandIcon href={link.href} size={15} />
                       {link.label} ↗
                     </a>
                   </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { BrandIcon } from '@/components/BrandIcon'
 import type { SearchDoc } from '@/data/types'
 import type { Anchor } from './Pet'
 import { highlight, loadEngine, normalize, snippet, typeLabels, type Engine, type Hit, type Segment } from './search'
@@ -221,6 +222,7 @@ export function PetBubble({ open, anchor, mobile, away, onClose, onActivity, onG
                   </span>
                   <span className={styles.text}>
                     <span className={styles.title}>
+                      {doc.external ? <BrandIcon href={doc.href} name={doc.title} size={14} /> : null}
                       <Marked segments={highlight(doc.title, terms)} />
                     </span>
                     {line ? (

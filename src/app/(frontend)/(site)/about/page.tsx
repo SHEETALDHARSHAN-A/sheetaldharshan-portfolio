@@ -4,11 +4,12 @@ import { draftMode } from 'next/headers'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
-import { Picture } from '@/components/Media/Picture'
+import { AboutPhoto } from '@/components/Media/AboutPhoto'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { aboutSectionId } from '@/data/types'
 import { personSchema } from '@/data/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { BrandIcon } from '@/components/BrandIcon'
 import { formatMonth, getAbout, getCertifications, getEducation, getExperience, getProjects, getPublications, getSite } from '@/data/content'
 
 export const revalidate = 300
@@ -79,7 +80,9 @@ export default async function AboutPage() {
                     </span>
                     <div>
                       <strong>
-                        {entry.role}, {entry.companyUrl ? <a className="inline-link" href={entry.companyUrl} rel="noreferrer" target="_blank">{entry.company}</a> : entry.company}
+                        {entry.role},{' '}
+                        <BrandIcon href={entry.companyUrl} name={entry.company} size={16} />
+                        {entry.companyUrl ? <a className="inline-link" href={entry.companyUrl} rel="noreferrer" target="_blank">{entry.company}</a> : entry.company}
                       </strong>
                       {entry.location && <span className="sub">{entry.location}</span>}
                       {entry.summary && <p>{entry.summary}</p>}
@@ -107,7 +110,10 @@ export default async function AboutPage() {
                       {formatMonth(entry.startDate)} – {formatMonth(entry.endDate)}
                     </span>
                     <div>
-                      <strong>{entry.institution}</strong>
+                      <strong>
+                        <BrandIcon name={entry.institution} size={16} />
+                        {entry.institution}
+                      </strong>
                       <span className="sub">{[entry.degree, entry.field].filter(Boolean).join(', ')}</span>
                       {entry.notes && <p>{entry.notes}</p>}
                     </div>
@@ -119,7 +125,12 @@ export default async function AboutPage() {
                     <span className="when">{entry.year}</span>
                     <div>
                       <strong>{entry.url ? <a className="inline-link" href={entry.url} rel="noreferrer" target="_blank">{entry.title}</a> : entry.title}</strong>
-                      {entry.issuer && <span className="sub">{entry.issuer}</span>}
+                      {entry.issuer && (
+                        <span className="sub">
+                          <BrandIcon href={entry.url} name={entry.issuer} size={14} />
+                          {entry.issuer}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -129,7 +140,10 @@ export default async function AboutPage() {
                     <span className="when">{pub.year}</span>
                     <div>
                       <strong>{pub.externalUrl ? <a className="inline-link" href={pub.externalUrl} rel="noreferrer" target="_blank">{pub.title}</a> : pub.title}</strong>
-                      <span className="sub">{[pub.publisher, pub.venue].filter(Boolean).join(' · ')}</span>
+                      <span className="sub">
+                        <BrandIcon name={pub.publisher} size={14} />
+                        {[pub.publisher, pub.venue].filter(Boolean).join(' · ')}
+                      </span>
                       {pub.personalContribution && <p>{pub.personalContribution}</p>}
                     </div>
                   </div>
@@ -174,7 +188,7 @@ export default async function AboutPage() {
           )}
         </div>
         <div className="about-photo" aria-hidden={!about.photo}>
-          {about.photo ? <Picture media={about.photo} size="large" sizes="(max-width: 960px) 100vw, 40vw" /> : <div className="placeholder">Photo coming soon</div>}
+          {about.photo ? <AboutPhoto media={about.photo} /> : <div className="placeholder">Photo coming soon</div>}
         </div>
       </div>
     </div>

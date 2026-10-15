@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { BrandIcon } from '@/components/BrandIcon'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { getSite } from '@/data/content'
 
@@ -27,6 +28,7 @@ export default async function ContactPage() {
           <div className="contact-links">
             {site.socialLinks.map((link) => (
               <a href={link.href} key={link.href} rel="noreferrer" target="_blank">
+                <BrandIcon href={link.href} name={link.label} size={18} />
                 {link.label} <span aria-hidden="true">↗</span>
               </a>
             ))}
@@ -36,7 +38,10 @@ export default async function ContactPage() {
           <h2>Email</h2>
           {site.email ? (
             <div className="contact-links">
-              <a href={`mailto:${site.email}`}>{site.email}</a>
+              <a href={`mailto:${site.email}`}>
+                <BrandIcon href={`mailto:${site.email}`} size={18} />
+                {site.email}
+              </a>
             </div>
           ) : (
             <p>No public email is listed. A message on LinkedIn or GitHub reaches me.</p>

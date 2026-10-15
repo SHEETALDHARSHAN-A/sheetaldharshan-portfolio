@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { BrandIcon } from '@/components/BrandIcon'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { getPublications, getSite } from '@/data/content'
@@ -35,7 +36,10 @@ export default async function ResearchPage() {
                   ...(pub.externalUrl ? { url: pub.externalUrl } : {}),
                 }}
               />
-              <span className="eyebrow">{[pub.publisher, pub.venue, pub.year].filter(Boolean).join(' · ')}</span>
+              <span className="eyebrow">
+                <BrandIcon name={pub.publisher} size={15} />
+                {[pub.publisher, pub.venue, pub.year].filter(Boolean).join(' · ')}
+              </span>
               <h2>{pub.title}</h2>
               <div className="meta">{pub.authors}</div>
               {pub.abstract && <p>{pub.abstract}</p>}
@@ -48,11 +52,13 @@ export default async function ResearchPage() {
               <div className="meta" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 {pub.doi && (
                   <a className="inline-link" href={`https://doi.org/${pub.doi}`} rel="noreferrer" target="_blank">
+                    <BrandIcon href="https://doi.org" size={14} />
                     doi:{pub.doi}
                   </a>
                 )}
                 {pub.externalUrl && !pub.externalUrl.includes('doi.org') && (
                   <a className="inline-link" href={pub.externalUrl} rel="noreferrer" target="_blank">
+                    <BrandIcon href={pub.externalUrl} name={pub.publisher} size={14} />
                     Publisher page
                   </a>
                 )}

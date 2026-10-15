@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BrandIcon } from '@/components/BrandIcon'
 import { MobileMenu } from '@/components/shell/MobileMenu'
 import { NavLinks } from '@/components/shell/NavLinks'
 import type { Site } from '@/data/types'
@@ -19,6 +20,7 @@ export function Sidebar({ site }: { site: Site }) {
         <div className="sidebar-foot">
           {site.socialLinks.map((link) => (
             <a key={link.href} href={link.href} rel="noreferrer" target="_blank">
+              <BrandIcon href={link.href} name={link.label} size={13} />
               {link.label}
             </a>
           ))}
