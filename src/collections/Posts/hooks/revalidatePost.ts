@@ -1,6 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
 import { revalidatePath, revalidateTag } from 'next/cache'
+import { pingIndexNow } from '@/utilities/indexNow'
 
 import type { Post } from '../../../payload-types'
 
@@ -19,6 +20,7 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
       revalidatePath('/blog')
       revalidatePath('/rss.xml')
       revalidateTag('posts-sitemap', 'max')
+      pingIndexNow([path, '/blog', '/'])
     }
 
     // If the post was previously published, we need to revalidate the old path

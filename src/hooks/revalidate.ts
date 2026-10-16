@@ -1,5 +1,6 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook } from 'payload'
 import { revalidatePath, revalidateTag } from 'next/cache'
+import { pingIndexNow } from '@/utilities/indexNow'
 
 /**
  * Revalidation helpers. Every public page reads from Payload at request time, so these
@@ -10,6 +11,7 @@ const safeRevalidate = (paths: string[], tags: string[] = []) => {
   try {
     for (const path of paths) revalidatePath(path)
     for (const tag of tags) revalidateTag(tag, 'max')
+    pingIndexNow(paths)
   } catch {
     // Revalidation is unavailable outside a Next request context (seed scripts, CLI). That is fine.
   }
