@@ -35,7 +35,6 @@ export const siteSettings = {
   location: 'Chennai, India',
   socialLinks: [
     { label: 'GitHub', href: 'https://github.com/SHEETALDHARSHAN-A' },
-    { label: 'GitHub (work)', href: 'https://github.com/Sheetaldharshan200' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/sheetaldharshan' },
   ],
   email: 'sheetaldharshan@gmail.com',
