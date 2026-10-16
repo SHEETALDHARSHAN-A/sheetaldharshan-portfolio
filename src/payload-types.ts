@@ -235,7 +235,7 @@ export interface Project {
       }[]
     | null;
   /**
-   * YouTube or Vimeo URL for a demo.
+   * The film shown in a pop-up player: a YouTube or Vimeo link, or a direct MP4 link from Media.
    */
   demoVideoUrl?: string | null;
   /**

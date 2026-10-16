@@ -2,41 +2,17 @@ import React from 'react'
 import RichText from '@/components/RichText'
 import { MediaAny, Picture } from '@/components/Media/Picture'
 import { CodeBlock } from '@/blocks/Code/Component'
-import { ALLOWED_EMBED_HOSTS } from '@/blocks/Embed/config'
+import { videoSource } from '@/utilities/videoSource'
 import { toMediaRef } from '@/data/media'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 type AnyBlock = { blockType: string; id?: string | null } & Record<string, unknown>
 
-function embedSrc(url: string): string | null {
-  try {
-    const u = new URL(url)
-    if (!ALLOWED_EMBED_HOSTS.includes(u.hostname)) return null
-    if (u.hostname.includes('youtube.com')) {
-      const id = u.searchParams.get('v') ?? u.pathname.split('/').filter(Boolean).pop()
-      return id ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}` : null
-    }
-    if (u.hostname === 'youtu.be') {
-      const id = u.pathname.slice(1)
-      return id ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}` : null
-    }
-    if (u.hostname.includes('vimeo.com')) {
-      const id = u.pathname.split('/').filter(Boolean).pop()
-      return id && /^\d+$/.test(id) ? `https://player.vimeo.com/video/${id}` : null
-    }
-  } catch {
-    return null
-  }
-  return null
-}
-
 /** `autoplay` is for players opened by a click (the "Watch the film" overlay), so one click is enough. */
 export function Embed({ url, caption, autoplay = false }: { url: string; caption?: string | null; autoplay?: boolean }) {
-  const base = embedSrc(url)
-  if (!base) return null
-  // rel=0 keeps end-of-video suggestions to the same channel; playsinline stops iPhones going fullscreen.
-  const params = base.includes('youtube') ? `rel=0&playsinline=1${autoplay ? '&autoplay=1' : ''}` : autoplay ? 'autoplay=1' : ''
-  const src = params ? `${base}?${params}` : base
+  const source = videoSource(url, autoplay)
+  if (source?.kind !== 'embed') return null
+  const src = source.src
   return (
     <figure className="media-figure">
       <div className="embed">

@@ -89,7 +89,7 @@ export const Projects: CollectionConfig<'projects'> = {
                 { name: 'caption', type: 'text' },
               ],
             },
-            { name: 'demoVideoUrl', type: 'text', admin: { description: 'YouTube or Vimeo URL for a demo.' } },
+            { name: 'demoVideoUrl', type: 'text', admin: { description: 'The film shown in a pop-up player: a YouTube or Vimeo link, or a direct MP4 link from Media.' } },
           ],
         },
         {
