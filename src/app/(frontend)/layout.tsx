@@ -71,7 +71,11 @@ export async function generateMetadata(): Promise<Metadata> {
       apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
     },
     manifest: '/site.webmanifest',
-    verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
+    // Search Console and Bing Webmaster Tools ownership codes, set as Vercel environment variables.
+    verification: {
+      ...(process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : {}),
+      ...(process.env.BING_SITE_VERIFICATION ? { other: { 'msvalidate.01': process.env.BING_SITE_VERIFICATION } } : {}),
+    },
     alternates: { types: { 'application/rss+xml': '/rss.xml' } },
   }
 }
