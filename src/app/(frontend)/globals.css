@@ -534,6 +534,8 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
    turn to the left (cards pull back one by one, the visual follows, the next page comes from the
    right); nav-back is the opposite. The sidebar is anchored. */
 ::view-transition { pointer-events: none; }
+/* Returning to the homepage within a session goes to /projects; hide the intro while that happens. */
+html[data-skip-home] .jg { visibility: hidden; }
 .section[id] { scroll-margin-top: 24px; }
 @media (max-width: 960px) { .section[id] { scroll-margin-top: 76px; } }
 ::view-transition-group(site-sidebar), ::view-transition-group(site-topbar), ::view-transition-group(site-tabbar), ::view-transition-group(site-pet) { animation: none; z-index: 100; }
