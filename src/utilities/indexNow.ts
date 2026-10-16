@@ -2,7 +2,7 @@ import { after } from 'next/server'
 import { getServerSideURL } from './getURL'
 
 /** IndexNow key; public by design (served at /<key>.txt so search engines can verify it). */
-export const INDEXNOW_KEY = 'b7826fa8771d06d5e920cbb23fe15c27'
+export const INDEXNOW_KEY = 'a7effa954b134cea94d4128c57f50bef'
 
 /**
  * Tells Bing and the other IndexNow engines which pages just changed, so they recrawl in minutes
