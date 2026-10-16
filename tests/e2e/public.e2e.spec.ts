@@ -159,14 +159,12 @@ test.describe('Public site', () => {
     expect(data.docs.some((doc) => doc.href === '/projects')).toBeTruthy()
     expect(data.docs.some((doc) => doc.type === 'project')).toBeTruthy()
   })
-  test('project film opens in a dialog and closes with Escape', async ({ page }) => {
+  test('project film plays in place after clicking the thumbnail', async ({ page }) => {
     await page.goto(`${base}/projects/exasol-personal-local-starter-kit`)
-    const thumb = page.locator('.vd-thumb')
+    const thumb = page.locator('.vp-thumb')
     if ((await thumb.count()) === 0) test.skip(true, 'No film set for this project')
+    await expect(page.locator('.video-player :is(video, iframe)')).toHaveCount(0)
     await thumb.click()
-    await expect(page.locator('dialog.vd-dialog[open] .vd-frame :is(video, iframe)')).toHaveCount(1)
-    await page.keyboard.press('Escape')
-    await expect(page.locator('dialog.vd-dialog[open]')).toHaveCount(0)
-    await expect(page.locator('.vd-frame :is(video, iframe)')).toHaveCount(0)
+    await expect(page.locator('.video-player[data-playing="true"] .vp-media :is(video, iframe)')).toHaveCount(1)
   })
 })

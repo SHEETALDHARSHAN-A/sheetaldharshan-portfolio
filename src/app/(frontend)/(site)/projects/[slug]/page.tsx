@@ -3,7 +3,7 @@ import { BrandIcon } from '@/components/BrandIcon'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RenderProjectBlocks } from '@/components/blocks/RenderProjectBlocks'
-import { VideoDialog } from '@/components/projects/VideoDialog'
+import { VideoPlayer } from '@/components/projects/VideoPlayer'
 import { HeroImage } from '@/components/projects/HeroImage'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { MediaAny, Picture } from '@/components/Media/Picture'
@@ -125,7 +125,7 @@ export default async function ProjectPage({ params }: Props) {
 
       <div className="case-body">
         {project.demoVideoUrl ? (
-          <VideoDialog image={project.heroImage} title={project.title} url={project.demoVideoUrl} />
+          <VideoPlayer image={project.heroImage} title={project.title} url={project.demoVideoUrl} />
         ) : project.heroVideo ? (
           <div className="case-hero">
             <video autoPlay loop muted playsInline poster={project.heroImage?.url} src={project.heroVideo.url} />
