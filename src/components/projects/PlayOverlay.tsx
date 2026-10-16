@@ -11,7 +11,7 @@ import type { MediaRef } from '@/data/types'
  */
 export function PlayOverlay({ image, video, url, title }: { image?: MediaRef; video?: MediaRef; url: string; title: string }) {
   const [playing, setPlaying] = useState(false)
-  if (playing) return <Embed caption={`${title}, the film`} url={url} />
+  if (playing) return <Embed autoplay caption={`${title}, the film`} url={url} />
   return (
     <div className="case-hero has-play">
       {video ? <video autoPlay loop muted playsInline poster={image?.url} src={video.url} /> : image ? <Picture media={image} priority size="xlarge" sizes="(max-width: 960px) 100vw, 70vw" /> : <div className="case-hero-blank" />}

@@ -30,9 +30,13 @@ function embedSrc(url: string): string | null {
   return null
 }
 
-export function Embed({ url, caption }: { url: string; caption?: string | null }) {
-  const src = embedSrc(url)
-  if (!src) return null
+/** `autoplay` is for players opened by a click (the "Watch the film" overlay), so one click is enough. */
+export function Embed({ url, caption, autoplay = false }: { url: string; caption?: string | null; autoplay?: boolean }) {
+  const base = embedSrc(url)
+  if (!base) return null
+  // rel=0 keeps end-of-video suggestions to the same channel; playsinline stops iPhones going fullscreen.
+  const params = base.includes('youtube') ? `rel=0&playsinline=1${autoplay ? '&autoplay=1' : ''}` : autoplay ? 'autoplay=1' : ''
+  const src = params ? `${base}?${params}` : base
   return (
     <figure className="media-figure">
       <div className="embed">
