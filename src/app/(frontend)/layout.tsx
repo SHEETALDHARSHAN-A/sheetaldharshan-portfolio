@@ -63,8 +63,10 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: { type: 'website', locale: 'en_IN', url: '/', siteName: brandName(site), title, description: site.description, images: [image] },
     twitter: { card: 'summary_large_image', title, description: site.description, images: [image] },
     icons: {
+      // The SVG follows the browser's light or dark mode (black or white mark); the rest are fallbacks.
       icon: [
-        { url: '/favicon.ico', sizes: '48x48' },
+        { url: '/favicon.ico', sizes: '32x32' },
+        { url: '/icon.svg', type: 'image/svg+xml' },
         { url: '/icon-96.png', type: 'image/png', sizes: '96x96' },
         { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
       ],
