@@ -30,7 +30,8 @@ export default async function ContactPage() {
         <section>
           <h2>Profiles</h2>
           <div className="contact-links">
-            {site.socialLinks.map((link) => (
+            {/* The work GitHub account is not a contact channel, so it is left off this page. */}
+            {site.socialLinks.filter((link) => !/\(work\)/i.test(link.label)).map((link) => (
               <a href={link.href} key={link.href} rel="noreferrer" target="_blank">
                 <BrandIcon href={link.href} name={link.label} size={18} />
                 {link.label} <span aria-hidden="true">↗</span>
