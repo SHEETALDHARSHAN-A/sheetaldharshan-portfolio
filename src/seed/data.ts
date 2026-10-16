@@ -4,25 +4,15 @@
  * Nothing is estimated or invented. Items marked `needsReview` stay unpublished.
  */
 
-export const homepageMessages = [
+export const homepageMessages: { content: string; style: string; choices?: { label: string; href: string }[] }[] = [
   { content: 'Hi there 👋.', style: 'default' },
   { content: "I'm Sheetaldharshan.", style: 'default' },
   { content: 'I build developer tools and AI agents that work over real databases.', style: 'default' },
   { content: "I'm currently a software engineer at [Exasol](https://www.exasol.com).", style: 'default' },
   { content: 'Outside work, I build things that make working with data a little easier.', style: 'default' },
-  {
-    content: 'Want to take a look?',
-    style: 'default',
-    choices: [
-      // Rendered as one sentence ("A, B, C and D"), so these read as phrases, not buttons.
-      { label: "Things I've built", href: '/projects' },
-      { label: "what I'm writing", href: '/blog' },
-      { label: 'who I am', href: '/about' },
-      { label: 'my research', href: '/research' },
-      { label: 'how to reach me', href: '/contact' },
-    ],
-  },
-] as const
+  { content: 'You can explore [my projects](/projects), read [my writing](/blog) or look through [my research](/research).', style: 'default' },
+  { content: 'Want to know more? Read [a bit about me](/about) or [say hello](/contact).', style: 'default' },
+]
 
 export const navigation = {
   items: [

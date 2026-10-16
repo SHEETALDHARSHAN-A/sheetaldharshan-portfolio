@@ -50,7 +50,7 @@ async function main() {
   await payload.updateGlobal({ slug: 'appearance', data: appearance as never, context })
   await payload.updateGlobal({
     slug: 'homepage',
-    data: { messages: homepageMessages.map((m) => ({ ...m, enabled: true, choices: 'choices' in m ? [...m.choices] : [] })), animationPreset: 'calm', typingIndicator: 'dots', startDelay: 400, _status: 'published' } as never,
+    data: { messages: homepageMessages.map((m) => ({ ...m, enabled: true, choices: m.choices ? [...m.choices] : [] })), animationPreset: 'calm', typingIndicator: 'dots', startDelay: 400, _status: 'published' } as never,
     context,
   })
   await payload.updateGlobal({ slug: 'about', data: { ...about, _status: 'published' } as never, context })
