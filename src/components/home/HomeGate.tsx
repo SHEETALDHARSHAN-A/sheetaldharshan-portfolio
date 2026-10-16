@@ -2,14 +2,20 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useLayoutEffect, useRef } from 'react'
-import { SEEN_HOME_COOKIE } from './HomeGate.shared'
+
+/** Session cookie set once the visitor has seen the intro (no expiry: it ends with the browser). */
+const SEEN_HOME_COOKIE = 'seen_home'
+
+/** Set after the first homepage render in this document, so later ones are in-site visits. */
+let renderedInThisDocument = false
 
 const hasSeen = () => document.cookie.split('; ').includes(`${SEEN_HOME_COOKIE}=1`)
 
 /**
- * Client half of "the intro plays once per session" (the proxy handles full page loads). Coming
- * back to "/" inside the site, for example with the Back button, hides the homepage before it
- * paints and replaces the entry with /projects, so Back never bounces between the two.
+ * The intro plays once per browser session when visitors move around the site: coming back to "/"
+ * with the Back button or the wordmark hides the homepage before it paints and replaces the entry
+ * with /projects, so Back never bounces between the two. Opening the address directly (typing it,
+ * a bookmark, a reload) always shows the conversation.
  */
 export function HomeGate() {
   const router = useRouter()
@@ -17,7 +23,12 @@ export function HomeGate() {
 
   useLayoutEffect(() => {
     // Decide once per mount; the ref survives React's development double-mount.
-    decision.current ??= hasSeen() ? 'skip' : 'show'
+    if (decision.current === null) {
+      const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
+      const openedDirectly = !renderedInThisDocument && new URL(nav?.name ?? window.location.href).pathname === '/'
+      renderedInThisDocument = true
+      decision.current = openedDirectly || !hasSeen() ? 'show' : 'skip'
+    }
     if (decision.current === 'skip') {
       document.documentElement.dataset.skipHome = '1'
       router.replace('/projects')

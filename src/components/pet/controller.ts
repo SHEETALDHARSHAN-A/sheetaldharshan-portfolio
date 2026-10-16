@@ -4,8 +4,8 @@ import { SHEET, STATES, lookCell, type PetState } from './sprite'
 export type Mode = 'idle' | 'waiting' | 'working'
 
 const BASE: Record<Mode, PetState> = { idle: 'idle', waiting: 'waiting', working: 'running' }
-const WALK_SPEED = 62 // px per second: an unhurried stroll
-const STRIDE = 0.05 // share of the pet's width covered per walk frame, so the feet keep pace with the ground
+const WALK_SPEED = 55 // px per second: an unhurried stroll
+const STEP_FPS = 6 // walk-cycle frames per second: a calm, natural step
 const GAZE_HOLD = 4500 // ms the pet keeps looking after the cursor stops
 const GAZE_STEP = 260 // ms between gaze changes, so the head turns calmly
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
@@ -272,14 +272,14 @@ export class PetController {
     const from = { ...this.pos }
     const total = Math.hypot(x - from.x, y - from.y)
     const duration = (total / speed) * 1000 * 1.25
-    const stride = Math.max(6, this.w * STRIDE)
+    // Faster trips (walking home) step a little quicker, never frantically.
+    const fps = STEP_FPS * Math.min(1.5, Math.max(1, speed / WALK_SPEED / 2))
     const start = performance.now()
     const step = (now: number) => {
       const t = Math.min(1, (now - start) / duration)
       const e = 0.5 - Math.cos(Math.PI * t) / 2
       this.place(from.x + (x - from.x) * e, from.y + (y - from.y) * e)
-      // Legs advance with distance travelled, so steps slow down and speed up with the body.
-      this.show(gait.row, Math.floor((total * e) / stride) % gait.frames)
+      this.show(gait.row, Math.floor(((now - start) / 1000) * fps) % gait.frames)
       if (t >= 1) {
         this.walkRaf = 0
         return done()
@@ -294,7 +294,7 @@ export class PetController {
     this.onDrop?.(true)
     const x = this.home.x + this.offset
     // Long trips home take about a second and a half; short ones keep the stroll pace.
-    this.walkTo(x, this.home.y, undefined, clamp(Math.hypot(x - this.pos.x, this.home.y - this.pos.y) / 2.2, WALK_SPEED * 2, 420))
+    this.walkTo(x, this.home.y, undefined, clamp(Math.hypot(x - this.pos.x, this.home.y - this.pos.y) / 3, WALK_SPEED * 1.5, 180))
   }
 
   private scheduleWander() {
@@ -352,16 +352,15 @@ export class PetController {
       const speed = Math.hypot(vx, (ny - this.pos.y) / dt)
       this.place(nx, ny)
       if (Math.abs(vx) > 25) dd.dir = vx > 0 ? 1 : -1
-      // Legs keep running while held and sprint as the drag speeds up. Only every other frame of
-      // the stride is used, so the legs snap between wide positions like a runner's, not a stroller's.
-      dd.phase += dt * (7 + Math.min(9, speed / 70))
+      // Legs keep moving while held, at a steady pace that quickens a little with a fast drag.
+      dd.phase += dt * (7 + Math.min(5, speed / 150))
       const gait = STATES[dd.dir > 0 ? 'running-right' : 'running-left']
-      this.show(gait.row, (Math.floor(dd.phase) * 2) % gait.frames)
+      this.show(gait.row, Math.floor(dd.phase) % gait.frames)
       if (!this.reduced) {
-        // A runner's forward lean, more with speed, and a bounce on every step.
-        const lean = dd.dir * (7 + Math.min(9, speed / 90))
-        dd.tilt += (lean - dd.tilt) * Math.min(1, dt * 10)
-        const bob = -Math.abs(Math.sin((dd.phase * Math.PI) / 2)) * 6
+        // A gentle lean into the direction of travel and a soft bounce on each step (four frames).
+        const lean = dd.dir * (4 + Math.min(4, speed / 200))
+        dd.tilt += (lean - dd.tilt) * Math.min(1, dt * 6)
+        const bob = -Math.abs(Math.sin((dd.phase * Math.PI) / 4)) * 3
         this.sprite.style.transform = `translateY(${bob.toFixed(2)}px) rotate(${dd.tilt.toFixed(2)}deg) scale(1.06)`
       }
       this.dragRaf = requestAnimationFrame(loop)

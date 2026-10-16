@@ -167,14 +167,16 @@ test.describe('Public site', () => {
     await thumb.click()
     await expect(page.locator('.video-player[data-playing="true"] .vp-media :is(video, iframe)')).toHaveCount(1)
   })
-  test('the homepage intro plays once per session, then home goes to projects', async ({ page }) => {
+  test('back to home within a session goes to projects; a typed address shows the intro', async ({ page }) => {
     await page.goto(base)
     await expect(page.locator('.jg-messages')).toBeVisible()
     await page.locator('.jg-bubble a[href="/projects"]').first().click({ timeout: 60000 })
     await expect(page).toHaveURL(/\/projects$/)
     await page.goBack()
     await expect(page).toHaveURL(/\/projects$/)
+    // Opening the address directly always shows the conversation.
     await page.goto(base)
-    await expect(page).toHaveURL(/\/projects$/)
+    await expect(page).toHaveURL(new RegExp(`${base}/?$`))
+    await expect(page.locator('.jg-messages')).toBeVisible()
   })
 })
