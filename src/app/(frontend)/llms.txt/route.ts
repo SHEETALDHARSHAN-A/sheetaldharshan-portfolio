@@ -5,7 +5,7 @@ export const revalidate = 300
 
 /**
  * /llms.txt: a plain-Markdown summary of who this is and what is on the site, for AI search and
- * assistants (ChatGPT, Perplexity, Claude) that read it to answer questions about the owner.
+ * assistants (ChatGPT, Perplexity and others) that read it to answer questions about the owner.
  */
 export async function GET() {
   const [site, projects, posts, publications] = await Promise.all([getSite(), getProjects(), getPosts({ limit: 50 }), getPublications()])
