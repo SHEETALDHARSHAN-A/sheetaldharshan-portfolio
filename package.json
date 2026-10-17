@@ -21,7 +21,9 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "seed": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/seed/run.ts",
     "typecheck": "tsc --noEmit",
-    "admin:reset-password": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/reset-admin-password.ts"
+    "admin:reset-password": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/reset-admin-password.ts",
+    "content:export": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/content.ts export",
+    "content:import": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/content.ts import"
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.90.2",
@@ -48,6 +50,7 @@
     "clsx": "^2.1.1",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
+    "fflate": "0.8.2",
     "geist": "^1.3.0",
     "graphql": "^16.8.2",
     "lucide-react": "0.563.0",

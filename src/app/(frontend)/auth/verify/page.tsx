@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Confirm it’s you', robots: { index: false, follow: false } }
 
 const MESSAGES: Record<string, string> = {
-  'not-allowed': 'That GitHub account is not allowed into this admin.',
+  'not-allowed': 'That GitHub account is not linked to this admin user. Sign out of GitHub and use the account set under Admin users → GitHub username.',
   failed: 'The GitHub check did not finish. Please try again.',
   unavailable: 'GitHub is not set up for the admin yet. Run pnpm admin:reset-password on your machine instead.',
   'no-user': 'No admin account matches that GitHub account.',

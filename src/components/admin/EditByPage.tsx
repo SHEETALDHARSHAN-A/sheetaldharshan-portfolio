@@ -46,7 +46,9 @@ export async function EditByPage({ payload }: { payload: Payload }) {
       items: [
         { label: 'Logo, colours & font', href: g('admin-look') },
         { label: 'Your account, photo & theme', href: '/admin/account' },
+        { label: 'Sign-in & security (2FA)', href: g('admin-security') },
         { label: 'Admin users', href: c('users') },
+        { label: 'Import & export (site.json)', href: '/admin/site-data' },
       ],
     },
   ]

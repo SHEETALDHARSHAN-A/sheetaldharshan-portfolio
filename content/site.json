@@ -1,0 +1,961 @@
+{
+  "$about": "Every setting and piece of content of this site. Edit it (or have an AI fill it in from your details; see docs/site-json.md) and import it in the admin under Admin panel → Import & export, or with pnpm content:import. Rich text is Markdown; images are { \"url\", \"alt\" }; links to other entries use their slug or title.",
+  "version": 1,
+  "exportedAt": "2026-10-17T20:08:23.794Z",
+  "source": "https://www.sheetaldharshan.me",
+  "globals": {
+    "site-settings": {
+      "displayName": "Sheetaldharshan",
+      "fullName": "Sheetaldharshan A",
+      "tagline": "I build developer tools and AI agents that work over real databases.",
+      "description": "Sheetal (Sheetaldharshan A) is a software engineer at Exasol in Chennai, India, building developer tools and AI agents that work over real databases.",
+      "canonicalUrl": "https://sheetaldharshan.me",
+      "currentRole": "Software Engineer at Exasol",
+      "location": "Chennai, India",
+      "socialLinks": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/SHEETALDHARSHAN-A"
+        },
+        {
+          "label": "LinkedIn",
+          "href": "https://www.linkedin.com/in/sheetaldharshan"
+        }
+      ],
+      "email": "sheetaldharshan@gmail.com",
+      "contactFormEnabled": false,
+      "resume": null,
+      "ogImage": {
+        "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/sheetaldharshan-og-v2.jpg",
+        "alt": "Sheetal (Sheetaldharshan A), Software Engineer at Exasol. I build developer tools and AI agents that work over real databases."
+      },
+      "footerNote": "Built with Next.js and Payload. Content managed from /admin.",
+      "updatedAt": "2026-10-16T08:48:53.029Z",
+      "createdAt": "2026-10-14T18:37:18.479Z"
+    },
+    "navigation": {
+      "items": [
+        {
+          "label": "Projects",
+          "href": "/projects",
+          "visible": true,
+          "newTab": false
+        },
+        {
+          "label": "Writing",
+          "href": "/blog",
+          "visible": true,
+          "newTab": false
+        },
+        {
+          "label": "About",
+          "href": "/about",
+          "visible": true,
+          "newTab": false
+        },
+        {
+          "label": "Research",
+          "href": "/research",
+          "visible": true,
+          "newTab": false
+        },
+        {
+          "label": "Contact",
+          "href": "/contact",
+          "visible": true,
+          "newTab": false
+        }
+      ],
+      "footerLinks": [],
+      "sidebarBackground": null,
+      "wordmarkColor": null,
+      "wordmarkDotColor": null,
+      "menuColor": null,
+      "menuActiveColor": null,
+      "menuFontSize": null,
+      "wordmarkFontSize": null,
+      "updatedAt": "2026-10-14T18:37:18.165Z",
+      "createdAt": "2026-10-14T18:37:18.166Z"
+    },
+    "pet": {
+      "enabled": true,
+      "showOnPhones": true,
+      "sprite": null,
+      "idleAfter": 30,
+      "idleAction": "work",
+      "idleRepeat": true,
+      "returnAction": "wave",
+      "clickAction": "wave",
+      "dropAction": "none",
+      "foundAction": "none",
+      "emptyAction": "jump",
+      "followCursor": true,
+      "stroll": true,
+      "strollEvery": 40,
+      "updatedAt": "2026-10-17T19:24:12.535Z",
+      "createdAt": "2026-10-17T19:23:47.628Z"
+    },
+    "coding-activity": {
+      "githubInSidebar": true,
+      "githubSidebarOpen": true,
+      "githubOnAbout": true,
+      "githubAboutOpen": true,
+      "githubAccounts": [
+        {
+          "username": "SHEETALDHARSHAN-A",
+          "enabled": true
+        },
+        {
+          "username": "Sheetaldharshan200",
+          "enabled": true
+        }
+      ],
+      "leetcodeInSidebar": false,
+      "leetcodeSidebarOpen": false,
+      "leetcodeOnAbout": true,
+      "leetcodeAboutOpen": true,
+      "leetcodeAccounts": [
+        {
+          "username": "sheetaldharshan",
+          "enabled": true
+        }
+      ],
+      "updatedAt": "2026-10-17T18:32:24.425Z",
+      "createdAt": "2026-10-17T16:40:28.073Z"
+    },
+    "brand": {},
+    "appearance": {
+      "theme": "dark",
+      "accent": "blue",
+      "fontPreset": "inter",
+      "headingScale": "regular",
+      "spacing": "regular",
+      "radius": "pill",
+      "linkStyle": "underline",
+      "bubbleStyle": "pill",
+      "animationIntensity": "normal",
+      "animationSpeed": "normal",
+      "projectDisplayStyle": "explorer",
+      "colorBackground": null,
+      "colorSurface": null,
+      "colorText": null,
+      "colorMuted": null,
+      "colorAccent": null,
+      "colorLine": null,
+      "bodyFont": "preset",
+      "headingFont": "barlow-condensed",
+      "updatedAt": "2026-10-17T19:41:56.999Z",
+      "createdAt": "2026-10-14T18:37:18.780Z"
+    },
+    "admin-look": {
+      "logoText": "sheetaldharshan.me",
+      "font": "system",
+      "radius": "default"
+    },
+    "admin-security": {
+      "githubStep": true
+    },
+    "homepage": {
+      "messages": [
+        {
+          "content": "Hi there 👋.",
+          "style": "default",
+          "revealDelay": null,
+          "enabled": true,
+          "choices": []
+        },
+        {
+          "content": "I'm Sheetaldharshan.",
+          "style": "default",
+          "revealDelay": null,
+          "enabled": true,
+          "choices": []
+        },
+        {
+          "content": "I'm currently a software engineer at [Exasol](https://www.exasol.com).",
+          "style": "default",
+          "revealDelay": null,
+          "enabled": true,
+          "choices": []
+        },
+        {
+          "content": "I build developer tools and AI agents that work over real databases.",
+          "style": "default",
+          "revealDelay": null,
+          "enabled": true,
+          "choices": []
+        },
+        {
+          "content": "Most of my work lives in [my projects](/projects). I also [write about what I learn](/blog) and [publish research](/research).",
+          "style": "default",
+          "revealDelay": null,
+          "enabled": true,
+          "choices": []
+        },
+        {
+          "content": "Want to chat? [Say hi](/contact), or [get to know me](/about) first.",
+          "style": "default",
+          "revealDelay": null,
+          "enabled": true,
+          "choices": []
+        }
+      ],
+      "animationPreset": "calm",
+      "typingIndicator": "dots",
+      "startDelay": 400,
+      "meta": {
+        "title": null,
+        "description": null
+      },
+      "pageBackground": null,
+      "bubbleColor": null,
+      "textColor": null,
+      "linkColor": null,
+      "_status": "published",
+      "updatedAt": "2026-10-16T08:12:25.840Z",
+      "createdAt": "2026-10-14T18:37:19.086Z"
+    },
+    "projects-page": {
+      "imageTransition": "wipe",
+      "imageZoom": true,
+      "zoomSeconds": 14
+    },
+    "about": {
+      "eyebrow": "About",
+      "title": "Sheetaldharshan A",
+      "intro": "I’m Sheetal. I build AI agents that work on real databases, and the tooling that makes them safe to ship.\n\nAt Exasol I co-built the Personal Local Starter Kit: one command sets up an analytics database on any laptop, with Claude, Codex and Cursor connected. On my own I built Exasol Studio, a desktop AI assistant that writes the SQL and asks before changing anything.\n\nBefore that, a year at Prayag.AI shipping LLM agents and Python backends, plus a co-authored IEEE paper on AI hiring agents. Open to forward-deployed and backend roles.",
+      "photo": {
+        "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/sheetal-sheetaldharshan-portrait.jpg",
+        "alt": "Sheetal (Sheetaldharshan A), software engineer at Exasol, portrait"
+      },
+      "photoFocalX": 53,
+      "photoFocalY": 41,
+      "sections": [
+        {
+          "title": "Experience",
+          "kind": "experience",
+          "visible": true,
+          "body": null,
+          "technologyGroups": []
+        },
+        {
+          "title": "Selected projects",
+          "kind": "projects",
+          "visible": true,
+          "body": null,
+          "technologyGroups": []
+        },
+        {
+          "title": "Technologies",
+          "kind": "technologies",
+          "visible": true,
+          "body": null,
+          "technologyGroups": [
+            {
+              "label": "At work",
+              "items": "Python, FastAPI, PostgreSQL, Docker, MCP, LangChain, LangGraph, OpenAI Agents SDK, Redis, Apache Kafka, Qdrant, Shell scripting, PowerShell"
+            },
+            {
+              "label": "Side projects",
+              "items": "TypeScript, React, Rust, Tauri, WebRTC, Spring Boot"
+            },
+            {
+              "label": "Learning",
+              "items": "C and C++ for DSA"
+            }
+          ]
+        },
+        {
+          "title": "Education",
+          "kind": "education",
+          "visible": true,
+          "body": null,
+          "technologyGroups": []
+        },
+        {
+          "title": "Research",
+          "kind": "publications",
+          "visible": true,
+          "body": null,
+          "technologyGroups": []
+        }
+      ],
+      "meta": {
+        "title": null,
+        "description": null
+      },
+      "_status": "published",
+      "updatedAt": "2026-10-17T19:58:09.000Z",
+      "createdAt": "2026-10-14T18:37:19.743Z"
+    }
+  },
+  "collections": {
+    "categories": [
+      {
+        "title": "Software Engineering",
+        "generateSlug": false,
+        "slug": "software-engineering",
+        "parent": null,
+        "breadcrumbs": [
+          {
+            "doc": 1,
+            "url": "/software-engineering",
+            "label": "Software Engineering"
+          }
+        ],
+        "updatedAt": "2026-10-14T18:37:22.431Z",
+        "createdAt": "2026-10-14T18:37:22.073Z"
+      },
+      {
+        "title": "Backend Development",
+        "generateSlug": false,
+        "slug": "backend-development",
+        "parent": null,
+        "breadcrumbs": [
+          {
+            "doc": 2,
+            "url": "/backend-development",
+            "label": "Backend Development"
+          }
+        ],
+        "updatedAt": "2026-10-14T18:37:23.166Z",
+        "createdAt": "2026-10-14T18:37:22.819Z"
+      },
+      {
+        "title": "Artificial Intelligence",
+        "generateSlug": false,
+        "slug": "artificial-intelligence",
+        "parent": null,
+        "breadcrumbs": [
+          {
+            "doc": 3,
+            "url": "/artificial-intelligence",
+            "label": "Artificial Intelligence"
+          }
+        ],
+        "updatedAt": "2026-10-14T18:37:23.895Z",
+        "createdAt": "2026-10-14T18:37:23.554Z"
+      },
+      {
+        "title": "AI Agents",
+        "generateSlug": false,
+        "slug": "ai-agents",
+        "parent": null,
+        "breadcrumbs": [
+          {
+            "doc": 4,
+            "url": "/ai-agents",
+            "label": "AI Agents"
+          }
+        ],
+        "updatedAt": "2026-10-14T18:37:24.622Z",
+        "createdAt": "2026-10-14T18:37:24.278Z"
+      },
+      {
+        "title": "Databases",
+        "generateSlug": false,
+        "slug": "databases",
+        "parent": null,
+        "breadcrumbs": [
+          {
+            "doc": 5,
+            "url": "/databases",
+            "label": "Databases"
+          }
+        ],
+        "updatedAt": "2026-10-14T18:37:25.359Z",
+        "createdAt": "2026-10-14T18:37:25.009Z"
+      },
+      {
+        "title": "Developer Tools",
+        "generateSlug": false,
+        "slug": "developer-tools",
+        "parent": null,
+        "breadcrumbs": [
+          {
+            "doc": 6,
+            "url": "/developer-tools",
+            "label": "Developer Tools"
+          }
+        ],
+        "updatedAt": "2026-10-14T18:37:26.079Z",
+        "createdAt": "2026-10-14T18:37:25.738Z"
+      },
+      {
+        "title": "Research",
+        "generateSlug": false,
+        "slug": "research",
+        "parent": null,
+        "breadcrumbs": [
+          {
+            "doc": 7,
+            "url": "/research",
+            "label": "Research"
+          }
+        ],
+        "updatedAt": "2026-10-14T18:37:26.802Z",
+        "createdAt": "2026-10-14T18:37:26.461Z"
+      },
+      {
+        "title": "Engineering Notes",
+        "generateSlug": false,
+        "slug": "engineering-notes",
+        "parent": null,
+        "breadcrumbs": [
+          {
+            "doc": 8,
+            "url": "/engineering-notes",
+            "label": "Engineering Notes"
+          }
+        ],
+        "updatedAt": "2026-10-14T18:37:27.531Z",
+        "createdAt": "2026-10-14T18:37:27.186Z"
+      }
+    ],
+    "experience": [
+      {
+        "role": "Software Engineer",
+        "company": "Exasol",
+        "companyUrl": "https://www.exasol.com",
+        "location": "Chennai, India",
+        "startDate": "2026-06-01T00:00:00.000Z",
+        "endDate": null,
+        "current": true,
+        "summary": "Co-built the Exasol Personal Local Starter Kit: one command installs a local analytics database and connects AI tools to it through MCP.",
+        "highlights": [
+          {
+            "text": "Read-only MCP login for AI clients."
+          },
+          {
+            "text": "Configs for Claude, Codex, Cursor, Gemini CLI and Copilot."
+          },
+          {
+            "text": "One installer for macOS, Linux and Windows."
+          },
+          {
+            "text": "Guided data loading, updates and uninstall."
+          }
+        ],
+        "technologies": [
+          {
+            "name": "Python"
+          },
+          {
+            "name": "Shell"
+          },
+          {
+            "name": "PowerShell"
+          },
+          {
+            "name": "MCP"
+          },
+          {
+            "name": "Docker"
+          },
+          {
+            "name": "Podman"
+          },
+          {
+            "name": "Exasol"
+          }
+        ],
+        "order": 0,
+        "updatedAt": "2026-10-17T17:51:15.051Z",
+        "createdAt": "2026-10-14T18:37:20.309Z",
+        "_status": "published"
+      },
+      {
+        "role": "AI Intern",
+        "company": "Prayag.AI",
+        "companyUrl": "https://prayag.ai",
+        "location": "Palakkad, India",
+        "startDate": "2025-06-01T00:00:00.000Z",
+        "endDate": "2026-06-01T00:00:00.000Z",
+        "current": false,
+        "summary": "Built Python backends, LLM integrations and agent workflows. Internal work, not public.",
+        "highlights": [],
+        "technologies": [
+          {
+            "name": "FastAPI"
+          },
+          {
+            "name": "PostgreSQL"
+          },
+          {
+            "name": "Redis"
+          },
+          {
+            "name": "Kafka"
+          },
+          {
+            "name": "Docker"
+          },
+          {
+            "name": "OpenAI Agents SDK"
+          },
+          {
+            "name": "LangChain"
+          },
+          {
+            "name": "Qdrant"
+          },
+          {
+            "name": "WebRTC"
+          }
+        ],
+        "order": 1,
+        "updatedAt": "2026-10-17T17:51:14.128Z",
+        "createdAt": "2026-10-14T18:37:20.829Z",
+        "_status": "published"
+      }
+    ],
+    "education": [
+      {
+        "institution": "Karpagam College of Engineering",
+        "degree": "Bachelor of Technology",
+        "field": "Information Technology",
+        "startDate": "2022-11-01T00:00:00.000Z",
+        "endDate": "2026-06-01T00:00:00.000Z",
+        "location": "Coimbatore, India",
+        "notes": null,
+        "order": 0,
+        "updatedAt": "2026-10-14T18:37:21.271Z",
+        "createdAt": "2026-10-14T18:37:21.271Z",
+        "_status": "published"
+      }
+    ],
+    "certifications": [],
+    "publications": [
+      {
+        "title": "An Autonomous Hiring Intelligence Using Goal-oriented AI Agents and Dynamic Skill Inference",
+        "authors": "C. Agjelia Lydia, V. Athithyan, M. Chandru, S. Dravid, A. Sheetaldharshan",
+        "year": 2026,
+        "publisher": "IEEE",
+        "kind": "conference",
+        "venue": "2026 International Conference on Machine Learning and Autonomous Systems (ICMLAS)",
+        "doi": "10.1109/ICMLAS67792.2026.11483816",
+        "externalUrl": "https://doi.org/10.1109/ICMLAS67792.2026.11483816",
+        "abstract": null,
+        "personalContribution": "Co-author. I built the hiring-agent system the paper describes. The paper itself was written by my co-authors.",
+        "tags": [
+          {
+            "name": "AI agents"
+          },
+          {
+            "name": "Hiring"
+          }
+        ],
+        "featured": true,
+        "order": 0,
+        "updatedAt": "2026-10-14T18:37:21.629Z",
+        "createdAt": "2026-10-14T18:37:21.628Z",
+        "_status": "published"
+      }
+    ],
+    "projects": [
+      {
+        "title": "Exasol Studio",
+        "summary": "A desktop app for Exasol databases with a built-in AI assistant that writes SQL you can see before it runs.",
+        "description": "A personal project exploring how an AI assistant can help developers and analysts work with a database without hiding the SQL. Ask in plain words; the assistant finds the right tables, writes and runs the query, builds a dashboard or loads a file, and shows every step. Anything that changes data waits for approval.",
+        "kind": "personal",
+        "category": "Desktop app",
+        "year": "2026",
+        "role": "Sole author",
+        "client": null,
+        "technologies": [
+          {
+            "name": "Tauri 2"
+          },
+          {
+            "name": "Rust"
+          },
+          {
+            "name": "React 19"
+          },
+          {
+            "name": "TypeScript"
+          },
+          {
+            "name": "LangGraph"
+          },
+          {
+            "name": "LangChain"
+          },
+          {
+            "name": "MCP"
+          }
+        ],
+        "tags": [
+          {
+            "name": "AI assistant"
+          },
+          {
+            "name": "SQL"
+          },
+          {
+            "name": "Desktop"
+          }
+        ],
+        "startDate": null,
+        "completionDate": null,
+        "thumbnail": {
+          "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/studio-hero-1.jpg",
+          "alt": "Exasol Studio: a question, the generated SQL shown before it runs, a chart, and a write waiting for approval"
+        },
+        "heroImage": {
+          "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/studio-hero-1.jpg",
+          "alt": "Exasol Studio: a question, the generated SQL shown before it runs, a chart, and a write waiting for approval"
+        },
+        "heroVideo": null,
+        "screenshots": [],
+        "demoVideoUrl": null,
+        "cardColor": null,
+        "cardTextColor": null,
+        "pageBackground": null,
+        "pageTextColor": null,
+        "heroLoop": [],
+        "loopSeconds": 5,
+        "layout": [
+          {
+            "blockType": "features",
+            "heading": "What it does",
+            "items": [
+              {
+                "title": "Database exploration",
+                "text": "Schema browser, connection management with encrypted password storage, data import and export."
+              },
+              {
+                "title": "Natural-language interaction",
+                "text": "Ask a question; the assistant inspects the schema, writes the SQL and shows it before running."
+              },
+              {
+                "title": "SQL generation and review",
+                "text": "Monaco SQL editor, multi-statement runs, an execution log and a query performance view."
+              },
+              {
+                "title": "AI-assisted workflows",
+                "text": "Load a file into a table, build a dashboard from a question, export it as a PDF. Changes wait for Allow or Deny."
+              },
+              {
+                "title": "Dashboards",
+                "text": "Build dashboards by hand or ask the assistant; built-in read-only system dashboards."
+              },
+              {
+                "title": "Cross-platform desktop",
+                "text": "One codebase for macOS, Windows and Linux. Signed builds with auto-update; Homebrew and Scoop packages."
+              }
+            ],
+            "blockName": null
+          },
+          {
+            "blockType": "stats",
+            "heading": "Facts",
+            "items": [
+              {
+                "value": "3",
+                "label": "operating systems"
+              },
+              {
+                "value": "47",
+                "label": "cases in the eval suite that gates each release"
+              },
+              {
+                "value": "1",
+                "label": "author"
+              }
+            ],
+            "blockName": null
+          },
+          {
+            "blockType": "links",
+            "heading": "Links",
+            "items": [
+              {
+                "label": "Repository",
+                "href": "https://github.com/Sheetaldharshan200/Exasol-studio",
+                "note": null
+              },
+              {
+                "label": "Releases",
+                "href": "https://github.com/Sheetaldharshan200/Exasol-studio/releases",
+                "note": "Installers for macOS, Windows and Linux"
+              }
+            ],
+            "blockName": null
+          }
+        ],
+        "layoutPreset": "case-study",
+        "githubUrl": "https://github.com/Sheetaldharshan200/Exasol-studio",
+        "liveDemoUrl": null,
+        "documentationUrl": null,
+        "releasesUrl": "https://github.com/Sheetaldharshan200/Exasol-studio/releases",
+        "meta": {
+          "title": null,
+          "image": null,
+          "description": null
+        },
+        "featured": true,
+        "archived": false,
+        "displayOrder": 1,
+        "accent": "blue",
+        "generateSlug": false,
+        "slug": "exasol-studio",
+        "updatedAt": "2026-10-14T18:40:39.996Z",
+        "createdAt": "2026-10-14T18:37:27.979Z",
+        "_status": "published"
+      },
+      {
+        "title": "Exasol Personal Local Starter Kit",
+        "summary": "One command sets up a local Exasol analytics database and connects AI clients to it through MCP.",
+        "description": "An open-source starter kit that installs the Exasol Personal in-memory analytics database on a laptop, loads sample data and connects AI development tools such as Claude, Codex and Cursor through a read-only MCP login. Co-built with one other engineer at Exasol; my parts are listed below.",
+        "kind": "contribution",
+        "category": "Developer tool",
+        "year": "2026",
+        "role": "Co-built with one other engineer",
+        "client": "Exasol",
+        "technologies": [
+          {
+            "name": "Python"
+          },
+          {
+            "name": "Shell"
+          },
+          {
+            "name": "PowerShell"
+          },
+          {
+            "name": "MCP"
+          },
+          {
+            "name": "Exasol"
+          },
+          {
+            "name": "Podman"
+          }
+        ],
+        "tags": [
+          {
+            "name": "Installer"
+          },
+          {
+            "name": "MCP"
+          },
+          {
+            "name": "Data"
+          }
+        ],
+        "startDate": null,
+        "completionDate": null,
+        "thumbnail": {
+          "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/kit-hero-1.jpg",
+          "alt": "Exasol Personal Local Starter Kit: one install command, a database ready, MCP read-only login, AI clients connected"
+        },
+        "heroImage": {
+          "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/kit-hero-1.jpg",
+          "alt": "Exasol Personal Local Starter Kit: one install command, a database ready, MCP read-only login, AI clients connected"
+        },
+        "heroVideo": null,
+        "screenshots": [],
+        "demoVideoUrl": "https://youtu.be/zj7LovdlzWk",
+        "cardColor": null,
+        "cardTextColor": null,
+        "pageBackground": null,
+        "pageTextColor": null,
+        "heroLoop": [],
+        "loopSeconds": 5,
+        "layout": [
+          {
+            "blockType": "features",
+            "heading": "My contributions",
+            "items": [
+              {
+                "title": "MCP access configuration",
+                "text": "A dedicated read-only database user with validated credentials, so AI clients can query but never change data."
+              },
+              {
+                "title": "AI client configuration",
+                "text": "Generated configs for Claude, Codex, Cursor, Gemini CLI and GitHub Copilot, plus a doctor command to check them."
+              },
+              {
+                "title": "Installer reliability",
+                "text": "Windows parity with macOS and Linux, and self-repair paths for Linux installs."
+              },
+              {
+                "title": "Data-loading workflows",
+                "text": "Guided sample-data loading, schema selection and a dry run that shows what will load."
+              },
+              {
+                "title": "Update and uninstall",
+                "text": "Commands that keep the kit and its components current and remove them cleanly."
+              }
+            ],
+            "blockName": null
+          },
+          {
+            "blockType": "timeline",
+            "heading": "Releases",
+            "items": [
+              {
+                "when": "July 2026",
+                "title": "v0.1.0",
+                "text": "First public release."
+              },
+              {
+                "when": "October 2026",
+                "title": "v0.2.0",
+                "text": "Add-on marketplace, updates, agent skills, Linux and Windows improvements."
+              }
+            ],
+            "blockName": null
+          },
+          {
+            "blockType": "links",
+            "heading": "Links",
+            "items": [
+              {
+                "label": "Repository",
+                "href": "https://github.com/exasol-labs/exasol-personal-local-starterkit",
+                "note": "exasol-labs on GitHub"
+              }
+            ],
+            "blockName": null
+          }
+        ],
+        "layoutPreset": "case-study",
+        "githubUrl": "https://github.com/exasol-labs/exasol-personal-local-starterkit",
+        "liveDemoUrl": null,
+        "documentationUrl": null,
+        "releasesUrl": null,
+        "meta": {
+          "title": null,
+          "image": null,
+          "description": null
+        },
+        "featured": true,
+        "archived": false,
+        "displayOrder": 0,
+        "accent": "green",
+        "generateSlug": false,
+        "slug": "exasol-personal-local-starter-kit",
+        "updatedAt": "2026-10-16T08:06:32.860Z",
+        "createdAt": "2026-10-14T18:37:29.083Z",
+        "_status": "published"
+      },
+      {
+        "title": "SignSense",
+        "summary": "A sign-language learning app that recognises signs from the camera and grades the learner.",
+        "description": "Academic team project. Courses teach alphabets, numbers and common signs; a camera quiz asks the learner to perform a sign and a model grades it. Team of four; I was tech lead, wrote the system design and built the recognition model. Second place at an All-India hackathon at Sengunthar Engineering College, 2025.",
+        "kind": "academic",
+        "category": "Computer vision",
+        "year": "2025",
+        "role": "Tech lead, system design, model development",
+        "client": null,
+        "technologies": [
+          {
+            "name": "Python"
+          },
+          {
+            "name": "OpenCV"
+          },
+          {
+            "name": "MediaPipe"
+          },
+          {
+            "name": "scikit-learn"
+          },
+          {
+            "name": "FastAPI"
+          }
+        ],
+        "tags": [
+          {
+            "name": "Hackathon"
+          },
+          {
+            "name": "Deep learning"
+          }
+        ],
+        "startDate": null,
+        "completionDate": null,
+        "thumbnail": null,
+        "heroImage": null,
+        "heroVideo": null,
+        "screenshots": [],
+        "demoVideoUrl": null,
+        "cardColor": null,
+        "cardTextColor": null,
+        "pageBackground": null,
+        "pageTextColor": null,
+        "heroLoop": [],
+        "loopSeconds": 5,
+        "layout": [],
+        "layoutPreset": "case-study",
+        "githubUrl": null,
+        "liveDemoUrl": null,
+        "documentationUrl": null,
+        "releasesUrl": null,
+        "meta": {
+          "title": null,
+          "image": null,
+          "description": null
+        },
+        "featured": false,
+        "archived": false,
+        "displayOrder": 10,
+        "accent": "orange",
+        "generateSlug": false,
+        "slug": "signsense",
+        "updatedAt": "2026-10-14T18:37:30.129Z",
+        "createdAt": "2026-10-14T18:37:30.129Z",
+        "_status": "draft"
+      }
+    ],
+    "posts": [
+      {
+        "title": "Example draft: how publishing works here",
+        "heroImage": null,
+        "content": "This is an example draft. It exists so the editing, preview and publish steps can be tried before the first real note is written.\n\nDrafts are never shown on the public site. Use Preview in the admin to see this page, then Publish when a real article is ready.\n\nReplace the title, the content and the excerpt in the SEO tab, pick a category, and publish.",
+        "relatedPosts": [],
+        "categories": [
+          "engineering-notes"
+        ],
+        "meta": {
+          "title": "Example draft: how publishing works here",
+          "image": null,
+          "description": "An unpublished example that shows the blog workflow. Delete it or replace its content before publishing."
+        },
+        "publishedAt": null,
+        "authors": [],
+        "populatedAuthors": [],
+        "generateSlug": false,
+        "slug": "example-draft-publishing-workflow",
+        "updatedAt": "2026-10-14T18:37:30.674Z",
+        "createdAt": "2026-10-14T18:37:30.673Z",
+        "_status": "draft"
+      }
+    ],
+    "pages": []
+  },
+  "media": [
+    {
+      "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/kit-hero-1.jpg",
+      "filename": "kit-hero-1.jpg",
+      "alt": "Exasol Personal Local Starter Kit: one install command, a database ready, MCP read-only login, AI clients connected"
+    },
+    {
+      "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/studio-hero-1.jpg",
+      "filename": "studio-hero-1.jpg",
+      "alt": "Exasol Studio: a question, the generated SQL shown before it runs, a chart, and a write waiting for approval"
+    },
+    {
+      "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/sheetaldharshan-og-v2.jpg",
+      "filename": "sheetaldharshan-og-v2.jpg",
+      "alt": "Sheetal (Sheetaldharshan A), Software Engineer at Exasol. I build developer tools and AI agents that work over real databases."
+    },
+    {
+      "url": "https://itfzpetffxsglwfmnghl.supabase.co/storage/v1/object/public/media/media/sheetal-sheetaldharshan-portrait.jpg",
+      "filename": "sheetal-sheetaldharshan-portrait.jpg",
+      "alt": "Sheetal (Sheetaldharshan A), software engineer at Exasol, portrait"
+    }
+  ]
+}

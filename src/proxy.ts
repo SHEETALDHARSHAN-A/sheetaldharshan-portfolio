@@ -16,7 +16,7 @@ export async function proxy(request: NextRequest) {
   }
   const token = request.cookies.get('payload-token')?.value
   // The /auth routes check the password session themselves before starting the GitHub step.
-  if (!token || pathname.startsWith('/auth/') || !(await secondFactorRequired())) return NextResponse.next()
+  if (!token || pathname.startsWith('/auth/') || !(await secondFactorRequired(request.nextUrl.origin))) return NextResponse.next()
 
   const { id, sid } = tokenClaims(token)
   if (id && (await verifySecondFactor(request.cookies.get(SECOND_FACTOR_COOKIE)?.value, id, sid))) return NextResponse.next()

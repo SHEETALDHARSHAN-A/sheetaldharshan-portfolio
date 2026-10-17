@@ -53,14 +53,30 @@ export function tokenClaims(token: string): { id?: string; sid?: string } {
 }
 
 let githubState: { on: boolean; at: number } | null = null
+let switchState: { on: boolean; at: number } | null = null
+
+/** The admin's on/off switch (Admin panel → Sign-in & security), checked at most every 30 s. On when unsure. */
+async function switchedOn(origin: string): Promise<boolean> {
+  if (switchState && Date.now() - switchState.at < 30 * 1000) return switchState.on
+  let on = true
+  try {
+    const res = await fetch(`${origin}/api/globals/admin-security?depth=0`, { signal: AbortSignal.timeout(3000), cache: 'no-store' })
+    if (res.ok) on = ((await res.json()) as { githubStep?: boolean | null }).githubStep !== false
+  } catch {
+    on = true
+  }
+  switchState = { on, at: Date.now() }
+  return on
+}
 
 /**
- * Whether the GitHub step is enforced: on as soon as GitHub is enabled in Supabase, so the admin is
- * never locked out before that setup. ADMIN_2FA=off switches it off in an emergency. When Supabase
- * cannot be reached it stays on.
+ * Whether the GitHub step is enforced: when the admin switch is on and GitHub is enabled in Supabase
+ * (so the admin is never locked out before that setup). ADMIN_2FA=off switches it off in an
+ * emergency. When either check cannot be made it stays on.
  */
-export async function secondFactorRequired(): Promise<boolean> {
+export async function secondFactorRequired(origin?: string): Promise<boolean> {
   if (process.env.ADMIN_2FA === 'off') return false
+  if (origin && !(await switchedOn(origin))) return false
   const cfg = supabaseConfig()
   if (!cfg) return false
   if (githubState && Date.now() - githubState.at < 5 * 60 * 1000) return githubState.on

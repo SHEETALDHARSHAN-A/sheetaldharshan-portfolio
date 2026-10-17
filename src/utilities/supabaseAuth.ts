@@ -14,6 +14,11 @@ export function supabaseConfig(): { url: string; anonKey: string } | null {
   return url && anonKey ? { url, anonKey } : null
 }
 
+/** The GitHub username of a Supabase user signed in with GitHub, lower-cased. */
+export function githubLogin(user: User | null | undefined): string {
+  return String(user?.user_metadata?.user_name ?? user?.user_metadata?.preferred_username ?? '').toLowerCase()
+}
+
 /** True when the signed-in Supabase user is on the admin allowlist. */
 export function isAllowedAdmin(user: User | null | undefined): boolean {
   if (!user) return false

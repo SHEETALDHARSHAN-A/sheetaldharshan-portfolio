@@ -33,9 +33,12 @@ import { AdminTheme as AdminTheme_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/com
 import { SignOut as SignOut_c39e61ddc8453d0bd90f2a671bca5628 } from '@/components/admin/SignOut'
 import { AdminIcon as AdminIcon_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/components/admin/AdminBrand'
 import { AdminLogo as AdminLogo_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/components/admin/AdminBrand'
+import { HeaderActions as HeaderActions_f4e1fd82961580711a6eff07683a96ce } from '@/components/admin/HeaderActions'
 import { GitHubSignIn as GitHubSignIn_82cf83256c7a63e9acf8479437502e71 } from '@/components/admin/GitHubSignIn'
+import { NavResizer as NavResizer_8b09548babb1802c7ff1585e9156d7bf } from '@/components/admin/NavResizer'
 import { AdminSearch as AdminSearch_4809d3107d6dbaf55f5d8b161ea31e82 } from '@/components/admin/AdminSearch'
 import { EditByPage as EditByPage_0ac81aaab5bf5f1ac9d225bad456e817 } from '@/components/admin/EditByPage'
+import { SiteDataView as SiteDataView_583f325b64c07375d3a09e2698afe0ad } from '@/components/admin/SiteDataView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -77,9 +80,12 @@ export const importMap = {
   "@/components/admin/SignOut#SignOut": SignOut_c39e61ddc8453d0bd90f2a671bca5628,
   "@/components/admin/AdminBrand#AdminIcon": AdminIcon_c3544fd04a86558fd1f1e4a8d6afed38,
   "@/components/admin/AdminBrand#AdminLogo": AdminLogo_c3544fd04a86558fd1f1e4a8d6afed38,
+  "@/components/admin/HeaderActions#HeaderActions": HeaderActions_f4e1fd82961580711a6eff07683a96ce,
   "@/components/admin/GitHubSignIn#GitHubSignIn": GitHubSignIn_82cf83256c7a63e9acf8479437502e71,
+  "@/components/admin/NavResizer#NavResizer": NavResizer_8b09548babb1802c7ff1585e9156d7bf,
   "@/components/admin/AdminSearch#AdminSearch": AdminSearch_4809d3107d6dbaf55f5d8b161ea31e82,
   "@/components/admin/EditByPage#EditByPage": EditByPage_0ac81aaab5bf5f1ac9d225bad456e817,
+  "@/components/admin/SiteDataView#SiteDataView": SiteDataView_583f325b64c07375d3a09e2698afe0ad,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24

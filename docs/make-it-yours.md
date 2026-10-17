@@ -62,6 +62,8 @@ pnpm dev
 
 Open http://localhost:3000/admin and create your admin user.
 
+**Fastest way to your own content:** give an AI your résumé and [`content/site.json`](../content/site.json) with the prompt in [site.json](site-json.md), then import its answer (admin → Import & export, or `pnpm content:import`). Images can be links; they're downloaded for you.
+
 **Don't run `pnpm seed` as is.** `src/seed/data.ts` holds the owner's real profile. Either rewrite that file with your details first (fast if you have a lot to enter), or skip it and type everything into the admin in step 5.
 
 ## 2. Replace the owner's identity in code
@@ -164,7 +166,7 @@ pnpm admin:reset-password
 
 It asks for the admin email and a new password (hidden as you type). It uses `DATABASE_URL` from your local `.env`, so point that at the live database to reset the live admin. No deploy is needed. To run it without prompts, set `ADMIN_EMAIL` and `NEW_PASSWORD` for that one command.
 
-**2. GitHub fails: switch the GitHub step off.**
+**2. GitHub fails: switch the GitHub step off.** If you can still get in, turn it off under **Admin panel → Sign-in & security**. If you can't:
 
 1. Vercel → Project → Settings → Environment Variables → add `ADMIN_2FA` = `off` (Production).
 2. Redeploy (Deployments → ⋯ → Redeploy). Environment changes only apply to new deployments.

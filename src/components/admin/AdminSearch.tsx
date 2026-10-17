@@ -1,7 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { AdminHit } from '@/endpoints/adminSearch'
 
 const KINDS: Record<AdminHit['kind'], string> = { document: 'Content', page: 'Pages & settings', field: 'Fields', action: 'Create' }
@@ -20,6 +21,7 @@ export function AdminSearch() {
   const [loading, setLoading] = useState(false)
   const [active, setActive] = useState(0)
   const [open, setOpen] = useState(false)
+  const [place, setPlace] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -65,6 +67,26 @@ export function AdminSearch() {
     }
   }, [q])
 
+  const visible = open && Boolean(q.trim())
+
+  // The results float above the page (the admin menu would clip them), lined up under the field.
+  useLayoutEffect(() => {
+    if (!visible) return
+    const update = () => {
+      const r = inputRef.current?.getBoundingClientRect()
+      if (!r) return
+      const width = Math.min(window.innerWidth - 16, Math.max(r.width, 460))
+      setPlace({ left: Math.max(8, Math.min(r.left, window.innerWidth - width - 8)), top: r.bottom + 6, width, maxHeight: Math.max(200, window.innerHeight - r.bottom - 24) })
+    }
+    update()
+    window.addEventListener('resize', update)
+    window.addEventListener('scroll', update, true)
+    return () => {
+      window.removeEventListener('resize', update)
+      window.removeEventListener('scroll', update, true)
+    }
+  }, [visible])
+
   const shown = q.trim() ? hits : []
   const grouped = ORDER.map((kind) => ({ kind, items: shown.filter((h) => h.kind === kind) })).filter((g) => g.items.length)
   const flat = grouped.flatMap((g) => g.items)
@@ -78,20 +100,23 @@ export function AdminSearch() {
   }
 
   return (
-    <div className="admin-search" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node) && setOpen(false)}>
+    <div className="admin-search">
       <style>{`
         .admin-search { position: relative; margin: 0 0 16px; }
         .admin-search input { width: 100%; height: 36px; padding: 0 44px 0 32px; border-radius: var(--style-radius-m, 6px); border: 1px solid var(--theme-elevation-150); background: var(--theme-input-bg, var(--theme-elevation-50)); color: var(--theme-text); font: inherit; font-size: 13px; outline: none; }
         .admin-search input:focus { border-color: var(--theme-success-500); }
         .admin-search .icon { position: absolute; left: 10px; top: 10px; width: 15px; height: 15px; color: var(--theme-elevation-500); pointer-events: none; }
+        .admin-search .clear { position: absolute; right: 6px; top: 6px; width: 24px; height: 24px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--theme-elevation-500); font-size: 18px; line-height: 1; cursor: pointer; }
+        .admin-search .clear:hover { color: var(--theme-text); background: var(--theme-elevation-100); }
         .admin-search kbd { position: absolute; right: 8px; top: 8px; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--theme-elevation-150); font: 11px/18px inherit; color: var(--theme-elevation-500); pointer-events: none; }
-        .admin-search .panel { position: absolute; z-index: 50; left: 0; top: 42px; width: min(420px, 86vw); max-height: 60vh; overflow-y: auto; padding: 6px; border-radius: var(--style-radius-m, 8px); border: 1px solid var(--theme-elevation-150); background: var(--theme-bg); box-shadow: 0 16px 40px rgba(0,0,0,.35); }
-        .admin-search .group { margin: 8px 8px 4px; font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--theme-elevation-500); }
-        .admin-search button { display: grid; gap: 1px; width: 100%; padding: 7px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
-        .admin-search button[aria-selected='true'] { background: var(--theme-elevation-100); }
-        .admin-search button span { font-size: 13px; }
-        .admin-search button small { font-size: 11.5px; color: var(--theme-elevation-500); overflow-wrap: anywhere; }
-        .admin-search .empty { margin: 10px; font-size: 13px; color: var(--theme-elevation-500); }
+        .admin-search input::-webkit-search-cancel-button { -webkit-appearance: none; }
+        .admin-search-panel { position: fixed; z-index: 1000; overflow-y: auto; padding: 6px; border-radius: var(--style-radius-m, 8px); border: 1px solid var(--theme-elevation-150); background: var(--theme-bg); box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+        .admin-search-panel .group { margin: 8px 8px 4px; font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--theme-elevation-500); }
+        .admin-search-panel button { display: grid; gap: 1px; width: 100%; padding: 7px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+        .admin-search-panel button[aria-selected='true'] { background: var(--theme-elevation-100); }
+        .admin-search-panel button span { font-size: 13px; }
+        .admin-search-panel button small { font-size: 11.5px; color: var(--theme-elevation-500); overflow-wrap: anywhere; }
+        .admin-search-panel .empty { margin: 10px; font-size: 13px; color: var(--theme-elevation-500); }
       `}</style>
       <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
         <circle cx="11" cy="11" r="7" />
@@ -111,6 +136,7 @@ export function AdminSearch() {
           setOpen(true)
         }}
         onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
         onKeyDown={(e) => {
           if (e.key === 'ArrowDown') {
             e.preventDefault()
@@ -127,9 +153,22 @@ export function AdminSearch() {
           }
         }}
       />
-      <kbd>⌘K</kbd>
-      {open && q.trim() ? (
-        <div className="panel" id="admin-search-results" role="listbox">
+      {q ? (
+        <button type="button" className="clear" aria-label="Clear search" onClick={() => { setQ(''); inputRef.current?.focus() }}>
+          ×
+        </button>
+      ) : (
+        <kbd>⌘K</kbd>
+      )}
+      {visible && place ? createPortal(
+        <div
+          className="admin-search-panel"
+          id="admin-search-results"
+          role="listbox"
+          style={place}
+          // Clicking a result must not blur the field first, or the panel would close before the click lands.
+          onMouseDown={(e) => e.preventDefault()}
+        >
           {grouped.map((g) => (
             <div key={g.kind}>
               <p className="group">{KINDS[g.kind]}</p>
@@ -145,7 +184,8 @@ export function AdminSearch() {
             </div>
           ))}
           {!flat.length ? <p className="empty">{loading ? 'Searching…' : `Nothing matches “${q.trim()}”.`}</p> : loading ? <p className="empty">Looking through content…</p> : null}
-        </div>
+        </div>,
+        document.body,
       ) : null}
     </div>
   )

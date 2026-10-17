@@ -20,7 +20,7 @@ pnpm admin:reset-password
 
 It asks for the admin email and a new password (hidden as you type). It uses `DATABASE_URL` from your local `.env`, so point that at the live database to reset the live admin. No deploy is needed. To run it without prompts, set `ADMIN_EMAIL` and `NEW_PASSWORD` for that one command.
 
-**2. GitHub fails: switch the GitHub step off.**
+**2. GitHub fails: switch the GitHub step off.** If you can still get in, turn it off under **Admin panel → Sign-in & security**. If you can't:
 
 1. Vercel → Project → Settings → Environment Variables → add `ADMIN_2FA` = `off` (Production).
 2. Redeploy (Deployments → ⋯ → Redeploy). Environment changes only apply to new deployments.
@@ -29,6 +29,17 @@ It asks for the admin email and a new password (hidden as you type). It uses `DA
 
 While `ADMIN_2FA=off` is set, anyone with the password gets in. Keep it off only as long as you need to.
 
+## Add another admin
+1. **Admin panel → Admin users → Create new.**
+2. Enter their **name**, **email**, a **password** (share it with them privately; they can change it under *Your account*), and their **GitHub username** (e.g. `octocat`).
+3. Save. They sign in at `/admin` with the email and password, then **Continue with GitHub** and approve with *that* GitHub account. The first time, GitHub asks them to authorise the app.
+
+Each person's GitHub step must match their own GitHub username. Someone else's GitHub account is refused. A forgotten password is reset the same way: **Forgot password?** → GitHub. The GitHub account decides whose password is reset.
+
+A user without a GitHub username falls back to the accounts listed in `src/config/admin.ts`. If the GitHub step is switched off (*Sign-in & security*), the password alone is enough for everyone.
+
+Nothing needs changing on GitHub or Supabase for a new person: the same OAuth app serves everyone.
+
 ## Find anything
 The search box at the top of the admin menu (**⌘K** or **/**) finds settings pages, any field by its label (showing where it lives, for example *Pet › Behaviour*), content by title, and "New …" actions. It reads the CMS setup itself, so pages and fields added later are found without extra work. The **More** group in *Edit by page* lists anything new that hasn't been placed in the menu yet.
 
@@ -36,7 +47,9 @@ The search box at the top of the admin menu (**⌘K** or **/**) finds settings p
 **Admin panel** in the menu:
 - **Logo, colours & font** (*Admin look*): the login-page logo and name, the menu icon, the default avatar, the accent colour, background colours for dark and light mode, the font and the corner style. Empty fields keep the SD logo and Payload's colours. Reload after saving.
 - **Your account, photo & theme**: your name, email and password, your **photo** (shown top right instead of the default avatar), and light or dark mode for the admin.
+- **Sign-in & security (2FA)**: switch the GitHub two-step sign-in on or off. Off means the password alone signs you in. It takes effect within about a minute.
 - **Admin users**: who can sign in.
+- **Import & export (site.json)**: download every setting and piece of content as one JSON file, edit it (or have an AI fill it in), and import it back with a preview first. See [site.json](site-json.md).
 
 Image settings (favicons, pet, About photo, link preview, admin logos) show an **In use now** preview: what the site is using today, and whether it's your upload or the built-in default.
 

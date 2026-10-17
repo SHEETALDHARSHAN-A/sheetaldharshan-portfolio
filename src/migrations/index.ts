@@ -9,6 +9,8 @@ import * as migration_20261017_220000_sidebar_homepage_look from './20261017_220
 import * as migration_20261017_230000_pet_behaviour from './20261017_230000_pet_behaviour';
 import * as migration_20261017_235000_admin_look from './20261017_235000_admin_look';
 import * as migration_20261018_010000_about_photo_focal from './20261018_010000_about_photo_focal';
+import * as migration_20261018_020000_admin_security from './20261018_020000_admin_security';
+import * as migration_20261018_030000_user_github from './20261018_030000_user_github';
 
 export const migrations = [
   {
@@ -65,5 +67,15 @@ export const migrations = [
     up: migration_20261018_010000_about_photo_focal.up,
     down: migration_20261018_010000_about_photo_focal.down,
     name: '20261018_010000_about_photo_focal',
+  },
+  {
+    up: migration_20261018_020000_admin_security.up,
+    down: migration_20261018_020000_admin_security.down,
+    name: '20261018_020000_admin_security',
+  },
+  {
+    up: migration_20261018_030000_user_github.up,
+    down: migration_20261018_030000_user_github.down,
+    name: '20261018_030000_user_github',
   },
 ];

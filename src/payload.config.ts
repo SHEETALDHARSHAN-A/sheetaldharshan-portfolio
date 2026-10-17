@@ -29,7 +29,9 @@ import { ProjectsPage } from './globals/ProjectsPage'
 import { Navigation } from './globals/Navigation'
 import { About } from './globals/About'
 import { AdminLook } from './globals/AdminLook'
+import { AdminSecurity } from './globals/AdminSecurity'
 import { adminSearch } from './endpoints/adminSearch'
+import { siteJson } from './endpoints/siteJson'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,12 +49,16 @@ export default buildConfig({
     avatar: { Component: '@/components/admin/AdminBrand#AdminAvatar' },
     components: {
       header: ['@/components/admin/AdminBrand#AdminTheme'],
+      // Top bar, left of the account avatar: Export (full backup) and Import.
+      actions: ['@/components/admin/HeaderActions#HeaderActions'],
+      // Admin panel → Import & export: the whole site as one JSON file.
+      views: { siteData: { Component: '@/components/admin/SiteDataView#SiteDataView', path: '/site-data' } },
       graphics: {
         Logo: '@/components/admin/AdminBrand#AdminLogo',
         Icon: '@/components/admin/AdminBrand#AdminIcon',
       },
       // The admin menu, page by page in the site's order (projects listed one by one).
-      beforeNavLinks: ['@/components/admin/AdminSearch#AdminSearch', '@/components/admin/EditByPage#EditByPage'],
+      beforeNavLinks: ['@/components/admin/NavResizer#NavResizer', '@/components/admin/AdminSearch#AdminSearch', '@/components/admin/EditByPage#EditByPage'],
       // A note on the two-step sign-in above the password form, and a sign-out that ends the whole session.
       beforeLogin: ['@/components/admin/GitHubSignIn#GitHubSignIn'],
       logout: { Button: '@/components/admin/SignOut#SignOut' },
@@ -108,9 +114,9 @@ export default buildConfig({
   collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   // Order sets the admin menu: Sidebar, Brand, then Pages.
-  globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, AdminLook, Homepage, ProjectsPage, About],
+  globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, AdminLook, AdminSecurity, Homepage, ProjectsPage, About],
   // The admin's search bar (src/components/admin/AdminSearch.tsx).
-  endpoints: [adminSearch],
+  endpoints: [adminSearch, ...siteJson],
   plugins: [
     ...plugins,
     // Persistent media in production. Enabled only when a Vercel Blob token is present; local dev writes to public/media.

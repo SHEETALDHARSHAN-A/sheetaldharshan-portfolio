@@ -61,8 +61,9 @@ function configEntries(config: SanitizedConfig): Entry[] {
     for (const f of found) add({ kind: 'field', label: f.label, detail: [label, ...f.trail].join(' › '), href }, f.description)
   }
   add({ kind: 'page', label: 'Your account', detail: 'Name, email, password, photo, admin theme', href: `${admin}/account` }, 'profile avatar user dark light')
+  add({ kind: 'page', label: 'Import & export', detail: 'The whole site as one JSON file: backup, edit, AI', href: `${admin}/site-data` }, 'json export import backup download upload ai restore site.json')
   add(
-    { kind: 'page', label: 'Password & two-step sign-in', detail: 'Change your password (Your account); the GitHub step is set up in Supabase', href: `${admin}/account` },
+    { kind: 'page', label: 'Password & two-step sign-in', detail: 'Turn the GitHub step on or off (Sign-in & security); change your password under Your account', href: `${admin}/globals/admin-security` },
     '2fa two-factor mfa github security login sign in signin reset forgot otp',
   )
   cached = { config, entries }

@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import { ADMIN_EMAILS } from '@/config/admin'
 import { PURPOSE_COOKIE, SECOND_FACTOR_COOKIE, SECOND_FACTOR_SECONDS, signSecondFactor } from '@/utilities/secondFactor'
-import { isAllowedAdmin } from '@/utilities/supabaseAuth'
+import { githubLogin, isAllowedAdmin } from '@/utilities/supabaseAuth'
 import { supabaseForRoute } from '@/utilities/supabaseRoute'
 
 /**
@@ -26,12 +26,20 @@ export async function GET(request: NextRequest) {
   if (error) return back('failed')
   const { data } = await supabase.auth.getUser()
   await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined)
-  if (!isAllowedAdmin(data.user)) return back('not-allowed')
-
+  const login = githubLogin(data.user)
   const payload = await getPayload({ config: configPromise })
+
   if (purpose === 'reset') {
-    const githubEmail = String(data.user?.email ?? '').toLowerCase()
-    const email = ADMIN_EMAILS.includes(githubEmail) ? githubEmail : ADMIN_EMAILS[0]
+    // The admin user linked to this GitHub account; otherwise the allowlist in src/config/admin.ts.
+    const linked = login
+      ? (await payload.find({ collection: 'users', where: { githubUsername: { equals: login } }, limit: 1, depth: 0, overrideAccess: true })).docs[0]
+      : undefined
+    let email = linked?.email
+    if (!email) {
+      if (!isAllowedAdmin(data.user)) return back('not-allowed')
+      const githubEmail = String(data.user?.email ?? '').toLowerCase()
+      email = ADMIN_EMAILS.includes(githubEmail) ? githubEmail : ADMIN_EMAILS[0]
+    }
     const token = email ? await payload.forgotPassword({ collection: 'users', data: { email }, disableEmail: true }).catch(() => null) : null
     if (!token) return back('no-user')
     return NextResponse.redirect(`${url.origin}/admin/reset/${encodeURIComponent(token)}`)
@@ -39,6 +47,9 @@ export async function GET(request: NextRequest) {
 
   const { user } = await payload.auth({ headers: await headers() })
   if (!user) return NextResponse.redirect(`${url.origin}/admin/login`)
+  // Each person confirms with their own GitHub account; users without one use the allowlist.
+  const linkedLogin = String((user as { githubUsername?: string | null }).githubUsername ?? '').toLowerCase()
+  if (linkedLogin ? linkedLogin !== login : !isAllowedAdmin(data.user)) return back('not-allowed')
   const res = NextResponse.redirect(`${url.origin}/admin`)
   res.cookies.set(SECOND_FACTOR_COOKIE, await signSecondFactor(user.id, (user as { _sid?: string })._sid), {
     httpOnly: true,

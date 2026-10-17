@@ -36,7 +36,7 @@ pnpm payload migrate:create && pnpm payload migrate
 See `docs/architecture.md`. Short version: pages under `src/app/(frontend)` read Payload through `src/data/content.ts`; the homepage is a server-rendered conversation animated by `src/components/home/ConversationPlayer.tsx`; projects use `src/components/projects/ProjectExplorer.tsx`; CMS blocks render through `src/components/blocks/RenderProjectBlocks.tsx`.
 
 ## Documentation
-- **[Make it yours](docs/make-it-yours.md)**: use this as your own portfolio, step by step · **[Contributing](CONTRIBUTING.md)**
+- **[Make it yours](docs/make-it-yours.md)**: use this as your own portfolio, step by step · **[site.json](docs/site-json.md)**: the whole site in one file, AI-ready · **[Contributing](CONTRIBUTING.md)**
 - [Reference analysis](docs/reference-analysis.md) · [Design spec](docs/design-spec.md) · [Animation spec](docs/animation-spec.md)
 - [Architecture](docs/architecture.md) · [CMS schema](docs/cms-schema.md) · [Implementation plan and status](docs/implementation-plan.md)
 - [Admin guide](docs/admin-guide.md) · [Deployment](docs/deployment.md) · [Visual QA report](docs/visual-qa-report.md)

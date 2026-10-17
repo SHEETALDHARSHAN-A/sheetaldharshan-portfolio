@@ -127,6 +127,7 @@ export interface Config {
     brand: Brand;
     appearance: Appearance;
     'admin-look': AdminLook;
+    'admin-security': AdminSecurity;
     homepage: Homepage;
     'projects-page': ProjectsPage;
     about: About;
@@ -139,6 +140,7 @@ export interface Config {
     brand: BrandSelect<false> | BrandSelect<true>;
     appearance: AppearanceSelect<false> | AppearanceSelect<true>;
     'admin-look': AdminLookSelect<false> | AdminLookSelect<true>;
+    'admin-security': AdminSecuritySelect<false> | AdminSecuritySelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     'projects-page': ProjectsPageSelect<false> | ProjectsPageSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
@@ -666,6 +668,8 @@ export interface Category {
   createdAt: string;
 }
 /**
+ * People who can sign in to this admin. To add someone: Create new, enter their name, email, a password to share with them, and their GitHub username; they sign in with the password, then confirm with that GitHub account.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -676,6 +680,10 @@ export interface User {
    * Your picture in the admin (top right). Empty: the default avatar from Site-wide → Admin look.
    */
   photo?: (number | null) | Media;
+  /**
+   * The GitHub account this person confirms sign-in with (the second step) and resets their password with, e.g. octocat. Empty: the accounts listed in src/config/admin.ts are used.
+   */
+  githubUsername?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -2033,6 +2041,7 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   photo?: T;
+  githubUsername?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -2583,6 +2592,21 @@ export interface AdminLook {
   createdAt?: string | null;
 }
 /**
+ * How you sign in to this admin. Changes apply within about a minute.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admin-security".
+ */
+export interface AdminSecurity {
+  id: number;
+  /**
+   * On: after your password, confirm with the GitHub account in src/config/admin.ts (GitHub must be enabled in Supabase). Off: the password alone signs you in. Forgotten passwords are reset through GitHub either way; pnpm admin:reset-password always works.
+   */
+  githubStep?: boolean | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
  */
@@ -2909,6 +2933,16 @@ export interface AdminLookSelect<T extends boolean = true> {
   backgroundLight?: T;
   font?: T;
   radius?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admin-security_select".
+ */
+export interface AdminSecuritySelect<T extends boolean = true> {
+  githubStep?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
