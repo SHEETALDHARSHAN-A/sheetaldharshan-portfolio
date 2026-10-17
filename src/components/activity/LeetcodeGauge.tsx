@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { LeetcodeStats } from '@/data/activity'
 
 type Level = 'easy' | 'medium' | 'hard'
@@ -17,6 +17,7 @@ const R = 52
 const C = 2 * Math.PI * R
 const SWEEP = C * 0.75
 const GAP = 7
+const FADE_MS = 160
 
 const pct = (n: number) => {
   const [whole, frac = '00'] = n.toFixed(2).split('.')
@@ -26,13 +27,24 @@ const pct = (n: number) => {
 /**
  * LeetCode-style progress gauge. At rest: solved out of all problems, one arc per difficulty sized by
  * how many problems that level has. Hover the ring for the acceptance rate, or a level for its
- * "Beats x%"; a click keeps that view, and clicking it again goes back to the total. The ring's
- * background stays still; only the progress line grows, from the bottom of the gauge upward.
+ * "Beats x%"; a click keeps that view, and clicking it again goes back to the total.
+ *
+ * Changing view animates like LeetCode's own widget: the arcs and numbers fade out together, the new
+ * view is swapped in while faded, then it fades back in with its progress line growing from the start.
  */
 export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
   const [selected, setSelected] = useState<View | null>(null)
   const [hovered, setHovered] = useState<View | null>(null)
-  const view: View = hovered ?? selected ?? 'solved'
+  const wanted: View = hovered ?? selected ?? 'solved'
+  // The view on screen trails the wanted one by the fade-out, so the swap happens while it is faded.
+  const [view, setView] = useState<View>('solved')
+  const fading = wanted !== view
+  useEffect(() => {
+    if (wanted === view) return
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const t = window.setTimeout(() => setView(wanted), reduced ? 0 : FADE_MS)
+    return () => window.clearTimeout(t)
+  }, [wanted, view])
   // Click selects; clicking the selected one again returns to the total (and drops the hover preview).
   // After deselecting, the arcs re-render under the cursor and React reports a fresh "enter";
   // ignore hover on that item until the pointer really leaves it.
@@ -68,7 +80,7 @@ export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
   const acceptance = submissions.total ? (submissions.accepted / submissions.total) * 100 : 0
 
   return (
-    <div className="lcg" data-view={view} onPointerLeave={unhover}>
+    <div className="lcg" data-view={view} data-fading={fading ? 'true' : undefined} onPointerLeave={unhover}>
       <button
         type="button"
         className="lcg-ring"
@@ -140,7 +152,7 @@ export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
           <li key={l.key}>
             <button
               type="button"
-              data-active={view === l.key}
+              data-active={wanted === l.key}
               aria-pressed={selected === l.key}
               onPointerEnter={hover(l.key)}
               onPointerLeave={unhover}
