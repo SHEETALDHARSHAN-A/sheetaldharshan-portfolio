@@ -179,7 +179,7 @@ test.describe('Public site', () => {
     await expect(page).toHaveURL(new RegExp(`${base}/?$`))
     await expect(page.locator('.jg-messages')).toBeVisible()
   })
-  test('coding activity: sidebar logos open a card, About panels link their sources', async ({ page }) => {
+  test('coding activity: sidebar logos pin a card, About cards link their sources', async ({ page }) => {
     await page.goto(`${base}/about`)
     const logos = page.locator('.dock-logos .activity-logo')
     if ((await logos.count()) > 0) {
@@ -190,10 +190,11 @@ test.describe('Public site', () => {
       await logos.first().click()
       await expect(logos.first()).toHaveAttribute('aria-pressed', 'false')
     }
-    const panel = page.locator('.activity-panel[open]').first()
-    if ((await panel.count()) === 0) test.skip(true, 'No open About panels')
-    await panel.locator('.activity-footer > summary').click()
-    await expect(panel.locator('.activity-sources a').first()).toHaveAttribute('href', /^https:\/\/(github|leetcode)\.com\//)
+    // About: the same dock in the page; the card in view links its sources.
+    const card = page.locator(".activity-dock[data-variant='inline'] .dock-card[aria-hidden='false']").first()
+    if ((await card.count()) === 0) test.skip(true, 'No About cards open by default')
+    await card.locator('.activity-footer > summary').click()
+    await expect(card.locator('.activity-sources a').first()).toHaveAttribute('href', /^https:\/\/(github|leetcode)\.com\//)
   })
   test('admin: forgotten passwords reset through GitHub; step two needs a password session', async ({ page }) => {
     await page.goto(`${base}/admin/forgot`)

@@ -7,19 +7,23 @@ export type DockItem = { id: string; title: string; summary: string; icon: React
 const ROTATE_MS = 5000
 
 /**
- * Sidebar dock: overlapping round logos like Magic UI's AvatarCircles (they spread apart on hover).
- * The cards pop up above the logos without moving anything, and the pet steps up above them.
+ * Coding-activity dock: overlapping round logos like Magic UI's AvatarCircles, with the cards above
+ * them. In the sidebar the cards pop up over the avatar without moving anything (the pet steps up
+ * above them); on the About page ("inline") they sit in the page above the logos.
+ *
+ * Hovering a logo keeps it exactly where it is and slides the others away so each shows in full.
  *
  * - With two or more cards open by default (set in the admin), the pop-up is a carousel: it slides
  *   through them on its own, can be scrolled or swiped, and pauses while hovered or held.
  * - Clicking a logo pins its card. Clicking the same logo again, clicking outside or Escape releases
  *   it, back to the default view (the carousel, the one default card, or closed).
  */
-export function ActivityDock({ items }: { items: DockItem[] }) {
+export function ActivityDock({ items, variant = 'sidebar' }: { items: DockItem[]; variant?: 'sidebar' | 'inline' }) {
   const defaults = items.filter((i) => i.defaultOpen)
   const [pinned, setPinned] = useState<string | null>(null)
   const [active, setActive] = useState(0)
   const [paused, setPaused] = useState(false)
+  const [hovered, setHovered] = useState<number | null>(null)
   const root = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
 
@@ -33,13 +37,16 @@ export function ActivityDock({ items }: { items: DockItem[] }) {
     setActive(0)
   }, [])
 
-  // The pet moves up above the card while one shows (Pet.tsx watches this attribute and its value).
+  // In the sidebar the pet moves up above the card while one shows (Pet.tsx watches this attribute).
   useEffect(() => {
+    if (variant !== 'sidebar') return
     const html = document.documentElement
     if (visibleId) html.setAttribute('data-dock-open', visibleId)
     else html.removeAttribute('data-dock-open')
-  }, [visibleId])
-  useEffect(() => () => document.documentElement.removeAttribute('data-dock-open'), [])
+  }, [visibleId, variant])
+  useEffect(() => () => {
+    if (variant === 'sidebar') document.documentElement.removeAttribute('data-dock-open')
+  }, [variant])
 
   // The pop-up takes the height of the card in view.
   useEffect(() => {
@@ -85,34 +92,49 @@ export function ActivityDock({ items }: { items: DockItem[] }) {
     if (el) el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' })
   }
 
-  return (
-    <div className="activity-dock" ref={root}>
-      <div className="dock-row">
-        <div className="dock-logos" role="toolbar" aria-label="Coding activity" data-stacked={items.length > 1 ? 'true' : undefined}>
-          {items.map((i) => (
-            <button
-              key={i.id}
-              type="button"
-              className="activity-logo"
-              aria-pressed={pinned === i.id}
-              aria-expanded={visibleId === i.id}
-              aria-controls={`dock-${i.id}`}
-              title={pinned === i.id ? `${i.title}: click again to release` : `${i.title} · ${i.summary}`}
-              onClick={() => {
-                if (pinned === i.id) release()
-                else {
-                  setPinned(i.id)
-                  setActive(0)
-                }
-              }}
-            >
-              {i.icon}
-              <span className="sr-only">{i.title}</span>
-            </button>
-          ))}
-        </div>
-        {!visibleId ? <span className="dock-hint">Coding activity</span> : null}
+  const logos = (
+    <div className="dock-row">
+      <div
+        className="dock-logos"
+        role="toolbar"
+        aria-label="Coding activity"
+        data-stacked={items.length > 1 ? 'true' : undefined}
+        data-spread={hovered !== null ? 'true' : undefined}
+        style={{ '--h': hovered ?? 0 } as React.CSSProperties}
+        onPointerLeave={() => setHovered(null)}
+        onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node) && setHovered(null)}
+      >
+        {items.map((i, n) => (
+          <button
+            key={i.id}
+            type="button"
+            className="activity-logo"
+            style={{ '--i': n } as React.CSSProperties}
+            // Mouse only: on touch a tap pins the card, nothing needs to spread.
+            onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(n)}
+            onFocus={() => setHovered(n)}
+            aria-pressed={pinned === i.id}
+            aria-expanded={visibleId === i.id}
+            aria-controls={`dock-${i.id}`}
+            title={pinned === i.id ? `${i.title}: click again to release` : `${i.title} · ${i.summary}`}
+            onClick={() => {
+              if (pinned === i.id) release()
+              else {
+                setPinned(i.id)
+                setActive(0)
+              }
+            }}
+          >
+            {i.icon}
+            <span className="sr-only">{i.title}</span>
+          </button>
+        ))}
       </div>
+      {!visibleId ? <span className="dock-hint">Coding activity</span> : null}
+    </div>
+  )
+
+  const cards = (
       <div
         className="dock-cards"
         data-open={visibleId ? 'true' : 'false'}
@@ -142,6 +164,21 @@ export function ActivityDock({ items }: { items: DockItem[] }) {
           </div>
         ) : null}
       </div>
+  )
+
+  return (
+    <div className="activity-dock" data-variant={variant} ref={root}>
+      {variant === 'inline' ? (
+        <>
+          {cards}
+          {logos}
+        </>
+      ) : (
+        <>
+          {logos}
+          {cards}
+        </>
+      )}
     </div>
   )
 }

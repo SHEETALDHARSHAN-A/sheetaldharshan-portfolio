@@ -5,7 +5,7 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { AboutPhoto } from '@/components/Media/AboutPhoto'
-import { ActivityPanels } from '@/components/activity/ActivityPanels'
+import { ActivityDock } from '@/components/activity/ActivityDock'
 import { activityCards } from '@/components/activity/cards'
 import { getCodingActivity } from '@/data/activity'
 import { PageFrame } from '@/components/shell/PageFrame'
@@ -194,8 +194,16 @@ export default async function AboutPage() {
           <div className="about-photo" aria-hidden={!about.photo}>
             {about.photo ? <AboutPhoto media={about.photo} /> : <div className="placeholder">Photo coming soon</div>}
           </div>
-          {/* Coding activity (set up in the admin): collapsible panels under the photo. */}
-          <ActivityPanels cards={activityCards(activity)} />
+          {/* Coding activity (set up in the admin): a carousel of the default cards above round logos. */}
+          {(() => {
+            const cards = activityCards(activity).filter((c) => c.show.about)
+            return cards.length ? (
+              <ActivityDock
+                variant="inline"
+                items={cards.map((c) => ({ id: c.id, title: c.title, summary: c.summary, icon: <BrandIcon name={c.brand} size={16} />, body: c.body('about'), defaultOpen: c.show.aboutOpen }))}
+              />
+            ) : null
+          })()}
         </aside>
       </div>
     </div>
