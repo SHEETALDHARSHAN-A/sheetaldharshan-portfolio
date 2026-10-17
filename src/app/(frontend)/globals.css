@@ -204,9 +204,13 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .dock-cards[data-open='true'] { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
 /* The cards sit side by side in a scroll-snapping track: a carousel when several are shown. */
 /* Cards stretch to the tallest, so the track keeps one height and nothing around it moves between cards. */
-.dock-track { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; align-items: stretch; }
+.dock-track { position: relative; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; align-items: stretch; }
 .dock-track::-webkit-scrollbar { display: none; }
 /* Each card clips its own content, so a wide heatmap never shows a sliver in the next slide. */
+/* Cards out of view are hidden once the slide settles, so no edge of them shows or reacts to the pointer. */
+.dock-card[aria-hidden='true'] { visibility: hidden; transition: visibility 0s linear 450ms; }
+.dock-card[aria-hidden='false'] { visibility: visible; }
+.dock-track:active .dock-card { visibility: visible; }
 .dock-card { flex: 0 0 100%; min-width: 0; overflow: hidden; scroll-snap-align: start; display: grid; align-content: start; gap: 7px; }
 .dock-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
 .dock-dots button { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 999px; background: var(--line-strong); cursor: pointer; transition: width 200ms ease, background 200ms ease; }

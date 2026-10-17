@@ -5,9 +5,10 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 export type DockItem = { id: string; title: string; summary: string; icon: ReactNode; body: ReactNode; defaultOpen: boolean }
 
 
-/** Scrolls the card track to one card. */
+/** Scrolls the card track exactly to one card (its own position, so sub-pixel widths never leave a sliver). */
 function scrollToCard(el: HTMLElement | null, index: number, smooth = true) {
-  if (el) el.scrollTo({ left: index * el.clientWidth, behavior: smooth ? 'smooth' : 'instant' })
+  const card = el?.children[index] as HTMLElement | undefined
+  if (el && card) el.scrollTo({ left: card.offsetLeft, behavior: smooth ? 'smooth' : 'instant' })
 }
 
 /**
@@ -96,6 +97,15 @@ export function ActivityDock({ items, variant = 'sidebar', seconds = 10 }: { ite
     }, seconds * 1000)
     return () => window.clearInterval(t)
   }, [carousel, paused, rotationKey, seconds])
+
+  // When the track changes width (sidebar or photo column resized, window resized), stay on the same card.
+  useEffect(() => {
+    const el = track.current
+    if (!el) return
+    const ro = new ResizeObserver(() => scrollToCard(el, Math.round(el.scrollLeft / Math.max(1, el.clientWidth)), false))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const onScroll = () => {
     const el = track.current
