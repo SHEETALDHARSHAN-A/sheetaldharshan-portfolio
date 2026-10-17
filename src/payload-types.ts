@@ -2491,7 +2491,7 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
- * Cards in the sidebar, under the pet. Turn each one on or off; the pet resizes to fit whatever is shown.
+ * GitHub shows in the sidebar under the pet (the pet resizes to fit); LeetCode shows on the About page under the photo. Turn each one on or off.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "coding-activity".

@@ -5,6 +5,8 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { AboutPhoto } from '@/components/Media/AboutPhoto'
+import { LeetcodeCard } from '@/components/activity/LeetcodeCard'
+import { getCodingActivity } from '@/data/activity'
 import { PageFrame } from '@/components/shell/PageFrame'
 import { aboutSectionId } from '@/data/types'
 import { brandName, personSchema } from '@/data/seo'
@@ -33,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const [about, site, { isEnabled: draft }] = await Promise.all([getAbout(), getSite(), draftMode()])
+  const [about, site, activity, { isEnabled: draft }] = await Promise.all([getAbout(), getSite(), getCodingActivity(), draftMode()])
   const kinds = new Set(about.sections.map((section) => section.kind))
   const [experience, education, certifications, publications, projects] = await Promise.all([
     kinds.has('experience') ? getExperience() : [],
@@ -187,9 +189,17 @@ export default async function AboutPage() {
             </section>
           )}
         </div>
-        <div className="about-photo" aria-hidden={!about.photo}>
-          {about.photo ? <AboutPhoto media={about.photo} /> : <div className="placeholder">Photo coming soon</div>}
-        </div>
+        <aside className="about-aside">
+          <div className="about-photo" aria-hidden={!about.photo}>
+            {about.photo ? <AboutPhoto media={about.photo} /> : <div className="placeholder">Photo coming soon</div>}
+          </div>
+          {/* Optional LeetCode card (Coding activity in the admin). */}
+          {activity.leetcode ? (
+            <div className="about-activity">
+              <LeetcodeCard data={activity.leetcode} />
+            </div>
+          ) : null}
+        </aside>
       </div>
     </div>
     </PageFrame>

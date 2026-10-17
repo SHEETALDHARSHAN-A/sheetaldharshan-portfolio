@@ -27,7 +27,7 @@ export const CodingActivity: GlobalConfig = {
   label: 'Coding activity',
   access: { read: () => true, update: authenticated },
   hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/blog', '/about', '/contact', '/research'])] },
-  admin: { description: 'Cards in the sidebar, under the pet. Turn each one on or off; the pet resizes to fit whatever is shown.' },
+  admin: { description: 'GitHub shows in the sidebar under the pet (the pet resizes to fit); LeetCode shows on the About page under the photo. Turn each one on or off.' },
   fields: [
     {
       type: 'collapsible',
