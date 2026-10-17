@@ -12,7 +12,7 @@ export const Users: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    group: 'Library',
+    group: 'Admin panel',
     defaultColumns: ['name', 'email'],
     useAsTitle: 'name',
   },
@@ -22,6 +22,12 @@ export const Users: CollectionConfig = {
     {
       name: 'name',
       type: 'text',
+    },
+    {
+      name: 'photo',
+      type: 'upload',
+      relationTo: 'media',
+      admin: { description: 'Your picture in the admin (top right). Empty: the default avatar from Site-wide → Admin look.' },
     },
   ],
   timestamps: true,

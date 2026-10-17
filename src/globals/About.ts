@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
+import { currentImages } from '@/fields/currentImages'
 import { previewUrl } from '@/utilities/previewUrl'
 
 export const About: GlobalConfig = {
@@ -15,6 +16,7 @@ export const About: GlobalConfig = {
     { name: 'title', type: 'text', defaultValue: 'Sheetaldharshan A' },
     { name: 'intro', type: 'textarea', admin: { description: 'Two or three short paragraphs. Blank line between paragraphs.' } },
     { name: 'photo', type: 'upload', relationTo: 'media', admin: { description: 'Optional. A placeholder is shown until a photo is uploaded.' } },
+    currentImages('photoInUse', [{ label: 'About photo', watch: 'photo', fallbackLabel: 'None yet: a “Photo coming soon” placeholder shows' }]),
     {
       name: 'sections',
       type: 'array',

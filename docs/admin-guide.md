@@ -29,6 +29,17 @@ It asks for the admin email and a new password (hidden as you type). It uses `DA
 
 While `ADMIN_2FA=off` is set, anyone with the password gets in. Keep it off only as long as you need to.
 
+## Find anything
+The search box at the top of the admin menu (**⌘K** or **/**) finds settings pages, any field by its label (showing where it lives, for example *Pet › Behaviour*), content by title, and "New …" actions. It reads the CMS setup itself, so pages and fields added later are found without extra work. The **More** group in *Edit by page* lists anything new that hasn't been placed in the menu yet.
+
+## The admin panel itself
+**Admin panel** in the menu:
+- **Logo, colours & font** (*Admin look*): the login-page logo and name, the menu icon, the default avatar, the accent colour, background colours for dark and light mode, the font and the corner style. Empty fields keep the SD logo and Payload's colours. Reload after saving.
+- **Your account, photo & theme**: your name, email and password, your **photo** (shown top right instead of the default avatar), and light or dark mode for the admin.
+- **Admin users**: who can sign in.
+
+Image settings (favicons, pet, About photo, link preview, admin logos) show an **In use now** preview: what the site is using today, and whether it's your upload or the built-in default.
+
 ## Edit the homepage conversation
 **Homepage conversation** in the sidebar. Each row is one bubble.
 - **Content**: the text. Inline links use `[label](/projects)` or `[label](https://…)`.

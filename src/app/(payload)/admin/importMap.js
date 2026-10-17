@@ -24,10 +24,16 @@ import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@pa
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { CurrentImages as CurrentImages_477bc51b0b83d0e68cd6f65c7d453779 } from '@/components/admin/CurrentImages'
 import { ThemePresets as ThemePresets_81bbe54381f61464b860450d840e4946 } from '@/components/admin/ThemePresets'
 import { MessageRowLabel as MessageRowLabel_e22aff31a518801fbdf19d58d0295071 } from '@/components/admin/MessageRowLabel'
+import { AdminAvatar as AdminAvatar_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/components/admin/AdminBrand'
+import { AdminTheme as AdminTheme_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/components/admin/AdminBrand'
 import { SignOut as SignOut_c39e61ddc8453d0bd90f2a671bca5628 } from '@/components/admin/SignOut'
+import { AdminIcon as AdminIcon_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/components/admin/AdminBrand'
+import { AdminLogo as AdminLogo_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/components/admin/AdminBrand'
 import { GitHubSignIn as GitHubSignIn_82cf83256c7a63e9acf8479437502e71 } from '@/components/admin/GitHubSignIn'
+import { AdminSearch as AdminSearch_4809d3107d6dbaf55f5d8b161ea31e82 } from '@/components/admin/AdminSearch'
 import { EditByPage as EditByPage_0ac81aaab5bf5f1ac9d225bad456e817 } from '@/components/admin/EditByPage'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
@@ -61,10 +67,16 @@ export const importMap = {
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
+  "@/components/admin/CurrentImages#CurrentImages": CurrentImages_477bc51b0b83d0e68cd6f65c7d453779,
   "@/components/admin/ThemePresets#ThemePresets": ThemePresets_81bbe54381f61464b860450d840e4946,
   "@/components/admin/MessageRowLabel#MessageRowLabel": MessageRowLabel_e22aff31a518801fbdf19d58d0295071,
+  "@/components/admin/AdminBrand#AdminAvatar": AdminAvatar_c3544fd04a86558fd1f1e4a8d6afed38,
+  "@/components/admin/AdminBrand#AdminTheme": AdminTheme_c3544fd04a86558fd1f1e4a8d6afed38,
   "@/components/admin/SignOut#SignOut": SignOut_c39e61ddc8453d0bd90f2a671bca5628,
+  "@/components/admin/AdminBrand#AdminIcon": AdminIcon_c3544fd04a86558fd1f1e4a8d6afed38,
+  "@/components/admin/AdminBrand#AdminLogo": AdminLogo_c3544fd04a86558fd1f1e4a8d6afed38,
   "@/components/admin/GitHubSignIn#GitHubSignIn": GitHubSignIn_82cf83256c7a63e9acf8479437502e71,
+  "@/components/admin/AdminSearch#AdminSearch": AdminSearch_4809d3107d6dbaf55f5d8b161ea31e82,
   "@/components/admin/EditByPage#EditByPage": EditByPage_0ac81aaab5bf5f1ac9d225bad456e817,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,

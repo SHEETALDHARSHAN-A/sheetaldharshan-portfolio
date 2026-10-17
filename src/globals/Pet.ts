@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
+import { currentImages } from '@/fields/currentImages'
 
 // Everything the sprite sheet can act out. Each maps to one of its animation rows.
 const EMOTIONS = [
@@ -42,6 +43,7 @@ export const Pet: GlobalConfig = {
           'Optional: a new sprite sheet in the Codex pet format (8 columns × 11 rows of 192×208 frames, 1536×2288 px, transparent PNG or WebP). Leave empty to keep the current pet.',
       },
     },
+    currentImages('spriteInUse', [{ label: 'Pet', watch: 'sprite', fallback: '/pet/curly-hoodie.webp', fallbackLabel: 'Built-in pet (curly hoodie)', sprite: true }]),
     {
       type: 'collapsible',
       label: 'Behaviour',

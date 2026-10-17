@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
+import { currentImages } from '@/fields/currentImages'
 
 /** Browser-tab and home-screen icons. Empty fields keep the built-in SD logo. */
 export const Brand: GlobalConfig = {
@@ -20,6 +21,11 @@ export const Brand: GlobalConfig = {
         { name: 'faviconDark', type: 'upload', relationTo: 'media', label: 'Favicon on dark tabs', admin: { width: '50%', description: 'Optional. Usually a light logo. If empty, the light-tab icon is used everywhere.' } },
       ],
     },
+    currentImages('faviconsInUse', [
+      { label: 'Light tabs', watch: 'faviconLight', fallback: '/icon.svg', fallbackLabel: 'Built-in SD logo (follows light/dark)' },
+      { label: 'Dark tabs', watch: 'faviconDark', chain: ['faviconLight'], fallback: '/icon.svg', fallbackLabel: 'Built-in SD logo (follows light/dark)' },
+    ]),
     { name: 'appleIcon', type: 'upload', relationTo: 'media', label: 'Home-screen icon', admin: { description: 'Square PNG, 180×180 or larger, solid background (iPhone and Android shortcuts).' } },
+    currentImages('appleIconInUse', [{ label: 'Home screen', watch: 'appleIcon', fallback: '/apple-touch-icon.png', fallbackLabel: 'Built-in SD logo' }]),
   ],
 }

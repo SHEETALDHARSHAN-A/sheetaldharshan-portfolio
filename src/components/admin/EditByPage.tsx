@@ -42,8 +42,25 @@ export async function EditByPage({ payload }: { payload: Payload }) {
     },
     { label: 'Research page', view: '/research', items: [{ label: 'Publications', href: c('publications') }] },
     { label: 'Contact page', view: '/contact', items: [{ label: 'Email & profiles', href: g('site-settings') }] },
-    { label: 'Library', items: [{ label: 'Images, videos & files', href: c('media') }, { label: 'Admin users', href: c('users') }] },
+    { label: 'Library', items: [{ label: 'Images, videos & files', href: c('media') }] },
+    {
+      label: 'Admin panel',
+      items: [
+        { label: 'Logo, colours & font', href: g('admin-look') },
+        { label: 'Your account, photo & theme', href: '/admin/account' },
+        { label: 'Admin users', href: c('users') },
+      ],
+    },
   ]
+  // Anything added to the CMS later and not placed above still gets a link, under "More".
+  const listed = new Set(tree.flatMap((b) => b.items.map((i) => i.href)))
+  const more: Leaf[] = [
+    ...payload.config.globals.filter((x) => x.admin?.hidden !== true).map((x) => ({ label: typeof x.label === 'string' ? x.label : x.slug, href: g(x.slug) })),
+    ...payload.config.collections
+      .filter((x) => x.admin?.hidden !== true && !x.slug.startsWith('payload-'))
+      .map((x) => ({ label: typeof x.labels?.plural === 'string' ? x.labels.plural : x.slug, href: c(x.slug) })),
+  ].filter((l) => !listed.has(l.href))
+  if (more.length) tree.push({ label: 'More', items: more })
 
   return (
     <nav className="edit-by-page" aria-label="Edit by page">

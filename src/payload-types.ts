@@ -126,6 +126,7 @@ export interface Config {
     'coding-activity': CodingActivity;
     brand: Brand;
     appearance: Appearance;
+    'admin-look': AdminLook;
     homepage: Homepage;
     'projects-page': ProjectsPage;
     about: About;
@@ -137,6 +138,7 @@ export interface Config {
     'coding-activity': CodingActivitySelect<false> | CodingActivitySelect<true>;
     brand: BrandSelect<false> | BrandSelect<true>;
     appearance: AppearanceSelect<false> | AppearanceSelect<true>;
+    'admin-look': AdminLookSelect<false> | AdminLookSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     'projects-page': ProjectsPageSelect<false> | ProjectsPageSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
@@ -670,6 +672,10 @@ export interface Category {
 export interface User {
   id: number;
   name?: string | null;
+  /**
+   * Your picture in the admin (top right). Empty: the default avatar from Site-wide → Admin look.
+   */
+  photo?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -2026,6 +2032,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  photo?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -2541,6 +2548,41 @@ export interface Appearance {
   createdAt?: string | null;
 }
 /**
+ * The look of this admin panel only; the public site is under Appearance. Empty fields keep the built-in SD logo and Payload’s colours. Reload after saving to see it.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admin-look".
+ */
+export interface AdminLook {
+  id: number;
+  /**
+   * Square or wide image, shown above the sign-in form.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Leave empty to show the logo alone.
+   */
+  logoText?: string | null;
+  /**
+   * Small square image at the top of the admin menu.
+   */
+  icon?: (number | null) | Media;
+  /**
+   * Top right, for users without their own photo (Users → photo).
+   */
+  avatar?: (number | null) | Media;
+  /**
+   * Links, toggles, focus rings and the “in use” labels.
+   */
+  accentColor?: string | null;
+  backgroundDark?: string | null;
+  backgroundLight?: string | null;
+  font?: ('system' | 'ibm-plex-sans' | 'dm-sans' | 'manrope' | 'work-sans' | 'source-sans-3') | null;
+  radius?: ('default' | 'round' | 'square') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
  */
@@ -2847,6 +2889,24 @@ export interface AppearanceSelect<T extends boolean = true> {
   colorLine?: T;
   bodyFont?: T;
   headingFont?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admin-look_select".
+ */
+export interface AdminLookSelect<T extends boolean = true> {
+  logo?: T;
+  logoText?: T;
+  icon?: T;
+  avatar?: T;
+  accentColor?: T;
+  backgroundDark?: T;
+  backgroundLight?: T;
+  font?: T;
+  radius?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

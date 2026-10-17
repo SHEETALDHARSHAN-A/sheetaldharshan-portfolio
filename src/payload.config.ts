@@ -28,17 +28,32 @@ import { Brand } from './globals/Brand'
 import { ProjectsPage } from './globals/ProjectsPage'
 import { Navigation } from './globals/Navigation'
 import { About } from './globals/About'
+import { AdminLook } from './globals/AdminLook'
+import { adminSearch } from './endpoints/adminSearch'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
-    meta: { titleSuffix: ' · sheetaldharshan.me' },
+    meta: {
+      titleSuffix: ' · sheetaldharshan.me',
+      icons: [
+        { rel: 'icon', type: 'image/svg+xml', url: '/icon.svg' },
+        { rel: 'apple-touch-icon', url: '/apple-touch-icon.png' },
+      ],
+    },
+    // Logo, menu icon, avatar, colours and font from Site-wide → Admin look (SD logo by default).
+    avatar: { Component: '@/components/admin/AdminBrand#AdminAvatar' },
     components: {
+      header: ['@/components/admin/AdminBrand#AdminTheme'],
+      graphics: {
+        Logo: '@/components/admin/AdminBrand#AdminLogo',
+        Icon: '@/components/admin/AdminBrand#AdminIcon',
+      },
       // The admin menu, page by page in the site's order (projects listed one by one).
-      beforeNavLinks: ['@/components/admin/EditByPage#EditByPage'],
-      // GitHub sign-in (Supabase Auth) above the backup password form, and a sign-out that ends both sessions.
+      beforeNavLinks: ['@/components/admin/AdminSearch#AdminSearch', '@/components/admin/EditByPage#EditByPage'],
+      // A note on the two-step sign-in above the password form, and a sign-out that ends the whole session.
       beforeLogin: ['@/components/admin/GitHubSignIn#GitHubSignIn'],
       logout: { Button: '@/components/admin/SignOut#SignOut' },
     },
@@ -86,7 +101,9 @@ export default buildConfig({
   collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   // Order sets the admin menu: Sidebar, Brand, then Pages.
-  globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, Homepage, ProjectsPage, About],
+  globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, AdminLook, Homepage, ProjectsPage, About],
+  // The admin's search bar (src/components/admin/AdminSearch.tsx).
+  endpoints: [adminSearch],
   plugins: [
     ...plugins,
     // Persistent media in production. Enabled only when a Vercel Blob token is present; local dev writes to public/media.

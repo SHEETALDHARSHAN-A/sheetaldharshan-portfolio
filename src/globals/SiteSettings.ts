@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
+import { currentImages } from '@/fields/currentImages'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -39,6 +40,7 @@ export const SiteSettings: GlobalConfig = {
     { name: 'contactFormEnabled', type: 'checkbox', defaultValue: false, admin: { description: 'Requires an email provider configured on the server.' } },
     { name: 'resume', type: 'upload', relationTo: 'media', admin: { description: 'PDF shown as a download on the About page.' } },
     { name: 'ogImage', type: 'upload', relationTo: 'media', admin: { description: 'Default social preview image (1200×630).' } },
+    currentImages('ogImageInUse', [{ label: 'Link preview', watch: 'ogImage', fallback: '/icon-512.png', fallbackLabel: 'Built-in SD logo' }]),
     { name: 'footerNote', type: 'text', defaultValue: 'Built with Next.js and Payload. Content managed from /admin.' },
   ],
 }
