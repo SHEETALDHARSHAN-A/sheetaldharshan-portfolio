@@ -6,6 +6,7 @@ import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { AboutPhoto } from '@/components/Media/AboutPhoto'
 import { ActivityDock } from '@/components/activity/ActivityDock'
+import { AsideToggle } from '@/components/shell/AsideToggle'
 import { activityCards } from '@/components/activity/cards'
 import { getCodingActivity } from '@/data/activity'
 import { PageFrame } from '@/components/shell/PageFrame'
@@ -66,6 +67,7 @@ export default async function AboutPage() {
       {draft && <LivePreviewListener />}
       {/* The title sits in the left column, so the photo column starts at the top and fits the first screen. */}
       <div className="about">
+        <AsideToggle />
         <header className="page-head about-head">
           <span className="eyebrow">{about.eyebrow}</span>
           <h1>{about.title}</h1>

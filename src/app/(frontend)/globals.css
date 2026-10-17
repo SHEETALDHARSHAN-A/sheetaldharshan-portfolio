@@ -631,6 +631,15 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 /* ------------------------------------------------------------------ about / research / contact */
 .about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); grid-template-rows: auto 1fr; column-gap: clamp(24px, 4vw, 60px); align-items: start; }
 .about-head, .about-main { grid-column: 1; }
+/* Hide / show the right-hand column (AsideToggle): the text then takes the full width. */
+.about { position: relative; }
+.aside-toggle { position: fixed; top: 18px; right: calc(var(--gutter) - 6px); z-index: 30; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(8px); color: var(--muted); cursor: pointer; transition: color 160ms ease, background 160ms ease; }
+.aside-toggle svg { width: 18px; height: 18px; }
+.aside-toggle:hover { color: var(--text); background: var(--surface); }
+.aside-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+html[data-about-aside='collapsed'] .about { grid-template-columns: minmax(0, 1fr); }
+html[data-about-aside='collapsed'] .about-aside { display: none; }
+html[data-about-aside='collapsed'] .about-main { max-width: 960px; }
 .about-aside { grid-column: 2; grid-row: 1 / span 2; }
 /* One screen tall with its contents centred, so the photo, cards and logos always sit in the middle of the
    screen (the photo shrinks first when space is short). */
@@ -729,6 +738,9 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
   .topbar .menu { right: 0; top: calc(100% + 8px); min-width: 230px; }
   .about { grid-template-columns: minmax(0, 1fr); }
   .about-head, .about-main, .about-aside { grid-column: 1; grid-row: auto; }
+  /* Phones: the column is stacked under the title, so there is nothing to hide. */
+  .aside-toggle { display: none; }
+  html[data-about-aside='collapsed'] .about-aside { display: flex; }
   /* Phones: title, then the photo, then the text. */
   .about-head { order: 0; } .about-aside { order: 1; } .about-main { order: 2; }
   .about-aside { position: relative; top: auto; width: min(100%, 340px); margin: 0 auto 28px; height: auto; max-height: none; }
