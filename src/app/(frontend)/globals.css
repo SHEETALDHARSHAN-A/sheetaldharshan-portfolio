@@ -24,7 +24,7 @@
   --font-condensed: var(--font-barlow), 'Barlow Condensed', 'Arial Narrow', Impact, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --sidebar-w: 220px;
+  --sidebar-w: 248px;
   --gutter: clamp(20px, 3vw, 44px);
   --space: 1;
   --heading-scale: 1;
@@ -636,7 +636,8 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .about { display: grid; grid-template-columns: minmax(0, 1fr) var(--about-aside-w, clamp(260px, 28vw, 560px)); grid-template-rows: auto 1fr; column-gap: clamp(24px, 4vw, 60px); align-items: start; }
 .about-head, .about-main { grid-column: 1; }
 /* Hide / show the right-hand column (AsideToggle): the text then takes the full width. */
-.about { position: relative; }
+.about { position: relative; transition: grid-template-columns 360ms var(--ease-out), column-gap 360ms var(--ease-out); }
+html[data-resizing] .about { transition: none; }
 /* The divider on the photo column's left edge: drag to resize, grip to hide (AsideResizer). */
 .aside-resizer { position: absolute; top: 0; bottom: 0; left: calc(clamp(24px, 4vw, 60px) / -2 - 6px); width: 12px; z-index: 5; cursor: col-resize; touch-action: none; display: grid; place-items: center; }
 .aside-resizer::before { content: ''; position: absolute; top: 8%; bottom: 8%; left: 5px; width: 2px; border-radius: 2px; background: transparent; transition: background 150ms ease; }
@@ -645,13 +646,19 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .aside-resizer:hover .aside-grip, .aside-grip:focus-visible { opacity: 1; color: var(--text); }
 .aside-grip svg { width: 14px; height: 14px; }
 /* While hidden: a tab on the right edge brings the column back. */
-.aside-toggle { display: none; position: fixed; top: 50%; right: 0; z-index: 30; place-items: center; width: 22px; height: 56px; padding: 0; border: 0; border-radius: 10px 0 0 10px; background: var(--surface); color: var(--muted); cursor: pointer; transform: translateY(-50%); transition: color 150ms ease, width 150ms ease; }
-.aside-toggle:hover { color: var(--text); width: 26px; }
+/* Sits on the right edge of the page content (not the window), level with where the grip was. */
+.aside-toggle { display: none; position: fixed; top: 50%; right: var(--gutter); z-index: 30; place-items: center; width: 22px; height: 56px; padding: 0; border: 0; border-radius: 10px; background: var(--surface); color: var(--muted); cursor: pointer; transform: translateY(-50%); transition: color 150ms ease, width 150ms ease; }
+.aside-toggle:hover { color: var(--text); background: var(--surface-hover); }
 .aside-toggle svg { width: 15px; height: 15px; }
 html[data-about-aside='collapsed'] .aside-toggle { display: grid; }
-html[data-about-aside='collapsed'] .about { grid-template-columns: minmax(0, 1fr); }
-html[data-about-aside='collapsed'] .about-aside { display: none; }
-html[data-about-aside='collapsed'] .about-main { max-width: 960px; }
+/* Hidden: the column narrows to nothing and the text grows into the space, both animated (and back). */
+html[data-about-aside='collapsed'] .about { grid-template-columns: minmax(0, 1fr) 0px; column-gap: 0px; }
+.about-aside > :not(.aside-resizer) { transition: opacity 200ms ease; }
+html[data-about-aside='collapsed'] .about-aside { overflow: hidden; pointer-events: none; }
+html[data-about-aside='collapsed'] .about-aside > * { opacity: 0; }
+/* With the room, the intro widens too (still a comfortable line length). */
+.about-intro p { transition: max-width 360ms var(--ease-out); }
+html[data-about-aside='collapsed'] .about-intro p { max-width: 860px; }
 .about-aside { grid-column: 2; grid-row: 1 / span 2; }
 /* One screen tall with its contents centred, so the photo, cards and logos always sit in the middle of the
    screen (the photo shrinks first when space is short). */
@@ -752,7 +759,9 @@ html[data-about-aside='collapsed'] .about-main { max-width: 960px; }
   .about-head, .about-main, .about-aside { grid-column: 1; grid-row: auto; }
   /* Phones: the column is stacked under the title, so there is nothing to hide. */
   .aside-toggle, .aside-resizer { display: none !important; }
-  html[data-about-aside='collapsed'] .about-aside { display: flex; }
+  html[data-about-aside='collapsed'] .about-aside { overflow: visible; pointer-events: auto; }
+  html[data-about-aside='collapsed'] .about-aside > * { opacity: 1; }
+  html[data-about-aside='collapsed'] .about { grid-template-columns: minmax(0, 1fr); }
   /* Phones: title, then the photo, then the text. */
   .about-head { order: 0; } .about-aside { order: 1; } .about-main { order: 2; }
   .about-aside { position: relative; top: auto; width: min(100%, 340px); margin: 0 auto 28px; height: auto; max-height: none; }
