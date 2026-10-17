@@ -1,7 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
-import { supabaseStrategy } from './supabaseStrategy'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -17,8 +16,8 @@ export const Users: CollectionConfig = {
     defaultColumns: ['name', 'email'],
     useAsTitle: 'name',
   },
-  // GitHub sign-in through Supabase, plus the original email/password login as a backup.
-  auth: { strategies: [supabaseStrategy] },
+  // Email and password; src/proxy.ts then asks for a GitHub check before the session counts.
+  auth: true,
   fields: [
     {
       name: 'name',

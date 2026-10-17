@@ -1,3 +1,4 @@
+import type { PetIdleAction } from './behaviour'
 import { SHEET, STATES, lookCell, type PetState } from './sprite'
 
 /** What the pet does when nothing else is going on: rest, wait for input, or look busy. */
@@ -8,6 +9,8 @@ const WALK_SPEED = 55 // px per second: an unhurried stroll
 const STEP_FPS = 6 // walk-cycle frames per second: a calm, natural step
 const GAZE_HOLD = 4500 // ms the pet keeps looking after the cursor stops
 const GAZE_STEP = 260 // ms between gaze changes, so the head turns calmly
+// Emotions that can be held as a loop while the visitor is away; the rest play once.
+const LOOPS: Partial<Record<PetIdleAction, PetState>> = { wait: 'waiting', think: 'review', work: 'running' }
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 
 /**
@@ -23,6 +26,8 @@ export class PetController {
   onMove?: () => void
   onDragStart?: () => void
   onDrop?: (atHome: boolean) => void
+  /** After being dragged somewhere and set down (once it has walked home, if dropped near it). */
+  onLand?: () => void
 
   private el: HTMLElement
   private sprite: HTMLElement
@@ -33,6 +38,8 @@ export class PetController {
   private reduced = false
   private hidden = false
   private wanders = false
+  private wanderEvery = 40000
+  private hold: PetState | null = null
   private busy: 'none' | 'oneshot' | 'walk' | 'drag' = 'none'
   private current: { state: PetState; frame: number; loops: number; then?: () => void } | null = null
   private frameTimer = 0
@@ -86,8 +93,9 @@ export class PetController {
     this.rest()
   }
 
-  setWander(on: boolean) {
+  setWander(on: boolean, everyMs = this.wanderEvery) {
     this.wanders = on
+    this.wanderEvery = everyMs
     window.clearTimeout(this.wanderTimer)
     if (on) this.scheduleWander()
   }
@@ -137,7 +145,7 @@ export class PetController {
       if (current.loops <= 0) return this.finish()
       current.frame = 0
       // Resting loops hold still for a beat between cycles, like a breath.
-      if (current.state === 'idle' || current.state === 'waiting') {
+      if (current.state === 'idle' || current.state === 'waiting' || current.state === this.hold) {
         this.show(def.row, 0)
         return this.schedule(1600 + Math.random() * 2400)
       }
@@ -157,7 +165,62 @@ export class PetController {
   /** Back to the resting loop for the current mode. */
   rest() {
     if (this.busy !== 'none') return
-    this.play(BASE[this.mode])
+    this.play(this.mode === 'idle' && this.hold ? this.hold : BASE[this.mode])
+  }
+
+  /**
+   * Acts out an emotion picked in the admin. With `hold`, a loopable one (wait, think, work) becomes
+   * the resting loop until `release()`; others play once.
+   */
+  perform(action: PetIdleAction, hold = false) {
+    if (action === 'none' || this.busy === 'drag') return
+    const loop = LOOPS[action]
+    if (hold && loop) {
+      this.hold = loop
+      if (this.busy === 'none') this.play(loop)
+      return
+    }
+    switch (action) {
+      case 'wave':
+        return this.sayHi()
+      case 'jump':
+        return this.react('jumping', 1)
+      case 'sad':
+        return this.react('failed', 1)
+      case 'look':
+        return this.lookAround()
+      case 'stroll':
+        return void this.stroll()
+      default:
+        return this.react(loop!, action === 'wait' ? 1 : 2)
+    }
+  }
+
+  /** Ends a held loop from `perform(…, true)`. */
+  release() {
+    if (!this.hold) return
+    this.hold = null
+    if (this.busy === 'none') this.rest()
+  }
+
+  /** Glances left, then right, then back at you. */
+  lookAround() {
+    if (this.busy !== 'none' || this.hidden) return
+    window.clearTimeout(this.frameTimer)
+    window.clearTimeout(this.lookTimer)
+    this.current = null
+    this.gaze = null
+    this.busy = 'oneshot'
+    const steps = [lookCell(270), lookCell(247.5), lookCell(90), lookCell(112.5), { row: 0, col: 0 }]
+    const next = (i: number) => {
+      if (i >= steps.length) {
+        this.busy = 'none'
+        return this.rest()
+      }
+      this.show(steps[i].row, steps[i].col)
+      this.frameTimer = window.setTimeout(() => next(i + 1), i % 2 ? 900 : 260)
+    }
+    next(0)
   }
 
   setMode(mode: Mode) {
@@ -289,27 +352,32 @@ export class PetController {
     this.walkRaf = requestAnimationFrame(step)
   }
 
-  goHome() {
+  goHome(then?: () => void) {
     this.atHome = true
     this.onDrop?.(true)
     const x = this.home.x + this.offset
     // Long trips home take about a second and a half; short ones keep the stroll pace.
-    this.walkTo(x, this.home.y, undefined, clamp(Math.hypot(x - this.pos.x, this.home.y - this.pos.y) / 3, WALK_SPEED * 1.5, 180))
+    this.walkTo(x, this.home.y, then, clamp(Math.hypot(x - this.pos.x, this.home.y - this.pos.y) / 3, WALK_SPEED * 1.5, 180))
+  }
+
+  /** A stroll to the other side of its spot; false when it can't go (away, busy, or no room). */
+  stroll(): boolean {
+    if (this.hidden || this.reduced || !this.atHome || this.busy !== 'none' || this.mode !== 'idle' || this.range <= 6) return false
+    // Always a proper stroll to the other side, never a shuffle of a few pixels.
+    const next = (this.offset > 0 ? -1 : 1) * this.range * (0.6 + Math.random() * 0.4)
+    this.walkTo(this.home.x + next, this.home.y, () => {
+      this.offset = next
+      this.rest()
+    })
+    return true
   }
 
   private scheduleWander() {
     window.clearTimeout(this.wanderTimer)
     this.wanderTimer = window.setTimeout(() => {
-      if (this.wanders && !this.hidden && !this.reduced && this.atHome && this.busy === 'none' && this.mode === 'idle' && this.range > 6) {
-        // Always a proper stroll to the other side, never a shuffle of a few pixels.
-        const next = (this.offset > 0 ? -1 : 1) * this.range * (0.6 + Math.random() * 0.4)
-        this.walkTo(this.home.x + next, this.home.y, () => {
-          this.offset = next
-          this.rest()
-        })
-      }
+      if (this.wanders) this.stroll()
       this.scheduleWander()
-    }, 28000 + Math.random() * 22000)
+    }, this.wanderEvery * (0.7 + Math.random() * 0.6))
   }
 
   /* ------------------------------------------------------------ dragging */
@@ -382,11 +450,16 @@ export class PetController {
     const nearHome = Math.hypot(this.pos.x - this.home.x, this.pos.y - this.home.y) < Math.max(70, this.w * 0.6)
     if (nearHome) {
       this.offset = clamp(this.pos.x - this.home.x, -this.range, this.range)
-      this.goHome()
+      this.goHome(() => {
+        this.rest()
+        this.onLand?.()
+      })
     } else {
       this.atHome = false
       this.onDrop?.(false)
       this.rest()
+      // After the landing squash.
+      window.setTimeout(() => this.onLand?.(), 450)
     }
     return true
   }

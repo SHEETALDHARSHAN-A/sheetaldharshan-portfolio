@@ -3,15 +3,18 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { toMediaRef } from '@/data/media'
 import type { MediaRef } from '@/data/types'
+import { toBehaviour, type PetBehaviour } from '@/components/pet/behaviour'
 
-export type PetSettings = { enabled: boolean; showOnPhones: boolean; sprite?: string }
+export type PetSettings = { enabled: boolean; showOnPhones: boolean; sprite?: string; behaviour: PetBehaviour }
 export type BrandIcons = { faviconLight?: MediaRef; faviconDark?: MediaRef; appleIcon?: MediaRef }
 
 /** Pet settings from the admin (Sidebar → Pet); defaults keep the built-in pet. */
 export const getPetSettings = cache(async (): Promise<PetSettings> => {
   const payload = await getPayload({ config: configPromise })
-  const doc = (await payload.findGlobal({ slug: 'pet', depth: 1 }).catch(() => null)) as { enabled?: boolean | null; showOnPhones?: boolean | null; sprite?: unknown } | null
-  return { enabled: doc?.enabled ?? true, showOnPhones: doc?.showOnPhones ?? true, sprite: toMediaRef(doc?.sprite)?.url }
+  const doc = (await payload.findGlobal({ slug: 'pet', depth: 1 }).catch(() => null)) as
+    | ({ enabled?: boolean | null; showOnPhones?: boolean | null; sprite?: unknown } & Record<string, unknown>)
+    | null
+  return { enabled: doc?.enabled ?? true, showOnPhones: doc?.showOnPhones ?? true, sprite: toMediaRef(doc?.sprite)?.url, behaviour: toBehaviour(doc) }
 })
 
 /** Uploaded favicons (Brand → Favicon & icons); empty fields fall back to the built-in SD logo. */

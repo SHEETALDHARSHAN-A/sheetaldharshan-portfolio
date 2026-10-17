@@ -6,6 +6,7 @@ import * as migration_20261017_200000_coding_activity_open from './20261017_2000
 import * as migration_20261017_205000_pet_and_brand from './20261017_205000_pet_and_brand';
 import * as migration_20261017_210000_theme_projects_style from './20261017_210000_theme_projects_style';
 import * as migration_20261017_220000_sidebar_homepage_look from './20261017_220000_sidebar_homepage_look';
+import * as migration_20261017_230000_pet_behaviour from './20261017_230000_pet_behaviour';
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20261017_220000_sidebar_homepage_look.up,
     down: migration_20261017_220000_sidebar_homepage_look.down,
     name: '20261017_220000_sidebar_homepage_look',
+  },
+  {
+    up: migration_20261017_230000_pet_behaviour.up,
+    down: migration_20261017_230000_pet_behaviour.down,
+    name: '20261017_230000_pet_behaviour',
   },
 ];

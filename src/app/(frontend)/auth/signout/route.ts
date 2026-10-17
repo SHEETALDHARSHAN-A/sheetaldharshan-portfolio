@@ -1,12 +1,12 @@
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
-import { supabaseForRoute } from '@/utilities/supabaseRoute'
+import { SECOND_FACTOR_COOKIE } from '@/utilities/secondFactor'
 
-/** Ends both sessions (Supabase and Payload) and returns to the login page. */
+/** Ends the admin session (password and GitHub step) and returns to the login page. */
 export async function GET(request: NextRequest) {
   const origin = new URL(request.url).origin
-  const supabase = await supabaseForRoute()
-  await supabase?.auth.signOut().catch(() => undefined)
-  ;(await cookies()).delete('payload-token')
+  const store = await cookies()
+  store.delete('payload-token')
+  store.delete(SECOND_FACTOR_COOKIE)
   return NextResponse.redirect(`${origin}/admin/login`)
 }

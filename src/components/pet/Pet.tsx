@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { SearchDoc } from '@/data/types'
+import { DEFAULT_BEHAVIOUR, HOLDABLE, type PetBehaviour } from './behaviour'
 import { PetController } from './controller'
 import { PetBubble, type Activity } from './PetBubble'
 import { loadEngine } from './search'
@@ -35,10 +36,14 @@ function write(key: string, value: { x: number; y: number } | null) {
 
 /**
  * The site's companion: a Codex-style sprite pet that lives in the sidebar (bottom-right on
- * phones). It follows the cursor, strolls now and then, runs when dragged anywhere, and waves
- * hello as it opens a chat bubble with site search when clicked (or with / and ⌘K).
+ * phones). It runs when dragged anywhere and opens a chat bubble with site search when clicked
+ * (or with / and ⌘K). What it does when idle, clicked, dropped or searching is set in the admin.
  */
-export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPhones?: boolean } = {}) {
+export function Pet({
+  sprite,
+  showOnPhones = true,
+  behaviour = DEFAULT_BEHAVIOUR,
+}: { sprite?: string; showOnPhones?: boolean; behaviour?: PetBehaviour } = {}) {
   const sheet = sprite || SHEET.src
   const router = useRouter()
   const elRef = useRef<HTMLButtonElement>(null)
@@ -46,6 +51,7 @@ export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPh
   const ctl = useRef<PetController | null>(null)
   const wasDrag = useRef(false)
   const openRef = useRef(false)
+  const behaviourRef = useRef(behaviour)
   const [mounted, setMounted] = useState(false)
   const [ready, setReady] = useState(false)
   const [open, setOpen] = useState(false)
@@ -53,6 +59,7 @@ export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPh
   const [away, setAway] = useState(false)
   const [mobile, setMobile] = useState(false)
   openRef.current = open
+  behaviourRef.current = behaviour
 
   useEffect(() => setMounted(true), [])
 
@@ -80,6 +87,7 @@ export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPh
       setAway(!atHome)
       write(storageKey(mq.matches), atHome ? null : { x: c.pos.x / window.innerWidth, y: c.pos.y / window.innerHeight })
     }
+    c.onLand = () => c.perform(behaviourRef.current.dropAction)
 
     const layout = () => {
       const isMobile = mq.matches
@@ -100,7 +108,6 @@ export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPh
           c.setHome(slot.left + (slot.width - c.w) / 2, slot.top + (slot.height - c.h) / 2, Math.max(0, sidebar.width / 2 - c.w * 0.25 - 14))
         }
       }
-      c.setWander(!isMobile)
       syncAnchor()
     }
 
@@ -131,7 +138,7 @@ export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPh
 
     let lastLook = 0
     const onPointer = (e: PointerEvent) => {
-      if (e.pointerType === 'touch') return
+      if (e.pointerType === 'touch' || !behaviourRef.current.followCursor) return
       const now = performance.now()
       if (now - lastLook < 120) return
       lastLook = now
@@ -165,6 +172,52 @@ export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPh
     }
   }, [mounted, sheet])
 
+  /* strolling, from the admin; desktop only, where it has the sidebar to walk across */
+  useEffect(() => {
+    ctl.current?.setWander(ready && !mobile && behaviour.stroll, behaviour.strollEvery * 1000)
+  }, [ready, mobile, behaviour.stroll, behaviour.strollEvery])
+
+  /* the visitor going idle and coming back, from the admin */
+  const { idleAfter, idleAction, idleRepeat, returnAction } = behaviour
+  useEffect(() => {
+    if (!ready) return
+    let idle = false
+    let timer = 0
+    let again = 0
+    let last = 0
+    const arm = () => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(goIdle, idleAfter * 1000)
+    }
+    function goIdle() {
+      const c = ctl.current
+      if (!c || openRef.current || document.visibilityState !== 'visible') return arm()
+      idle = true
+      c.perform(idleAction, idleRepeat)
+      // One-off actions come round again while the visitor stays away; loops simply keep going.
+      if (idleRepeat && !HOLDABLE.has(idleAction)) again = window.setInterval(() => ctl.current?.perform(idleAction), Math.max(12, idleAfter) * 1000)
+    }
+    const onActive = () => {
+      if (idle) {
+        idle = false
+        window.clearInterval(again)
+        ctl.current?.release()
+        ctl.current?.perform(returnAction)
+      } else if (performance.now() - last < 400) return
+      last = performance.now()
+      arm()
+    }
+    const events = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart'] as const
+    for (const name of events) window.addEventListener(name, onActive, { passive: true, capture: true })
+    arm()
+    return () => {
+      for (const name of events) window.removeEventListener(name, onActive, { capture: true })
+      window.clearTimeout(timer)
+      window.clearInterval(again)
+      ctl.current?.release()
+    }
+  }, [ready, idleAfter, idleAction, idleRepeat, returnAction])
+
   /* the bubble follows the pet while it is open */
   useEffect(() => {
     const c = ctl.current
@@ -190,9 +243,11 @@ export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPh
     ctl.current?.setMode('idle')
   }, [])
 
-  // The only gesture: saying hi when the search opens. Otherwise it rests, looks and strolls.
+  // Reactions to the search bubble, as set in the admin.
   const onActivity = useCallback((activity: Activity) => {
-    if (activity === 'opened') ctl.current?.sayHi()
+    const b = behaviourRef.current
+    const action = activity === 'opened' ? b.clickAction : activity === 'found' ? b.foundAction : activity === 'empty' ? b.emptyAction : 'none'
+    ctl.current?.perform(action)
   }, [])
 
   const go = useCallback(

@@ -195,4 +195,13 @@ test.describe('Public site', () => {
     await panel.locator('.activity-footer > summary').click()
     await expect(panel.locator('.activity-sources a').first()).toHaveAttribute('href', /^https:\/\/(github|leetcode)\.com\//)
   })
+  test('admin: forgotten passwords reset through GitHub; step two needs a password session', async ({ page }) => {
+    await page.goto(`${base}/admin/forgot`)
+    await expect(page).toHaveURL(/\/auth\/verify\?reset=1$/)
+    await expect(page.getByRole('heading', { name: 'Reset your password with GitHub' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Continue with GitHub' })).toHaveAttribute('href', '/auth/github?purpose=reset')
+    await page.goto(`${base}/auth/verify`)
+    await expect(page).toHaveURL(/\/admin\/login/)
+    await expect(page.getByRole('link', { name: 'Reset it with GitHub' })).toBeVisible()
+  })
 })

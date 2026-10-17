@@ -18,7 +18,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           {children}
         </main>
       </div>
-      {pet.enabled ? <Pet sprite={pet.sprite} showOnPhones={pet.showOnPhones} /> : null}
+      {pet.enabled ? <Pet sprite={pet.sprite} showOnPhones={pet.showOnPhones} behaviour={pet.behaviour} /> : null}
     </div>
   )
 }

@@ -2424,6 +2424,23 @@ export interface Pet {
    * Optional: a new sprite sheet in the Codex pet format (8 columns × 11 rows of 192×208 frames, 1536×2288 px, transparent PNG or WebP). Leave empty to keep the current pet.
    */
   sprite?: (number | null) | Media;
+  /**
+   * No mouse, scroll, touch or typing for this long.
+   */
+  idleAfter?: number | null;
+  idleAction?: ('none' | 'wave' | 'jump' | 'think' | 'work' | 'wait' | 'sad' | 'look' | 'stroll') | null;
+  /**
+   * Off: it does it once.
+   */
+  idleRepeat?: boolean | null;
+  returnAction?: ('none' | 'wave' | 'jump' | 'think' | 'work' | 'wait' | 'sad' | 'look') | null;
+  clickAction?: ('none' | 'wave' | 'jump' | 'think' | 'work' | 'wait' | 'sad' | 'look') | null;
+  dropAction?: ('none' | 'wave' | 'jump' | 'think' | 'work' | 'wait' | 'sad' | 'look') | null;
+  foundAction?: ('none' | 'wave' | 'jump' | 'think' | 'work' | 'wait' | 'sad' | 'look') | null;
+  emptyAction?: ('none' | 'wave' | 'jump' | 'think' | 'work' | 'wait' | 'sad' | 'look') | null;
+  followCursor?: boolean | null;
+  stroll?: boolean | null;
+  strollEvery?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2748,6 +2765,17 @@ export interface PetSelect<T extends boolean = true> {
   enabled?: T;
   showOnPhones?: T;
   sprite?: T;
+  idleAfter?: T;
+  idleAction?: T;
+  idleRepeat?: T;
+  returnAction?: T;
+  clickAction?: T;
+  dropAction?: T;
+  foundAction?: T;
+  emptyAction?: T;
+  followCursor?: T;
+  stroll?: T;
+  strollEvery?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
