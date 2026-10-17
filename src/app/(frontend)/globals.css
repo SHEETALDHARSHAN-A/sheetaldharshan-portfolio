@@ -174,8 +174,12 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .activity-logo .brand-icon { margin: 0; }
 button.activity-logo:hover { background: var(--surface-hover); }
 /* No rings: while a card is in view, the other logos dim a little, so the selected one stands out. */
-.dock-logos:has(.activity-logo[aria-expanded='true']) .activity-logo:not([aria-expanded='true']) { opacity: 0.45; }
-.dock-logos .activity-logo:hover { opacity: 1 !important; }
+/* The selected logo comes to the front of the stack. */
+.dock-logos .activity-logo[aria-expanded='true'] { z-index: 2; }
+/* Only the icon dims; the circle stays solid so a logo behind never shows through. */
+.dock-logos .activity-logo .brand-icon { transition: opacity 200ms ease, filter 200ms ease; }
+.dock-logos:has(.activity-logo[aria-expanded='true']) .activity-logo:not([aria-expanded='true']) .brand-icon { opacity: 0.4; filter: grayscale(1); }
+.dock-logos .activity-logo:hover .brand-icon { opacity: 1 !important; filter: none !important; }
 button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .activity-dock { display: grid; gap: 10px; }
 .activity-dock .dock-row { display: flex; align-items: center; gap: 10px; }
@@ -186,9 +190,8 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 /* Magic UI AvatarCircles: 32px circles overlapping by 12px, no borders. Hovering (or focusing) one keeps it in place and nudges the others 6px away from it,
    just enough to make each easy to click. */
 .dock-logos[data-stacked] .activity-logo + .activity-logo { margin-left: -12px; }
-.dock-logos[data-stacked] .activity-logo { transition: transform 260ms var(--ease-out), background 160ms ease, opacity 200ms ease; }
+.dock-logos[data-stacked] .activity-logo { transition: transform 260ms var(--ease-out), background 160ms ease; }
 .dock-logos[data-stacked][data-spread] .activity-logo { transform: translateX(calc((var(--i) - var(--h)) * 6px)); }
-.dock-logos[data-stacked][data-spread] .activity-logo:not([aria-pressed='true']) { z-index: 0; }
 /* Magnification: each logo's size follows the pointer (set by ActivityDock), springing back on leave. */
 .dock-logos .activity-logo { width: 32px; height: 32px; }
 .dock-logos .activity-logo .brand-icon { width: 50%; height: 50%; }
