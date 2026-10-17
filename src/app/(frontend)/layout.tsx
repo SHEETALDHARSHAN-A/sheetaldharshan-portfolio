@@ -42,6 +42,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   )
 }
 
+/** Bump when the favicon changes: browsers cache favicons separately and only refetch a new address. */
+const ICON_VERSION = 'sd1'
+
 export const viewport: Viewport = { themeColor: '#000000', colorScheme: 'dark' }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -65,14 +68,14 @@ export async function generateMetadata(): Promise<Metadata> {
     icons: {
       // The SVG follows the browser's light or dark mode (black or white mark); the rest are fallbacks.
       icon: [
-        { url: '/favicon.ico', sizes: '32x32' },
-        { url: '/icon.svg', type: 'image/svg+xml' },
-        { url: '/icon-96.png', type: 'image/png', sizes: '96x96' },
-        { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+        { url: `/favicon.ico?v=${ICON_VERSION}`, sizes: '32x32' },
+        { url: `/icon.svg?v=${ICON_VERSION}`, type: 'image/svg+xml' },
+        { url: `/icon-96.png?v=${ICON_VERSION}`, type: 'image/png', sizes: '96x96' },
+        { url: `/icon-192.png?v=${ICON_VERSION}`, type: 'image/png', sizes: '192x192' },
       ],
-      apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
+      apple: [{ url: `/apple-touch-icon.png?v=${ICON_VERSION}`, sizes: '180x180' }],
     },
-    manifest: '/site.webmanifest',
+    manifest: `/site.webmanifest?v=${ICON_VERSION}`,
     // Search Console and Bing Webmaster Tools ownership codes, set as Vercel environment variables.
     verification: {
       ...(process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : {}),
