@@ -19,6 +19,8 @@ export function toMediaRef(input: unknown): MediaRef | undefined {
     width: media.width ?? undefined,
     height: media.height ?? undefined,
     mimeType: media.mimeType ?? undefined,
+    focalX: media.focalX ?? undefined,
+    focalY: media.focalY ?? undefined,
     sizes,
   }
 }

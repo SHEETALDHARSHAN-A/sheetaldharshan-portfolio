@@ -20,12 +20,14 @@ export function AboutPhoto({ media }: { media: MediaRef }) {
   }, [])
   const small = media.sizes?.thumbnail?.url ?? media.sizes?.small?.url
   const large = media.sizes?.large ?? media.sizes?.medium
+  // The frame changes shape (4:5 down to 3:2); the cut always keeps the focal point set in the media library.
+  const position = { objectPosition: `${media.focalX ?? 50}% ${media.focalY ?? 50}%` }
   return (
     <div className="photo-progressive" data-preview={preview ? 'true' : 'false'} data-ready={ready ? 'true' : 'false'}>
       <span className="photo-shimmer" aria-hidden="true" />
       {small ? (
         // eslint-disable-next-line @next/next/no-img-element -- the tiny preview is used as-is, blurred
-        <img ref={thumb} className="photo-preview" src={small} alt="" aria-hidden="true" decoding="async" onLoad={() => setPreview(true)} />
+        <img ref={thumb} className="photo-preview" src={small} alt="" aria-hidden="true" style={position} decoding="async" onLoad={() => setPreview(true)} />
       ) : null}
       <Image
         ref={sharp}
@@ -38,6 +40,7 @@ export function AboutPhoto({ media }: { media: MediaRef }) {
         quality={85}
         priority
         fetchPriority="high"
+        style={position}
         onLoad={() => setReady(true)}
       />
     </div>

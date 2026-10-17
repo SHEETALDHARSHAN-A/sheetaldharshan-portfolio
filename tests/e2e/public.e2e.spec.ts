@@ -202,6 +202,6 @@ test.describe('Public site', () => {
     await expect(page.getByRole('link', { name: 'Continue with GitHub' })).toHaveAttribute('href', '/auth/github?purpose=reset')
     await page.goto(`${base}/auth/verify`)
     await expect(page).toHaveURL(/\/admin\/login/)
-    await expect(page.getByRole('link', { name: 'Reset it with GitHub' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Forgot password?' })).toBeVisible()
   })
 })

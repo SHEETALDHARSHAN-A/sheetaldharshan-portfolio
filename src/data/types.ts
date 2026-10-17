@@ -6,6 +6,9 @@ export type MediaRef = {
   width?: number
   height?: number
   mimeType?: string
+  /** Focal point set in the media library, in percent (50/50 is the centre); crops keep it in view. */
+  focalX?: number
+  focalY?: number
   sizes?: Partial<Record<'thumbnail' | 'square' | 'small' | 'medium' | 'large' | 'xlarge' | 'og', { url: string; width?: number; height?: number }>>
 }
 

@@ -27,6 +27,7 @@ import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } f
 import { CurrentImages as CurrentImages_477bc51b0b83d0e68cd6f65c7d453779 } from '@/components/admin/CurrentImages'
 import { ThemePresets as ThemePresets_81bbe54381f61464b860450d840e4946 } from '@/components/admin/ThemePresets'
 import { MessageRowLabel as MessageRowLabel_e22aff31a518801fbdf19d58d0295071 } from '@/components/admin/MessageRowLabel'
+import { CropGuide as CropGuide_d9f346c4f95de8fdd740545b17f1c295 } from '@/components/admin/CropGuide'
 import { AdminAvatar as AdminAvatar_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/components/admin/AdminBrand'
 import { AdminTheme as AdminTheme_c3544fd04a86558fd1f1e4a8d6afed38 } from '@/components/admin/AdminBrand'
 import { SignOut as SignOut_c39e61ddc8453d0bd90f2a671bca5628 } from '@/components/admin/SignOut'
@@ -70,6 +71,7 @@ export const importMap = {
   "@/components/admin/CurrentImages#CurrentImages": CurrentImages_477bc51b0b83d0e68cd6f65c7d453779,
   "@/components/admin/ThemePresets#ThemePresets": ThemePresets_81bbe54381f61464b860450d840e4946,
   "@/components/admin/MessageRowLabel#MessageRowLabel": MessageRowLabel_e22aff31a518801fbdf19d58d0295071,
+  "@/components/admin/CropGuide#CropGuide": CropGuide_d9f346c4f95de8fdd740545b17f1c295,
   "@/components/admin/AdminBrand#AdminAvatar": AdminAvatar_c3544fd04a86558fd1f1e4a8d6afed38,
   "@/components/admin/AdminBrand#AdminTheme": AdminTheme_c3544fd04a86558fd1f1e4a8d6afed38,
   "@/components/admin/SignOut#SignOut": SignOut_c39e61ddc8453d0bd90f2a671bca5628,

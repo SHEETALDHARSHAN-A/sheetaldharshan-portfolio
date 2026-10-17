@@ -2687,7 +2687,7 @@ export interface About {
    */
   intro?: string | null;
   /**
-   * Optional. A placeholder is shown until a photo is uploaded.
+   * Best: a portrait photo, 4:5, at least 1200×1500 px. The site cuts it anywhere from 4:5 (tall) to 3:2 (wide), and 1:1 on phones; the guide below shows each cut.
    */
   photo?: (number | null) | Media;
   /**
