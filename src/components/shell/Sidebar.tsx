@@ -44,9 +44,9 @@ export function Sidebar({ site, activity, themeToggle = false }: { site: Site; a
               {link.label}
             </Link>
           ))}
+          {/* Light/dark switch for visitors (Site-wide → Theme), a small icon after the profile links. */}
+          {themeToggle ? <AnimatedThemeToggler className="theme-toggle" /> : null}
         </div>
-        {/* Light/dark switch for visitors (Site-wide → Theme). */}
-        {themeToggle ? <AnimatedThemeToggler className="theme-toggle" /> : null}
       </div>
     </aside>
   )

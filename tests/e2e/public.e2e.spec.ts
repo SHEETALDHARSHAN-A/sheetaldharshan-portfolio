@@ -181,12 +181,12 @@ test.describe('Public site', () => {
   })
   test('coding activity: sidebar logos pin a card, About cards link their sources', async ({ page }) => {
     await page.goto(`${base}/about`)
-    const logos = page.locator('.dock-logos .activity-logo')
+    const logos = page.locator('.sidebar .dock-logos .activity-logo')
     if ((await logos.count()) > 0) {
       // Clicking a logo pins its card in the pop-up; clicking it again releases it.
       await logos.first().click()
       await expect(logos.first()).toHaveAttribute('aria-pressed', 'true')
-      await expect(page.locator(".dock-cards[data-open='true']")).toHaveCount(1)
+      await expect(page.locator(".sidebar .dock-cards[data-open='true']")).toHaveCount(1)
       await logos.first().click()
       await expect(logos.first()).toHaveAttribute('aria-pressed', 'false')
     }
