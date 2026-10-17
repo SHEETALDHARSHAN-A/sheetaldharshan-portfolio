@@ -5,6 +5,30 @@ The admin lives at `/admin` (locally `http://localhost:3000/admin`, in productio
 ## First login
 On an empty database the admin shows **Create first user**. Enter your email and a strong password. There is no public sign-up; further users are created from **Users** by an existing admin.
 
+## Signing in
+Sign-in is two steps: your email and password, then a GitHub check of the account listed in `src/config/admin.ts`. The GitHub step switches on once GitHub is enabled in Supabase; until then the password alone is enough. **Forgot your password?** on the login page resets it through GitHub. Setup: [Make it yours, step 7](make-it-yours.md#7-secure-the-admin-password-then-github).
+
+### Locked out? Two overrides
+
+Use these when you forgot the password or GitHub is failing (GitHub down, OAuth app deleted, lost access to the account).
+
+**1. Forgot the password: reset it from your machine.** This works whether or not GitHub is set up, because it writes the new password straight into the database.
+
+```sh
+pnpm admin:reset-password
+```
+
+It asks for the admin email and a new password (hidden as you type). It uses `DATABASE_URL` from your local `.env`, so point that at the live database to reset the live admin. No deploy is needed. To run it without prompts, set `ADMIN_EMAIL` and `NEW_PASSWORD` for that one command.
+
+**2. GitHub fails: switch the GitHub step off.**
+
+1. Vercel → Project → Settings → Environment Variables → add `ADMIN_2FA` = `off` (Production).
+2. Redeploy (Deployments → ⋯ → Redeploy). Environment changes only apply to new deployments.
+3. Sign in with the password alone.
+4. Fix GitHub, then **delete `ADMIN_2FA`** and redeploy, so the two-step sign-in is back on.
+
+While `ADMIN_2FA=off` is set, anyone with the password gets in. Keep it off only as long as you need to.
+
 ## Edit the homepage conversation
 **Homepage conversation** in the sidebar. Each row is one bubble.
 - **Content**: the text. Inline links use `[label](/projects)` or `[label](https://…)`.

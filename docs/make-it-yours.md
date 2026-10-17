@@ -152,7 +152,26 @@ Admin sign-in is two steps: the email and password, then a check that you are si
 4. Make sure `SUPABASE_URL` and `SUPABASE_ANON_KEY` (or the `S3_*` variables) are set in Vercel.
 5. Sign out of the admin and sign in again: after the password you'll be sent to GitHub, then back to the admin.
 
-**Locked out?** With database access, `pnpm admin:reset-password` sets a new password directly. If GitHub itself is the problem, set `ADMIN_2FA=off` in Vercel and redeploy to switch the GitHub step off temporarily. Turn it back on afterwards.
+### Locked out? Two overrides
+
+Use these when you forgot the password or GitHub is failing (GitHub down, OAuth app deleted, lost access to the account).
+
+**1. Forgot the password: reset it from your machine.** This works whether or not GitHub is set up, because it writes the new password straight into the database.
+
+```sh
+pnpm admin:reset-password
+```
+
+It asks for the admin email and a new password (hidden as you type). It uses `DATABASE_URL` from your local `.env`, so point that at the live database to reset the live admin. No deploy is needed. To run it without prompts, set `ADMIN_EMAIL` and `NEW_PASSWORD` for that one command.
+
+**2. GitHub fails: switch the GitHub step off.**
+
+1. Vercel → Project → Settings → Environment Variables → add `ADMIN_2FA` = `off` (Production).
+2. Redeploy (Deployments → ⋯ → Redeploy). Environment changes only apply to new deployments.
+3. Sign in with the password alone.
+4. Fix GitHub, then **delete `ADMIN_2FA`** and redeploy, so the two-step sign-in is back on.
+
+While `ADMIN_2FA=off` is set, anyone with the password gets in. Keep it off only as long as you need to.
 
 ## 8. Search engines
 

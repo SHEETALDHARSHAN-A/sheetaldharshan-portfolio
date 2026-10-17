@@ -41,6 +41,8 @@ From `.env.example`:
 | `NEXT_PUBLIC_SERVER_URL` | `https://sheetaldharshan.me` |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token for persistent uploads |
 | `CRON_SECRET` | only if scheduled jobs are enabled |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` | admin GitHub step; optional when the `S3_*` variables point at the same Supabase project |
+| `ADMIN_2FA` | leave empty; `off` switches the GitHub sign-in step off in an emergency (redeploy after changing it, and remove it once fixed) |
 
 Never commit `.env`. Set the values in the hosting dashboard.
 
@@ -77,6 +79,7 @@ Vercel issues and renews certificates automatically once DNS resolves. Verify `h
 - Social preview: paste a project URL into a link preview checker.
 
 ## Backups and recovery
+- Admin locked out: `pnpm admin:reset-password` for a forgotten password, `ADMIN_2FA=off` when GitHub fails. Details in the [admin guide](admin-guide.md#locked-out-two-overrides).
 - Database: enable the provider's automatic backups (daily, 7+ days retention). Manual: `pg_dump "$DATABASE_URL" > backup.sql`.
 - Media: Vercel Blob is durable; export with the Vercel CLI if you need an offline copy.
 - Recovery: restore the database dump, redeploy the same commit, confirm `/admin` login and one project page.
