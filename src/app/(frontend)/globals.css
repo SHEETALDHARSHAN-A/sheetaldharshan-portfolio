@@ -196,8 +196,14 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 /* The open card floats up above the logos (over the avatar), so nothing in the sidebar moves. Above the pet (z 60). */
 .dock-cards { position: absolute; left: -12px; right: -12px; bottom: calc(100% + 10px); z-index: 70; display: grid; padding: 14px 12px 12px; border-radius: 16px; background: var(--sb-bg, var(--bg-elevated)); border: 1px solid var(--line-strong); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); visibility: hidden; opacity: 0; transform: translateY(8px) scale(0.98); transform-origin: 30px 100%; transition: opacity 200ms var(--ease-out), transform 220ms var(--ease-out), visibility 0s linear 220ms; }
 .dock-cards[data-open='true'] { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
-.dock-card { display: none; gap: 7px; }
-.dock-card[data-open='true'] { display: grid; }
+/* The cards sit side by side in a scroll-snapping track: a carousel when several are shown. */
+.dock-track { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; align-items: flex-start; transition: height 260ms var(--ease-out); }
+.dock-track::-webkit-scrollbar { display: none; }
+.dock-card { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; display: grid; gap: 7px; }
+.dock-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+.dock-dots button { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 999px; background: var(--line-strong); cursor: pointer; transition: width 200ms ease, background 200ms ease; }
+.dock-dots button[aria-selected='true'] { width: 16px; background: var(--accent); }
+button.activity-logo[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--sb-bg, var(--bg)), 0 0 0 4px var(--accent); }
 .dock-head { margin: 0; display: flex; align-items: baseline; font-family: var(--font-condensed); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .dock-head .activity-sub { margin-left: auto; }
 .activity-body { display: grid; gap: 7px; min-width: 0; }

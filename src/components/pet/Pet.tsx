@@ -160,7 +160,9 @@ export function Pet({
     const dockWatch = new MutationObserver(() => {
       el.style.transition = 'transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1), width 360ms ease, height 360ms ease'
       requestAnimationFrame(() => requestAnimationFrame(layout))
-      window.setTimeout(() => (el.style.transition = ''), 420)
+      // Again once the pop-up has settled to the new card's height.
+      window.setTimeout(layout, 300)
+      window.setTimeout(() => (el.style.transition = ''), 720)
     })
     dockWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-dock-open'] })
     const ro = new ResizeObserver(layout)
