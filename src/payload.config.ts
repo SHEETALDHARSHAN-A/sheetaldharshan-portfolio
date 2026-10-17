@@ -23,6 +23,8 @@ import { Appearance } from './globals/Appearance'
 import { Homepage } from './globals/Homepage'
 import { SiteSettings } from './globals/SiteSettings'
 import { CodingActivity } from './globals/CodingActivity'
+import { Pet } from './globals/Pet'
+import { Brand } from './globals/Brand'
 import { Navigation } from './globals/Navigation'
 import { About } from './globals/About'
 
@@ -76,7 +78,8 @@ export default buildConfig({
   }),
   collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Homepage, Navigation, About, Appearance, SiteSettings, CodingActivity],
+  // Order sets the admin menu: Sidebar, Brand, then Pages.
+  globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, Homepage, About],
   plugins: [
     ...plugins,
     // Persistent media in production. Enabled only when a Vercel Blob token is present; local dev writes to public/media.

@@ -27,7 +27,7 @@ export const CodingActivity: GlobalConfig = {
   label: 'Coding activity',
   access: { read: () => true, update: authenticated },
   hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/blog', '/about', '/contact', '/research'])] },
-  admin: { description: 'Choose where each card appears and whether it starts open. In the sidebar, cards show as round logos that open on click; on the About page they are collapsible panels under the photo. Untick both places to hide a card.' },
+  admin: { group: 'Sidebar', description: 'Choose where each card appears and whether it starts open. In the sidebar, cards show as round logos that open on click; on the About page they are collapsible panels under the photo. Untick both places to hide a card.' },
   fields: [
     {
       type: 'collapsible',

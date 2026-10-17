@@ -6,7 +6,8 @@ import { previewUrl } from '@/utilities/previewUrl'
 export const About: GlobalConfig = {
   slug: 'about',
   access: { read: () => true, update: authenticated },
-  admin: { livePreview: { url: () => previewUrl('/about') }, preview: () => previewUrl('/about') },
+  admin: {
+    group: 'Pages', livePreview: { url: () => previewUrl('/about') }, preview: () => previewUrl('/about') },
   versions: { drafts: true, max: 20 },
   hooks: { afterChange: [revalidateGlobalPaths(['/about'])] },
   fields: [

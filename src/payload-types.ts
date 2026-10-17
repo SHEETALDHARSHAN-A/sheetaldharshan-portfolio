@@ -120,20 +120,24 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
-    homepage: Homepage;
-    navigation: Navigation;
-    about: About;
-    appearance: Appearance;
     'site-settings': SiteSetting;
+    navigation: Navigation;
+    pet: Pet;
     'coding-activity': CodingActivity;
+    brand: Brand;
+    appearance: Appearance;
+    homepage: Homepage;
+    about: About;
   };
   globalsSelect: {
-    homepage: HomepageSelect<false> | HomepageSelect<true>;
-    navigation: NavigationSelect<false> | NavigationSelect<true>;
-    about: AboutSelect<false> | AboutSelect<true>;
-    appearance: AppearanceSelect<false> | AppearanceSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    navigation: NavigationSelect<false> | NavigationSelect<true>;
+    pet: PetSelect<false> | PetSelect<true>;
     'coding-activity': CodingActivitySelect<false> | CodingActivitySelect<true>;
+    brand: BrandSelect<false> | BrandSelect<true>;
+    appearance: AppearanceSelect<false> | AppearanceSelect<true>;
+    homepage: HomepageSelect<false> | HomepageSelect<true>;
+    about: AboutSelect<false> | AboutSelect<true>;
   };
   locale: null;
   widgets: {
@@ -2289,6 +2293,177 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * The name in the sidebar and page titles, your role, contact email, profile links (sidebar footer and Contact) and the link-preview image.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  displayName?: string | null;
+  fullName?: string | null;
+  tagline?: string | null;
+  description?: string | null;
+  canonicalUrl?: string | null;
+  currentRole?: string | null;
+  location?: string | null;
+  socialLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. Shown on the contact page only when set.
+   */
+  email?: string | null;
+  /**
+   * Requires an email provider configured on the server.
+   */
+  contactFormEnabled?: boolean | null;
+  /**
+   * PDF shown as a download on the About page.
+   */
+  resume?: (number | null) | Media;
+  /**
+   * Default social preview image (1200×630).
+   */
+  ogImage?: (number | null) | Media;
+  footerNote?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The numbered menu in the sidebar (and the phone tab bar), plus the small footer links.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation".
+ */
+export interface Navigation {
+  id: number;
+  /**
+   * Numbered in the order shown here.
+   */
+  items?:
+    | {
+        label: string;
+        href: string;
+        visible?: boolean | null;
+        newTab?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  footerLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The animated character in the sidebar (bottom-right on phones). Clicking it opens site search.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pet".
+ */
+export interface Pet {
+  id: number;
+  enabled?: boolean | null;
+  showOnPhones?: boolean | null;
+  /**
+   * Optional: a new sprite sheet in the Codex pet format (8 columns × 11 rows of 192×208 frames, 1536×2288 px, transparent PNG or WebP). Leave empty to keep the current pet.
+   */
+  sprite?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Choose where each card appears and whether it starts open. In the sidebar, cards show as round logos that open on click; on the About page they are collapsible panels under the photo. Untick both places to hide a card.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coding-activity".
+ */
+export interface CodingActivity {
+  id: number;
+  githubInSidebar?: boolean | null;
+  githubSidebarOpen?: boolean | null;
+  githubOnAbout?: boolean | null;
+  githubAboutOpen?: boolean | null;
+  /**
+   * Contributions from every included account are added together, day by day. Private work only counts if "Private contributions" is turned on in that GitHub profile.
+   */
+  githubAccounts?:
+    | {
+        username: string;
+        enabled?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  leetcodeInSidebar?: boolean | null;
+  leetcodeSidebarOpen?: boolean | null;
+  leetcodeOnAbout?: boolean | null;
+  leetcodeAboutOpen?: boolean | null;
+  /**
+   * Solved counts from every included account are added together.
+   */
+  leetcodeAccounts?:
+    | {
+        username: string;
+        enabled?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The icon in browser tabs, Google results and phone home screens. Leave a field empty to keep the current SD logo. Your About photo is under Pages → About; the link-preview image is under Sidebar → Name & profiles.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brand".
+ */
+export interface Brand {
+  id: number;
+  /**
+   * Square SVG or PNG (at least 96×96). Usually a dark logo.
+   */
+  faviconLight?: (number | null) | Media;
+  /**
+   * Optional. Usually a light logo. If empty, the light-tab icon is used everywhere.
+   */
+  faviconDark?: (number | null) | Media;
+  /**
+   * Square PNG, 180×180 or larger, solid background (iPhone and Android shortcuts).
+   */
+  appleIcon?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "appearance".
+ */
+export interface Appearance {
+  id: number;
+  theme?: ('dark' | 'light') | null;
+  accent?: ('blue' | 'orange' | 'green' | 'violet' | 'neutral') | null;
+  fontPreset?: ('inter' | 'geist' | 'system') | null;
+  headingScale?: ('compact' | 'regular' | 'large') | null;
+  spacing?: ('tight' | 'regular' | 'airy') | null;
+  radius?: ('pill' | 'rounded' | 'square') | null;
+  linkStyle?: ('underline' | 'plain') | null;
+  bubbleStyle?: ('pill' | 'rounded') | null;
+  animationIntensity?: ('reduced' | 'normal' | 'expressive') | null;
+  animationSpeed?: ('slow' | 'normal' | 'fast') | null;
+  projectDisplayStyle?: ('explorer' | 'grid') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
  */
@@ -2334,34 +2509,6 @@ export interface Homepage {
     description?: string | null;
   };
   _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "navigation".
- */
-export interface Navigation {
-  id: number;
-  /**
-   * Numbered in the order shown here.
-   */
-  items?:
-    | {
-        label: string;
-        href: string;
-        visible?: boolean | null;
-        newTab?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  footerLinks?:
-    | {
-        label: string;
-        href: string;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2432,102 +2579,131 @@ export interface About {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "appearance".
+ * via the `definition` "site-settings_select".
  */
-export interface Appearance {
-  id: number;
-  theme?: ('dark' | 'light') | null;
-  accent?: ('blue' | 'orange' | 'green' | 'violet' | 'neutral') | null;
-  fontPreset?: ('inter' | 'geist' | 'system') | null;
-  headingScale?: ('compact' | 'regular' | 'large') | null;
-  spacing?: ('tight' | 'regular' | 'airy') | null;
-  radius?: ('pill' | 'rounded' | 'square') | null;
-  linkStyle?: ('underline' | 'plain') | null;
-  bubbleStyle?: ('pill' | 'rounded') | null;
-  animationIntensity?: ('reduced' | 'normal' | 'expressive') | null;
-  animationSpeed?: ('slow' | 'normal' | 'fast') | null;
-  projectDisplayStyle?: ('explorer' | 'grid') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings".
- */
-export interface SiteSetting {
-  id: number;
-  displayName?: string | null;
-  fullName?: string | null;
-  tagline?: string | null;
-  description?: string | null;
-  canonicalUrl?: string | null;
-  currentRole?: string | null;
-  location?: string | null;
+export interface SiteSettingsSelect<T extends boolean = true> {
+  displayName?: T;
+  fullName?: T;
+  tagline?: T;
+  description?: T;
+  canonicalUrl?: T;
+  currentRole?: T;
+  location?: T;
   socialLinks?:
+    | T
     | {
-        label: string;
-        href: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Optional. Shown on the contact page only when set.
-   */
-  email?: string | null;
-  /**
-   * Requires an email provider configured on the server.
-   */
-  contactFormEnabled?: boolean | null;
-  /**
-   * PDF shown as a download on the About page.
-   */
-  resume?: (number | null) | Media;
-  /**
-   * Default social preview image (1200×630).
-   */
-  ogImage?: (number | null) | Media;
-  footerNote?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  email?: T;
+  contactFormEnabled?: T;
+  resume?: T;
+  ogImage?: T;
+  footerNote?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
- * Choose where each card appears and whether it starts open. In the sidebar, cards show as round logos that open on click; on the About page they are collapsible panels under the photo. Untick both places to hide a card.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "coding-activity".
+ * via the `definition` "navigation_select".
  */
-export interface CodingActivity {
-  id: number;
-  githubInSidebar?: boolean | null;
-  githubSidebarOpen?: boolean | null;
-  githubOnAbout?: boolean | null;
-  githubAboutOpen?: boolean | null;
-  /**
-   * Contributions from every included account are added together, day by day. Private work only counts if "Private contributions" is turned on in that GitHub profile.
-   */
+export interface NavigationSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        visible?: T;
+        newTab?: T;
+        id?: T;
+      };
+  footerLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pet_select".
+ */
+export interface PetSelect<T extends boolean = true> {
+  enabled?: T;
+  showOnPhones?: T;
+  sprite?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coding-activity_select".
+ */
+export interface CodingActivitySelect<T extends boolean = true> {
+  githubInSidebar?: T;
+  githubSidebarOpen?: T;
+  githubOnAbout?: T;
+  githubAboutOpen?: T;
   githubAccounts?:
+    | T
     | {
-        username: string;
-        enabled?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  leetcodeInSidebar?: boolean | null;
-  leetcodeSidebarOpen?: boolean | null;
-  leetcodeOnAbout?: boolean | null;
-  leetcodeAboutOpen?: boolean | null;
-  /**
-   * Solved counts from every included account are added together.
-   */
+        username?: T;
+        enabled?: T;
+        id?: T;
+      };
+  leetcodeInSidebar?: T;
+  leetcodeSidebarOpen?: T;
+  leetcodeOnAbout?: T;
+  leetcodeAboutOpen?: T;
   leetcodeAccounts?:
+    | T
     | {
-        username: string;
-        enabled?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
+        username?: T;
+        enabled?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brand_select".
+ */
+export interface BrandSelect<T extends boolean = true> {
+  faviconLight?: T;
+  faviconDark?: T;
+  appleIcon?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "appearance_select".
+ */
+export interface AppearanceSelect<T extends boolean = true> {
+  theme?: T;
+  accent?: T;
+  fontPreset?: T;
+  headingScale?: T;
+  spacing?: T;
+  radius?: T;
+  linkStyle?: T;
+  bubbleStyle?: T;
+  animationIntensity?: T;
+  animationSpeed?: T;
+  projectDisplayStyle?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2567,31 +2743,6 @@ export interface HomepageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "navigation_select".
- */
-export interface NavigationSelect<T extends boolean = true> {
-  items?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-        visible?: T;
-        newTab?: T;
-        id?: T;
-      };
-  footerLinks?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about_select".
  */
 export interface AboutSelect<T extends boolean = true> {
@@ -2622,85 +2773,6 @@ export interface AboutSelect<T extends boolean = true> {
         description?: T;
       };
   _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "appearance_select".
- */
-export interface AppearanceSelect<T extends boolean = true> {
-  theme?: T;
-  accent?: T;
-  fontPreset?: T;
-  headingScale?: T;
-  spacing?: T;
-  radius?: T;
-  linkStyle?: T;
-  bubbleStyle?: T;
-  animationIntensity?: T;
-  animationSpeed?: T;
-  projectDisplayStyle?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings_select".
- */
-export interface SiteSettingsSelect<T extends boolean = true> {
-  displayName?: T;
-  fullName?: T;
-  tagline?: T;
-  description?: T;
-  canonicalUrl?: T;
-  currentRole?: T;
-  location?: T;
-  socialLinks?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-        id?: T;
-      };
-  email?: T;
-  contactFormEnabled?: T;
-  resume?: T;
-  ogImage?: T;
-  footerNote?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "coding-activity_select".
- */
-export interface CodingActivitySelect<T extends boolean = true> {
-  githubInSidebar?: T;
-  githubSidebarOpen?: T;
-  githubOnAbout?: T;
-  githubAboutOpen?: T;
-  githubAccounts?:
-    | T
-    | {
-        username?: T;
-        enabled?: T;
-        id?: T;
-      };
-  leetcodeInSidebar?: T;
-  leetcodeSidebarOpen?: T;
-  leetcodeOnAbout?: T;
-  leetcodeAboutOpen?: T;
-  leetcodeAccounts?:
-    | T
-    | {
-        username?: T;
-        enabled?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

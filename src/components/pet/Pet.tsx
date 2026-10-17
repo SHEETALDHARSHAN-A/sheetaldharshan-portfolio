@@ -38,7 +38,8 @@ function write(key: string, value: { x: number; y: number } | null) {
  * phones). It follows the cursor, strolls now and then, runs when dragged anywhere, and waves
  * hello as it opens a chat bubble with site search when clicked (or with / and ⌘K).
  */
-export function Pet() {
+export function Pet({ sprite, showOnPhones = true }: { sprite?: string; showOnPhones?: boolean } = {}) {
+  const sheet = sprite || SHEET.src
   const router = useRouter()
   const elRef = useRef<HTMLButtonElement>(null)
   const spriteRef = useRef<HTMLSpanElement>(null)
@@ -119,7 +120,7 @@ export function Pet() {
 
     const img = new Image()
     img.decoding = 'async'
-    img.src = SHEET.src
+    img.src = sheet
     let alive = true
     const start = () => {
       if (!alive) return
@@ -162,7 +163,7 @@ export function Pet() {
       c.destroy()
       ctl.current = null
     }
-  }, [mounted])
+  }, [mounted, sheet])
 
   /* the bubble follows the pet while it is open */
   useEffect(() => {
@@ -216,6 +217,7 @@ export function Pet() {
         type="button"
         className={styles.pet}
         data-pet=""
+        data-phones={showOnPhones ? 'on' : 'off'}
         data-ready={ready ? 'true' : 'false'}
         aria-label="Search the site"
         aria-haspopup="dialog"
@@ -242,7 +244,7 @@ export function Pet() {
         }}
         onDoubleClick={() => away && ctl.current?.goHome()}
       >
-        <span ref={spriteRef} className={styles.sprite} style={{ backgroundImage: ready ? `url(${SHEET.src})` : undefined }} />
+        <span ref={spriteRef} className={styles.sprite} style={{ backgroundImage: ready ? `url(${sheet})` : undefined }} />
       </button>
       <PetBubble
         open={open}

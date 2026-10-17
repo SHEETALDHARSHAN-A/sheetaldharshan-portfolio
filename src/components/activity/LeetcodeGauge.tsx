@@ -56,13 +56,12 @@ export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
   const level = view === 'easy' || view === 'medium' || view === 'hard' ? view : null
 
   // Segment layout at rest: three arcs proportional to each level's problem count, with small gaps.
-  let cursor = 0
   const usable = SWEEP - GAP * 2
-  const segments = LEVELS.map((l) => {
-    const len = available.all ? (available[l.key] / available.all) * usable : usable / 3
-    const seg = { ...l, start: cursor, len, fill: available[l.key] ? (solved[l.key] / available[l.key]) * len : 0 }
-    cursor += len + GAP
-    return seg
+  const lengths = LEVELS.map((l) => (available.all ? (available[l.key] / available.all) * usable : usable / 3))
+  const segments = LEVELS.map((l, i) => {
+    const len = lengths[i]
+    const start = lengths.slice(0, i).reduce((n, x) => n + x + GAP, 0)
+    return { ...l, start, len, fill: available[l.key] ? (solved[l.key] / available[l.key]) * len : 0 }
   })
 
   const arc = (start: number, len: number) => ({ strokeDasharray: `${Math.max(0, len)} ${C}`, strokeDashoffset: -start })

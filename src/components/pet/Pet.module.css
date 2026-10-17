@@ -137,3 +137,6 @@
   .bubble { animation: none; }
   .pet { transition: none; }
 }
+
+/* "Show on phones" turned off in the admin. */
+@media (max-width: 960px) { .pet[data-phones='off'] { display: none; } }

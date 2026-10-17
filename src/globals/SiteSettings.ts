@@ -4,7 +4,8 @@ import { revalidateGlobalPaths } from '@/hooks/revalidate'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
-  label: 'Site settings',
+  label: 'Name & profiles',
+  admin: { group: 'Sidebar', description: 'The name in the sidebar and page titles, your role, contact email, profile links (sidebar footer and Contact) and the link-preview image.' },
   access: { read: () => true, update: authenticated },
   hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/blog', '/about', '/contact', '/research'])] },
   fields: [

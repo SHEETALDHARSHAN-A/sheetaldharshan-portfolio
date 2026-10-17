@@ -8,6 +8,7 @@ import React from 'react'
 import { AdminBar } from '@/components/AdminBar'
 import { getAppearance, getSite } from '@/data/content'
 import { brandName, defaultTitle, nameVariants } from '@/data/seo'
+import { getBrandIcons } from '@/data/brand'
 import { themeAttributes } from '@/styles/theme'
 import { cn } from '@/utilities/ui'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -48,7 +49,7 @@ const ICON_VERSION = 'sd1'
 export const viewport: Viewport = { themeColor: '#000000', colorScheme: 'dark' }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const site = await getSite()
+  const [site, brand] = await Promise.all([getSite(), getBrandIcons()])
   const title = defaultTitle(site)
   const image = site.ogImage
     ? { url: site.ogImage.url, width: site.ogImage.width ?? 1200, height: site.ogImage.height ?? 630, alt: site.ogImage.alt || title }
@@ -67,13 +68,20 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: 'summary_large_image', title, description: site.description, images: [image] },
     icons: {
       // The SVG follows the browser's light or dark mode (black or white mark); the rest are fallbacks.
-      icon: [
-        { url: `/favicon.ico?v=${ICON_VERSION}`, sizes: '32x32' },
-        { url: `/icon.svg?v=${ICON_VERSION}`, type: 'image/svg+xml' },
-        { url: `/icon-96.png?v=${ICON_VERSION}`, type: 'image/png', sizes: '96x96' },
-        { url: `/icon-192.png?v=${ICON_VERSION}`, type: 'image/png', sizes: '192x192' },
-      ],
-      apple: [{ url: `/apple-touch-icon.png?v=${ICON_VERSION}`, sizes: '180x180' }],
+      // Uploaded icons (Brand → Favicon & icons) replace the built-in SD logo; light and dark versions
+      // are picked by the browser's colour mode.
+      icon: brand.faviconLight
+        ? [
+            { url: brand.faviconLight.url, type: brand.faviconLight.mimeType, ...(brand.faviconDark ? { media: '(prefers-color-scheme: light)' } : {}) },
+            ...(brand.faviconDark ? [{ url: brand.faviconDark.url, type: brand.faviconDark.mimeType, media: '(prefers-color-scheme: dark)' }] : []),
+          ]
+        : [
+            { url: `/favicon.ico?v=${ICON_VERSION}`, sizes: '32x32' },
+            { url: `/icon.svg?v=${ICON_VERSION}`, type: 'image/svg+xml' },
+            { url: `/icon-96.png?v=${ICON_VERSION}`, type: 'image/png', sizes: '96x96' },
+            { url: `/icon-192.png?v=${ICON_VERSION}`, type: 'image/png', sizes: '192x192' },
+          ],
+      apple: [{ url: brand.appleIcon?.url ?? `/apple-touch-icon.png?v=${ICON_VERSION}`, sizes: '180x180' }],
     },
     manifest: `/site.webmanifest?v=${ICON_VERSION}`,
     // Search Console and Bing Webmaster Tools ownership codes, set as Vercel environment variables.

@@ -11,7 +11,8 @@ export const Appearance: GlobalConfig = {
   slug: 'appearance',
   access: { read: () => true, update: authenticated },
   hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/blog', '/about', '/contact', '/research'])] },
-  admin: { livePreview: { url: () => previewUrl('/projects') } },
+  admin: {
+    group: 'Brand', livePreview: { url: () => previewUrl('/projects') } },
   fields: [
     {
       type: 'row',

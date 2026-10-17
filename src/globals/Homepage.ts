@@ -12,7 +12,8 @@ export const Homepage: GlobalConfig = {
   slug: 'homepage',
   label: 'Homepage conversation',
   access: { read: () => true, update: authenticated },
-  admin: { livePreview: { url: () => previewUrl('/') }, preview: () => previewUrl('/') },
+  admin: {
+    group: 'Pages', livePreview: { url: () => previewUrl('/') }, preview: () => previewUrl('/') },
   versions: { drafts: true, max: 30 },
   hooks: { afterChange: [revalidateGlobalPaths(['/'])] },
   fields: [
