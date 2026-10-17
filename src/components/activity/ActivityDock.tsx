@@ -4,13 +4,13 @@ import { useRef, useState, type ReactNode } from 'react'
 
 export type DockItem = { id: string; title: string; summary: string; icon: ReactNode; body: ReactNode; defaultOpen: boolean }
 
-const BASE = 30 // px, resting icon size
-const MAX = 44 // px, size right under the pointer
-const REACH = 70 // px, how far the swell spreads to neighbours
+const BASE = 32 // px, resting icon size
+const MAX = 38 // px, size right under the pointer (a gentle swell)
+const REACH = 60 // px, how far the swell spreads to neighbours
 
 /**
- * Sidebar dock, after Magic UI's Dock: round logos that swell as the pointer nears them (neighbours
- * a little less), like the macOS dock. Clicking one opens its card below; clicking again closes it.
+ * Sidebar dock: overlapping round logos like Magic UI's AvatarCircles, each gently swelling as the
+ * pointer nears it. Clicking one opens its card below; clicking again closes it.
  * One card is open at a time so the pet keeps its space; which one starts open is set in the admin.
  */
 export function ActivityDock({ items }: { items: DockItem[] }) {

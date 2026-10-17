@@ -37,7 +37,7 @@ export const CodingActivity: GlobalConfig = {
           type: 'row',
           fields: [
             { name: 'githubInSidebar', type: 'checkbox', defaultValue: true, label: 'Show in the sidebar', admin: { width: '25%' } },
-            { name: 'githubSidebarOpen', type: 'checkbox', defaultValue: false, label: 'Open there by default', admin: { width: '25%' } },
+            { name: 'githubSidebarOpen', type: 'checkbox', defaultValue: true, label: 'Open there by default', admin: { width: '25%' } },
             { name: 'githubOnAbout', type: 'checkbox', defaultValue: true, label: 'Show on the About page', admin: { width: '25%' } },
             { name: 'githubAboutOpen', type: 'checkbox', defaultValue: true, label: 'Open there by default', admin: { width: '25%' } },
           ],

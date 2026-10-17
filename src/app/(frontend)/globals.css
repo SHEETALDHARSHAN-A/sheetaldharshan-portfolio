@@ -173,14 +173,17 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .activity-logo { display: inline-grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); padding: 0; cursor: pointer; transition: border-color 160ms ease, transform 160ms ease, background 160ms ease; }
 .activity-logo .brand-icon { margin: 0; }
 button.activity-logo:hover { border-color: var(--text-soft); }
-button.activity-logo[aria-expanded='true'] { border-color: var(--accent); background: var(--accent-soft); }
+button.activity-logo[aria-expanded='true'] { box-shadow: 0 0 0 2px var(--accent); background: var(--accent-soft); }
 button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .activity-dock { display: grid; gap: 10px; }
 .activity-dock .dock-row { display: flex; align-items: center; gap: 10px; }
-/* After Magic UI's Dock: the logos sit in a frosted, rounded bar. */
-.dock-logos { display: flex; align-items: flex-end; gap: 8px; width: max-content; height: 46px; padding: 0 7px 7px; border: 1px solid var(--line-strong); border-radius: 16px; background: color-mix(in srgb, var(--surface) 55%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+/* After Magic UI's AvatarCircles: overlapping round logos, each ringed in the page colour. */
+.dock-logos { display: flex; align-items: center; height: 40px; padding-left: 2px; }
+.dock-logos .activity-logo + .activity-logo { margin-left: -8px; }
+.dock-logos .activity-logo { position: relative; border: 2px solid var(--sb-bg, var(--bg)); box-shadow: 0 0 0 1px var(--line-strong); }
+.dock-logos .activity-logo:hover, .dock-logos .activity-logo[aria-expanded='true'] { z-index: 1; }
 /* Magnification: each logo's size follows the pointer (set by ActivityDock), springing back on leave. */
-.dock-logos .activity-logo { width: var(--dock-size, 30px); height: var(--dock-size, 30px); transition: width 140ms cubic-bezier(0.2, 0.9, 0.3, 1.2), height 140ms cubic-bezier(0.2, 0.9, 0.3, 1.2), border-color 160ms ease, background 160ms ease; }
+.dock-logos .activity-logo { width: var(--dock-size, 32px); height: var(--dock-size, 32px); transition: width 140ms cubic-bezier(0.2, 0.9, 0.3, 1.2), height 140ms cubic-bezier(0.2, 0.9, 0.3, 1.2), border-color 160ms ease, background 160ms ease; }
 .dock-logos .activity-logo .brand-icon { width: 52%; height: 52%; }
 .dock-logos .dock-hint { align-self: center; }
 .dock-hint { font-family: var(--font-condensed); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-left: 2px; }
@@ -197,14 +200,14 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .activity-footer[open] .activity-footer-src { text-decoration: underline; text-underline-offset: 2px; }
 /* About: collapsible panels under the photo. */
 .activity-panels { display: grid; gap: 12px; }
-.activity-panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elevated); }
-.activity-panel-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; list-style: none; cursor: pointer; font-family: var(--font-condensed); font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.activity-panel { border: 0; background: transparent; }
+.activity-panel-head { display: flex; align-items: center; gap: 10px; padding: 10px 0; list-style: none; cursor: pointer; font-family: var(--font-condensed); font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .activity-panel-head::-webkit-details-marker { display: none; }
 .activity-panel-head .activity-sub { margin-left: auto; font-size: 13px; }
 .activity-panel-head:hover .activity-title { color: var(--accent); }
 .activity-panel-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: var(--radius); }
 .activity-panel[open] .activity-chev { transform: translateY(1px) rotate(-135deg); }
-.activity-panel > .activity-body { padding: 0 16px 14px; animation: el-in 260ms var(--ease-out) both; }
+.activity-panel > .activity-body { padding: 0 0 14px; animation: el-in 260ms var(--ease-out) both; }
 .activity-panel .activity-footer > summary { font-size: 11.5px; }
 .activity-panel .gh-months { font-size: 10px; }
 .activity-card { display: grid; gap: 7px; min-width: 0; }
@@ -288,7 +291,7 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .lcg-level { font-size: 12.5px; font-weight: 600; }
 .lcg-count { font-size: 13px; font-variant-numeric: tabular-nums; }
 @keyframes lcg-swap { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .lcg-fill, .lcg-center { animation: none !important; } .lcg-track { transition: none !important; } .dock-logos .activity-logo { width: 30px !important; height: 30px !important; } }
+@media (prefers-reduced-motion: reduce) { .lcg-fill, .lcg-center { animation: none !important; } .lcg-track { transition: none !important; } .dock-logos .activity-logo { width: 32px !important; height: 32px !important; } }
 /* In the sidebar the gauge stacks: the ring, then the three levels in a row. */
 .sidebar-activity .lcg { grid-template-columns: 1fr; gap: 8px; }
 .sidebar-activity .lcg-ring { max-width: 130px; }

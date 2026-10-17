@@ -183,10 +183,12 @@ test.describe('Public site', () => {
     await page.goto(`${base}/about`)
     const logos = page.locator('.dock-logos .activity-logo')
     if ((await logos.count()) > 0) {
+      // Clicking toggles the card, whichever way it starts (set in the admin).
+      const startsOpen = (await page.locator('.dock-card').count()) > 0
       await logos.first().click()
-      await expect(page.locator('.dock-card')).toBeVisible()
+      await expect(page.locator('.dock-card')).toHaveCount(startsOpen ? 0 : 1)
       await logos.first().click()
-      await expect(page.locator('.dock-card')).toHaveCount(0)
+      await expect(page.locator('.dock-card')).toHaveCount(startsOpen ? 1 : 0)
     }
     const panel = page.locator('.activity-panel[open]').first()
     if ((await panel.count()) === 0) test.skip(true, 'No open About panels')
