@@ -44,6 +44,15 @@ const defaultNav: NavItem[] = [
 ]
 
 /** A colour from the admin, only if it is a #rrggbb value. */
+/**
+ * A database read failed (not "nothing found"). Throwing keeps Next serving the last good version of
+ * the page; returning nothing here would cache a 404 or an empty page until the next refresh.
+ */
+const dbFailed = (error: unknown): never => {
+  console.error('[content] database read failed', error)
+  throw error
+}
+
 /** A focal point chosen for this one use (0–100 each) overrides the image's own. */
 const withFocal = (media: MediaRef | undefined, x: unknown, y: unknown): MediaRef | undefined => {
   const ok = (v: unknown): v is number => typeof v === 'number' && v >= 0 && v <= 100
@@ -59,11 +68,11 @@ const names = (rows: { name?: string | null }[] | null | undefined) => (rows ?? 
 export const getSite = cache(async (): Promise<Site> => {
   const payload = await getClient()
   const [settings, navigation, pages] = await Promise.all([
-    payload.findGlobal({ slug: 'site-settings', depth: 1 }).catch(() => null),
-    payload.findGlobal({ slug: 'navigation', depth: 0 }).catch(() => null),
+    payload.findGlobal({ slug: 'site-settings', depth: 1 }).catch(dbFailed),
+    payload.findGlobal({ slug: 'navigation', depth: 0 }).catch(dbFailed),
     payload
       .find({ collection: 'pages', depth: 0, limit: 20, where: { and: [{ _status: { equals: 'published' } }, { showInNavigation: { equals: true } }] } })
-      .catch(() => null),
+      .catch(dbFailed),
   ])
   const nav = (navigation?.items ?? []).filter((item) => item.visible !== false && item.label && item.href).map((item) => ({ label: item.label, href: item.href, newTab: item.newTab ?? false }))
   const pageLinks = (pages?.docs ?? []).map((page) => ({ label: page.title, href: `/${page.slug}` }))
@@ -100,7 +109,7 @@ export const getAppearance = cache(async (): Promise<ThemeSettings> => {
 export const getHomepage = cache(async (): Promise<Conversation> => {
   const payload = await getClient()
   const draft = await isDraft()
-  const homepage = await payload.findGlobal({ slug: 'homepage', depth: 0, draft, overrideAccess: draft }).catch(() => null)
+  const homepage = await payload.findGlobal({ slug: 'homepage', depth: 0, draft, overrideAccess: draft }).catch(dbFailed)
   const messages = (homepage?.messages ?? [])
     .filter((message) => message.enabled !== false && message.content?.trim())
     .map((message, index) => ({
@@ -186,7 +195,7 @@ export const getProjects = cache(async (options: { featuredOnly?: boolean } = {}
         and: [{ _status: { equals: 'published' } }, { archived: { not_equals: true } }, ...(options.featuredOnly ? [{ featured: { equals: true } }] : [])],
       },
     })
-    .catch(() => null)
+    .catch(dbFailed)
   return (result?.docs ?? []).map(toProjectSummary)
 })
 
@@ -195,7 +204,7 @@ export const getProject = cache(async (slug: string): Promise<Project | null> =>
   const draft = await isDraft()
   const result = await payload
     .find({ collection: 'projects', depth: 2, limit: 1, draft, overrideAccess: draft, pagination: false, where: { slug: { equals: slug } } })
-    .catch(() => null)
+    .catch(dbFailed)
   const doc = result?.docs?.[0]
   if (!doc) return null
   if (!draft && (doc._status !== 'published' || doc.archived)) return null
@@ -248,7 +257,7 @@ export const getPosts = cache(async (options: { query?: string; category?: strin
   if (options.category) conditions.push({ 'categories.slug': { equals: options.category } })
   const result = await payload
     .find({ collection: 'posts', depth: 1, limit: options.limit ?? 50, sort: '-publishedAt', where: { and: conditions } })
-    .catch(() => null)
+    .catch(dbFailed)
   return (result?.docs ?? []).map(toPostSummary)
 })
 
@@ -257,7 +266,7 @@ export const getPost = cache(async (slug: string): Promise<Post | null> => {
   const draft = await isDraft()
   const result = await payload
     .find({ collection: 'posts', depth: 2, limit: 1, draft, overrideAccess: draft, pagination: false, where: { slug: { equals: slug } } })
-    .catch(() => null)
+    .catch(dbFailed)
   const doc = result?.docs?.[0]
   if (!doc) return null
   if (!draft && doc._status !== 'published') return null
@@ -272,7 +281,7 @@ export const getPost = cache(async (slug: string): Promise<Post | null> => {
 
 export const getCategories = cache(async (): Promise<{ title: string; slug: string }[]> => {
   const payload = await getClient()
-  const result = await payload.find({ collection: 'categories', depth: 0, limit: 50, sort: 'title' }).catch(() => null)
+  const result = await payload.find({ collection: 'categories', depth: 0, limit: 50, sort: 'title' }).catch(dbFailed)
   return (result?.docs ?? []).map((category) => ({ title: category.title, slug: category.slug ?? '' })).filter((category) => category.slug)
 })
 
@@ -280,7 +289,7 @@ export const getCategories = cache(async (): Promise<{ title: string; slug: stri
 
 export const getExperience = cache(async (): Promise<ExperienceEntry[]> => {
   const payload = await getClient()
-  const result = await payload.find({ collection: 'experience', depth: 0, limit: 50, sort: 'order', where: { _status: { equals: 'published' } } }).catch(() => null)
+  const result = await payload.find({ collection: 'experience', depth: 0, limit: 50, sort: 'order', where: { _status: { equals: 'published' } } }).catch(dbFailed)
   return (result?.docs ?? []).map((doc) => ({
     id: String(doc.id),
     role: doc.role,
@@ -298,7 +307,7 @@ export const getExperience = cache(async (): Promise<ExperienceEntry[]> => {
 
 export const getEducation = cache(async (): Promise<EducationEntry[]> => {
   const payload = await getClient()
-  const result = await payload.find({ collection: 'education', depth: 0, limit: 50, sort: 'order', where: { _status: { equals: 'published' } } }).catch(() => null)
+  const result = await payload.find({ collection: 'education', depth: 0, limit: 50, sort: 'order', where: { _status: { equals: 'published' } } }).catch(dbFailed)
   return (result?.docs ?? []).map((doc) => ({
     id: String(doc.id),
     institution: doc.institution,
@@ -313,13 +322,13 @@ export const getEducation = cache(async (): Promise<EducationEntry[]> => {
 
 export const getCertifications = cache(async (): Promise<CertificationEntry[]> => {
   const payload = await getClient()
-  const result = await payload.find({ collection: 'certifications', depth: 0, limit: 50, sort: 'order', where: { _status: { equals: 'published' } } }).catch(() => null)
+  const result = await payload.find({ collection: 'certifications', depth: 0, limit: 50, sort: 'order', where: { _status: { equals: 'published' } } }).catch(dbFailed)
   return (result?.docs ?? []).map((doc) => ({ id: String(doc.id), title: doc.title, issuer: doc.issuer ?? undefined, year: doc.year ?? undefined, url: doc.url ?? undefined }))
 })
 
 export const getPublications = cache(async (): Promise<Publication[]> => {
   const payload = await getClient()
-  const result = await payload.find({ collection: 'publications', depth: 0, limit: 50, sort: 'order', where: { _status: { equals: 'published' } } }).catch(() => null)
+  const result = await payload.find({ collection: 'publications', depth: 0, limit: 50, sort: 'order', where: { _status: { equals: 'published' } } }).catch(dbFailed)
   return (result?.docs ?? []).map((doc) => ({
     id: String(doc.id),
     title: doc.title,
@@ -340,7 +349,7 @@ export const getPublications = cache(async (): Promise<Publication[]> => {
 export const getAbout = cache(async (): Promise<AboutContent> => {
   const payload = await getClient()
   const draft = await isDraft()
-  const about = (await payload.findGlobal({ slug: 'about', depth: 1, draft, overrideAccess: draft }).catch(() => null)) as AboutDoc | null
+  const about = (await payload.findGlobal({ slug: 'about', depth: 1, draft, overrideAccess: draft }).catch(dbFailed)) as AboutDoc | null
   const sections: AboutSection[] = (about?.sections ?? [])
     .filter((section) => section.visible !== false && section.title)
     .map((section) => {
@@ -370,7 +379,7 @@ export const getAbout = cache(async (): Promise<AboutContent> => {
 export const getPage = cache(async (slug: string) => {
   const payload = await getClient()
   const draft = await isDraft()
-  const result = await payload.find({ collection: 'pages', depth: 2, limit: 1, draft, overrideAccess: draft, pagination: false, where: { slug: { equals: slug } } }).catch(() => null)
+  const result = await payload.find({ collection: 'pages', depth: 2, limit: 1, draft, overrideAccess: draft, pagination: false, where: { slug: { equals: slug } } }).catch(dbFailed)
   const doc = result?.docs?.[0]
   if (!doc) return null
   if (!draft && doc._status !== 'published') return null
@@ -379,7 +388,7 @@ export const getPage = cache(async (slug: string) => {
 
 export const getPublishedPageSlugs = cache(async (): Promise<string[]> => {
   const payload = await getClient()
-  const result = await payload.find({ collection: 'pages', depth: 0, limit: 200, select: { slug: true }, where: { _status: { equals: 'published' } } }).catch(() => null)
+  const result = await payload.find({ collection: 'pages', depth: 0, limit: 200, select: { slug: true }, where: { _status: { equals: 'published' } } }).catch(dbFailed)
   return (result?.docs ?? []).map((doc) => doc.slug).filter((slug): slug is string => !!slug)
 })
 
@@ -404,7 +413,7 @@ export type ProjectsLook = { cardColor?: string; cardTextColor?: string; arrowCo
 /** Projects page settings (Projects page → Page settings), validated. */
 export const getProjectsLook = cache(async (): Promise<ProjectsLook> => {
   const payload = await getClient()
-  const doc = (await payload.findGlobal({ slug: 'projects-page', depth: 0 }).catch(() => null)) as Record<string, unknown> | null
+  const doc = (await payload.findGlobal({ slug: 'projects-page', depth: 0 }).catch(dbFailed)) as unknown as Record<string, unknown> | null
   const t = doc?.imageTransition
   return {
     cardColor: hex(doc?.cardColor),
@@ -422,7 +431,7 @@ export const getProjectsLook = cache(async (): Promise<ProjectsLook> => {
 /** Sidebar → Menu links → Sidebar look, as CSS variables (validated; empty keeps the theme). */
 export const getSidebarStyle = cache(async (): Promise<Record<string, string>> => {
   const payload = await getClient()
-  const nav = (await payload.findGlobal({ slug: 'navigation', depth: 0 }).catch(() => null)) as Record<string, unknown> | null
+  const nav = (await payload.findGlobal({ slug: 'navigation', depth: 0 }).catch(dbFailed)) as unknown as Record<string, unknown> | null
   const vars: Record<string, string> = {}
   const color = (key: string, v: unknown) => {
     const h = hex(v)

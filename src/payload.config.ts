@@ -102,7 +102,8 @@ export default buildConfig({
       // kept connection can be dead when the function wakes and a query on it would hang. Drop idle
       // connections quickly, keep sockets alive, and fail fast instead of waiting forever.
       idleTimeoutMillis: 5_000,
-      connectionTimeoutMillis: 10_000,
+      // Includes waiting for a free connection when the pool is busy, so it is generous.
+      connectionTimeoutMillis: 30_000,
       keepAlive: true,
       query_timeout: 20_000,
     },
