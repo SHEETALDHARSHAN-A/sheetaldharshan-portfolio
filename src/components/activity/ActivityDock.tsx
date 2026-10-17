@@ -1,24 +1,28 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 export type DockItem = { id: string; title: string; summary: string; icon: ReactNode; body: ReactNode; defaultOpen: boolean }
 
-const ROTATE_MS = 5000
+
+/** Scrolls the card track to one card. */
+function scrollToCard(el: HTMLElement | null, index: number, smooth = true) {
+  if (el) el.scrollTo({ left: index * el.clientWidth, behavior: smooth ? 'smooth' : 'instant' })
+}
 
 /**
  * Coding-activity dock: overlapping round logos like Magic UI's AvatarCircles, with the cards above
  * them. In the sidebar the cards pop up over the avatar without moving anything (the pet steps up
  * above them); on the About page ("inline") they sit in the page above the logos.
  *
- * Hovering a logo keeps it exactly where it is and slides the others away so each shows in full.
+ * Hovering a logo keeps it where it is and nudges the others a little away, so each is easy to click.
  *
  * - With two or more cards open by default (set in the admin), the pop-up is a carousel: it slides
  *   through them on its own, can be scrolled or swiped, and pauses while hovered or held.
  * - Clicking a logo pins its card. Clicking the same logo again, clicking outside or Escape releases
  *   it, back to the default view (the carousel, the one default card, or closed).
  */
-export function ActivityDock({ items, variant = 'sidebar' }: { items: DockItem[]; variant?: 'sidebar' | 'inline' }) {
+export function ActivityDock({ items, variant = 'sidebar', seconds = 10 }: { items: DockItem[]; variant?: 'sidebar' | 'inline'; seconds?: number }) {
   const defaults = items.filter((i) => i.defaultOpen)
   const [pinned, setPinned] = useState<string | null>(null)
   const [active, setActive] = useState(0)
@@ -27,69 +31,79 @@ export function ActivityDock({ items, variant = 'sidebar' }: { items: DockItem[]
   const root = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
 
-  // What the pop-up shows: the pinned card, or the default ones (a carousel when there are several).
-  const shown = pinned ? items.filter((i) => i.id === pinned) : defaults
-  const carousel = shown.length > 1
-  const visibleId = shown[Math.min(active, shown.length - 1)]?.id ?? null
+  // Every card sits in one track, so the cards keep one height (the tallest) and nothing around them
+  // moves as they change. The carousel cycles through the default cards; a pinned card holds still.
+  const indexOf = (id: string) => items.findIndex((i) => i.id === id)
+  const rotation = defaults.map((d) => indexOf(d.id))
+  const isOpen = pinned !== null || rotation.length > 0
+  const carousel = !pinned && rotation.length > 1
+  const visibleId = isOpen ? (items[Math.min(active, items.length - 1)]?.id ?? null) : null
 
-  const release = useCallback(() => {
+  const goTo = (index: number, smooth = true) => scrollToCard(track.current, index, smooth)
+
+  // Start on the first default card.
+  const startAt = rotation[0] ?? 0
+  useEffect(() => {
+    if (startAt) scrollToCard(track.current, startAt, false)
+  }, [startAt])
+
+  const release = () => {
     setPinned(null)
-    setActive(0)
-  }, [])
+    if (firstDefault >= 0) goTo(firstDefault)
+  }
 
   // In the sidebar the pet moves up above the card while one shows (Pet.tsx watches this attribute).
   useEffect(() => {
     if (variant !== 'sidebar') return
     const html = document.documentElement
-    if (visibleId) html.setAttribute('data-dock-open', visibleId)
+    if (visibleId) html.setAttribute('data-dock-open', 'true')
     else html.removeAttribute('data-dock-open')
   }, [visibleId, variant])
   useEffect(() => () => {
     if (variant === 'sidebar') document.documentElement.removeAttribute('data-dock-open')
   }, [variant])
 
-  // The pop-up takes the height of the card in view.
-  useEffect(() => {
-    const el = track.current
-    const card = el?.querySelector<HTMLElement>(`[data-card="${visibleId}"]`)
-    if (el && card) el.style.height = `${card.offsetHeight}px`
-  }, [visibleId, shown.length])
-
   // Releasing a pinned card: clicking elsewhere or Escape.
+  const firstDefault = items.findIndex((i) => i.defaultOpen)
   useEffect(() => {
     if (!pinned) return
-    const onDown = (e: PointerEvent) => !root.current?.contains(e.target as Node) && release()
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && release()
+    const letGo = () => {
+      setPinned(null)
+      if (firstDefault >= 0) scrollToCard(track.current, firstDefault)
+    }
+    const onDown = (e: PointerEvent) => !root.current?.contains(e.target as Node) && letGo()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && letGo()
     document.addEventListener('pointerdown', onDown)
     document.addEventListener('keydown', onKey)
     return () => {
       document.removeEventListener('pointerdown', onDown)
       document.removeEventListener('keydown', onKey)
     }
-  }, [pinned, release])
+  }, [pinned, firstDefault])
 
-  // The carousel moves on by itself unless hovered, held, focused, hidden, or motion is reduced.
+  // The carousel moves on through the default cards unless hovered, held, focused, hidden or reduced motion.
+  const rotationKey = rotation.join(',')
   useEffect(() => {
     if (!carousel || paused) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const order = rotationKey.split(',').map(Number)
     const t = window.setInterval(() => {
-      if (document.visibilityState !== 'visible') return
       const el = track.current
-      if (!el) return
-      const next = (Math.round(el.scrollLeft / el.clientWidth) + 1) % shown.length
-      el.scrollTo({ left: next * el.clientWidth, behavior: 'smooth' })
-    }, ROTATE_MS)
+      if (!el || document.visibilityState !== 'visible') return
+      const now = Math.round(el.scrollLeft / el.clientWidth)
+      const at = order.indexOf(now)
+      scrollToCard(el, order[(at + 1) % order.length])
+    }, seconds * 1000)
     return () => window.clearInterval(t)
-  }, [carousel, paused, shown.length])
+  }, [carousel, paused, rotationKey, seconds])
 
   const onScroll = () => {
     const el = track.current
-    if (el && el.clientWidth) setActive(Math.round(el.scrollLeft / el.clientWidth))
-  }
-
-  const goTo = (index: number) => {
-    const el = track.current
-    if (el) el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' })
+    if (!el || !el.clientWidth) return
+    const now = Math.round(el.scrollLeft / el.clientWidth)
+    setActive(now)
+    // Swiping while a card is pinned moves the pin along with it.
+    if (pinned && items[now] && items[now].id !== pinned && Math.abs(el.scrollLeft - now * el.clientWidth) < 2) setPinned(items[now].id)
   }
 
   const logos = (
@@ -121,7 +135,7 @@ export function ActivityDock({ items, variant = 'sidebar' }: { items: DockItem[]
               if (pinned === i.id) release()
               else {
                 setPinned(i.id)
-                setActive(0)
+                goTo(n)
               }
             }}
           >
@@ -137,7 +151,7 @@ export function ActivityDock({ items, variant = 'sidebar' }: { items: DockItem[]
   const cards = (
       <div
         className="dock-cards"
-        data-open={visibleId ? 'true' : 'false'}
+        data-open={isOpen ? 'true' : 'false'}
         data-carousel={carousel ? 'true' : undefined}
         aria-roledescription={carousel ? 'carousel' : undefined}
         onPointerEnter={() => setPaused(true)}
@@ -145,8 +159,8 @@ export function ActivityDock({ items, variant = 'sidebar' }: { items: DockItem[]
         onFocus={() => setPaused(true)}
         onBlur={() => setPaused(false)}
       >
-        <div className="dock-track" ref={track} onScroll={onScroll} key={pinned ?? 'defaults'}>
-          {shown.map((i) => (
+        <div className="dock-track" ref={track} onScroll={onScroll}>
+          {items.map((i) => (
             <div key={i.id} className="dock-card" id={`dock-${i.id}`} data-card={i.id} aria-hidden={visibleId !== i.id}>
               <p className="dock-head">
                 <span className="activity-title">{i.title}</span>
@@ -156,9 +170,9 @@ export function ActivityDock({ items, variant = 'sidebar' }: { items: DockItem[]
             </div>
           ))}
         </div>
-        {carousel ? (
+        {items.length > 1 ? (
           <div className="dock-dots" role="tablist" aria-label="Cards">
-            {shown.map((i, n) => (
+            {items.map((i, n) => (
               <button key={i.id} type="button" role="tab" aria-selected={n === active} aria-label={i.title} onClick={() => goTo(n)} />
             ))}
           </div>

@@ -200,6 +200,7 @@ export default async function AboutPage() {
             return cards.length ? (
               <ActivityDock
                 variant="inline"
+                seconds={activity.carouselSeconds}
                 items={cards.map((c) => ({ id: c.id, title: c.title, summary: c.summary, icon: <BrandIcon name={c.brand} size={16} />, body: c.body('about'), defaultOpen: c.show.aboutOpen }))}
               />
             ) : null

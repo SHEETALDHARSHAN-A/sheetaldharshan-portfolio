@@ -27,8 +27,17 @@ export const CodingActivity: GlobalConfig = {
   label: 'Coding activity',
   access: { read: () => true, update: authenticated },
   hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/blog', '/about', '/contact', '/research'])] },
-  admin: { group: 'Sidebar', description: 'Choose where each card appears and whether it starts open. In the sidebar, cards show as round logos that open on click; on the About page they are collapsible panels under the photo. Untick both places to hide a card.' },
+  admin: { group: 'Sidebar', description: 'Choose where each card appears and whether it starts open. Cards show above round logos (a pop-up in the sidebar, in the page on About); with two or more open by default they take turns as a carousel. Untick both places to hide a card.' },
   fields: [
+    {
+      name: 'carouselSeconds',
+      type: 'number',
+      label: 'Carousel: seconds on each card',
+      defaultValue: 10,
+      min: 3,
+      max: 120,
+      admin: { description: 'How long a card stays before the next one slides in, when two or more are open by default.' },
+    },
     {
       type: 'collapsible',
       label: 'GitHub activity',

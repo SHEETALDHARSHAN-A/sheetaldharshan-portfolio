@@ -2461,13 +2461,17 @@ export interface Pet {
   createdAt?: string | null;
 }
 /**
- * Choose where each card appears and whether it starts open. In the sidebar, cards show as round logos that open on click; on the About page they are collapsible panels under the photo. Untick both places to hide a card.
+ * Choose where each card appears and whether it starts open. Cards show above round logos (a pop-up in the sidebar, in the page on About); with two or more open by default they take turns as a carousel. Untick both places to hide a card.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "coding-activity".
  */
 export interface CodingActivity {
   id: number;
+  /**
+   * How long a card stays before the next one slides in, when two or more are open by default.
+   */
+  carouselSeconds?: number | null;
   githubInSidebar?: boolean | null;
   githubSidebarOpen?: boolean | null;
   githubOnAbout?: boolean | null;
@@ -2866,6 +2870,7 @@ export interface PetSelect<T extends boolean = true> {
  * via the `definition` "coding-activity_select".
  */
 export interface CodingActivitySelect<T extends boolean = true> {
+  carouselSeconds?: T;
   githubInSidebar?: T;
   githubSidebarOpen?: T;
   githubOnAbout?: T;

@@ -1,11 +1,13 @@
 'use client'
 
 import { useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 /**
  * GitHub-style tooltip for the heatmap: hovering (or tapping) a day shows "34 contributions on
  * July 16th." in a dark pill above it. The pill shifts to stay inside the window; its arrow keeps
- * pointing at the day.
+ * pointing at the day. It is drawn at page level, since a containing block (the About column's
+ * container query) or a clipping card would otherwise shift or cut it.
  */
 export function HeatmapTooltip({ children }: { children: React.ReactNode }) {
   const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null)
@@ -30,11 +32,14 @@ export function HeatmapTooltip({ children }: { children: React.ReactNode }) {
   return (
     <div className="gh-tip-host" onPointerOver={(e) => show(e.target)} onPointerLeave={() => setTip(null)} onPointerDown={(e) => show(e.target)}>
       {children}
-      {tip ? (
-        <span ref={pill} className="gh-tip" role="tooltip" style={{ left: tip.x, top: tip.y }}>
-          {tip.text}
-        </span>
-      ) : null}
+      {tip
+        ? createPortal(
+            <span ref={pill} className="gh-tip" role="tooltip" style={{ left: tip.x, top: tip.y }}>
+              {tip.text}
+            </span>,
+            document.body,
+          )
+        : null}
     </div>
   )
 }

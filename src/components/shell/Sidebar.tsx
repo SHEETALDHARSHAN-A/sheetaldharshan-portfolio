@@ -7,10 +7,12 @@ import { activityCards } from '@/components/activity/cards'
 import type { CodingActivity } from '@/data/activity'
 import type { Site } from '@/data/types'
 import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler'
+import { SidebarResizer } from '@/components/shell/SidebarResizer'
 
 export function Sidebar({ site, activity, themeToggle = false }: { site: Site; activity?: CodingActivity; themeToggle?: boolean }) {
   return (
     <aside className="sidebar" style={{ viewTransitionName: 'site-sidebar' }}>
+      <SidebarResizer />
       <Link href="/" className="wordmark" aria-label={`${site.displayName}, home`}>
         {site.displayName}
         <span className="dot">.</span>
@@ -23,6 +25,7 @@ export function Sidebar({ site, activity, themeToggle = false }: { site: Site; a
         return cards.length ? (
           <div className="sidebar-activity">
             <ActivityDock
+              seconds={activity?.carouselSeconds}
               items={cards.map((c) => ({ id: c.id, title: c.title, summary: c.summary, icon: <BrandIcon name={c.brand} size={15} />, body: c.body('sidebar'), defaultOpen: c.show.sidebarOpen }))}
             />
           </div>

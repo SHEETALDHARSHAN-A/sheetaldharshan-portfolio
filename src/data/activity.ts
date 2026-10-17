@@ -35,7 +35,7 @@ export type LeetcodeStats = {
 type LeetcodeProfile = Omit<LeetcodeStats, 'sources' | 'checkedAt'> & { checkedAt: number }
 /** Where each card is switched on in the admin. */
 export type Placement = { sidebar: boolean; about: boolean; sidebarOpen: boolean; aboutOpen: boolean }
-export type CodingActivity = { github?: GithubActivity & { show: Placement }; leetcode?: LeetcodeStats & { show: Placement } }
+export type CodingActivity = { github?: GithubActivity & { show: Placement }; leetcode?: LeetcodeStats & { show: Placement }; carouselSeconds?: number }
 
 const SIX_HOURS = 6 * 60 * 60
 
@@ -125,7 +125,8 @@ export const getCodingActivity = cache(async (): Promise<CodingActivity> => {
   const payload = await getPayload({ config: configPromise })
   const settings = (await payload.findGlobal({ slug: 'coding-activity', depth: 0 }).catch(() => null)) as CodingActivityDoc | null
   if (!settings) return {}
-  const result: CodingActivity = {}
+  const seconds = Number((settings as { carouselSeconds?: unknown }).carouselSeconds)
+  const result: CodingActivity = { carouselSeconds: Number.isFinite(seconds) && seconds > 0 ? Math.min(120, Math.max(3, seconds)) : 10 }
 
   const ghShow: Placement = {
     sidebar: settings.githubInSidebar ?? true,

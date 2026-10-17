@@ -183,11 +183,11 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 /* Two or more: they overlap at rest and spread apart on hover (or keyboard focus) so each shows in full. */
 .dock-logos .activity-logo { box-shadow: 0 0 0 2px var(--sb-bg, var(--bg)); }
 /* Magic UI AvatarCircles: 40px circles overlapping by 16px, each cut out of the one behind by a ring in the
-   background colour. Hovering (or focusing) one keeps it in place and slides the others away from it
-   (22px per step: the 16px overlap plus a 6px gap), so every logo shows in full. */
+   background colour. Hovering (or focusing) one keeps it in place and nudges the others 6px away from it,
+   just enough to make each easy to click. */
 .dock-logos[data-stacked] .activity-logo + .activity-logo { margin-left: -16px; }
 .dock-logos[data-stacked] .activity-logo { transition: transform 260ms var(--ease-out), background 160ms ease, box-shadow 160ms ease; }
-.dock-logos[data-stacked][data-spread] .activity-logo { transform: translateX(calc((var(--i) - var(--h)) * 22px)); }
+.dock-logos[data-stacked][data-spread] .activity-logo { transform: translateX(calc((var(--i) - var(--h)) * 6px)); }
 .dock-logos[data-stacked][data-spread] .activity-logo:not([aria-pressed='true']) { z-index: 0; }
 /* Magnification: each logo's size follows the pointer (set by ActivityDock), springing back on leave. */
 .dock-logos .activity-logo { width: 40px; height: 40px; }
@@ -197,12 +197,13 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 /* All cards share one cell, so the space is always kept: opening one fades it in without moving anything. */
 .activity-dock { position: relative; }
 /* The open card floats up above the logos (over the avatar), so nothing in the sidebar moves. Above the pet (z 60). */
-.dock-cards { position: absolute; left: -12px; right: -12px; bottom: calc(100% + 10px); z-index: 70; display: grid; padding: 14px 12px 12px; border-radius: 16px; background: var(--sb-bg, var(--bg-elevated)); border: 1px solid var(--line-strong); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); visibility: hidden; opacity: 0; transform: translateY(8px) scale(0.98); transform-origin: 30px 100%; transition: opacity 200ms var(--ease-out), transform 220ms var(--ease-out), visibility 0s linear 220ms; }
+.dock-cards { position: absolute; left: -12px; right: -12px; bottom: calc(100% + 10px); z-index: 70; display: grid; padding: 14px 12px 12px; border-radius: 16px; background: var(--sb-bg, var(--bg-elevated)); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); visibility: hidden; opacity: 0; transform: translateY(8px) scale(0.98); transform-origin: 30px 100%; transition: opacity 200ms var(--ease-out), transform 220ms var(--ease-out), visibility 0s linear 220ms; }
 .dock-cards[data-open='true'] { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
 /* The cards sit side by side in a scroll-snapping track: a carousel when several are shown. */
-.dock-track { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; align-items: flex-start; transition: height 260ms var(--ease-out); }
+/* Cards stretch to the tallest, so the track keeps one height and nothing around it moves between cards. */
+.dock-track { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; align-items: stretch; }
 .dock-track::-webkit-scrollbar { display: none; }
-.dock-card { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; display: grid; gap: 7px; }
+.dock-card { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; display: grid; align-content: start; gap: 7px; }
 .dock-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
 .dock-dots button { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 999px; background: var(--line-strong); cursor: pointer; transition: width 200ms ease, background 200ms ease; }
 .dock-dots button[aria-selected='true'] { width: 16px; background: var(--accent); }
@@ -286,7 +287,7 @@ button.activity-logo[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--sb-bg, v
 .gh-grid span[data-level='4'] { background: var(--accent); }
 /* LeetCode gauge, after LeetCode's profile widget: a 270° gauge with an arc per difficulty, and level tiles. */
 .lcg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 14px; align-items: center; }
-.lcg-ring { position: relative; display: grid; place-items: center; width: 100%; max-width: 200px; aspect-ratio: 1; margin: 0 auto; padding: 0; border: 0; background: none; color: var(--text); cursor: pointer; }
+.lcg-ring { position: relative; display: grid; place-items: center; width: 100%; max-width: 160px; aspect-ratio: 1; margin: 0 auto; padding: 0; border: 0; background: none; color: var(--text); cursor: pointer; }
 .lcg-ring:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 50%; }
 .lcg-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .lcg-track, .lcg-fill { fill: none; stroke-width: 4.5; stroke-linecap: round; }
@@ -303,7 +304,7 @@ button.activity-logo[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--sb-bg, v
 .lcg-check { color: #1cbaba; }
 .lcg-foot { position: absolute; left: 0; right: 0; bottom: 6%; font-size: 11px; color: var(--muted); text-align: center; }
 .lcg-levels { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.lcg-levels button { display: grid; justify-items: center; gap: 2px; width: 100%; padding: 8px 10px; border: 1px solid transparent; border-radius: 10px; background: var(--surface); color: var(--text); cursor: pointer; transition: background 200ms ease, border-color 200ms ease, transform 200ms ease; }
+.lcg-levels button { display: grid; justify-items: center; gap: 2px; width: 100%; padding: 6px 10px; border: 1px solid transparent; border-radius: 10px; background: var(--surface); color: var(--text); cursor: pointer; transition: background 200ms ease, border-color 200ms ease, transform 200ms ease; }
 .lcg-levels button:hover, .lcg-levels button[data-active='true'] { background: var(--surface-hover); border-color: var(--line-strong); }
 .lcg-levels button[aria-pressed='true'] { border-color: var(--text-soft); }
 .lcg-levels button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -312,14 +313,15 @@ button.activity-logo[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--sb-bg, v
 @keyframes lcg-swap { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .lcg-fill, .lcg-center { animation: none !important; } .lcg-track { transition: none !important; } .dock-logos .activity-logo { transition: none !important; } }
 /* In the sidebar the gauge stacks: the ring, then the three levels in a row. */
-.sidebar-activity .lcg { grid-template-columns: 1fr; gap: 8px; }
-.sidebar-activity .lcg-ring { max-width: 130px; }
-.sidebar-activity .lcg-big { font-size: 22px; }
+/* LeetCode, compact: the gauge beside the three levels, so the card is no taller than GitHub's. */
+.sidebar-activity .lcg { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); gap: 8px; }
+.sidebar-activity .lcg-ring { max-width: 104px; }
+.sidebar-activity .lcg-big { font-size: 18px; }
 .sidebar-activity .lcg-big small { font-size: 10px; }
 .sidebar-activity .lcg-caption { font-size: 10.5px; }
 .sidebar-activity .lcg-foot { font-size: 9.5px; }
-.sidebar-activity .lcg-levels { grid-template-columns: repeat(3, 1fr); gap: 5px; }
-.sidebar-activity .lcg-levels button { padding: 5px 2px; border-radius: 7px; }
+.sidebar-activity .lcg-levels { grid-template-columns: 1fr; gap: 4px; }
+.sidebar-activity .lcg-levels button { padding: 3px 2px; border-radius: 7px; gap: 0; }
 .sidebar-activity .lcg-level { font-size: 10px; }
 .sidebar-activity .lcg-count { font-size: 9.5px; }
 /* Short windows: keep the pet and nav readable before the card. */
@@ -327,6 +329,11 @@ button.activity-logo[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--sb-bg, v
 .sidebar-foot { margin-top: 34px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-family: var(--font-condensed); font-weight: 600; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
 .sidebar-foot a:hover { color: var(--text); }
 .topbar, .tabbar { display: none; }
+/* Drag handle on the sidebar's right edge. */
+.sidebar-resizer { position: absolute; top: 0; right: -4px; bottom: 0; width: 8px; z-index: 5; cursor: col-resize; touch-action: none; }
+.sidebar-resizer::after { content: ''; position: absolute; top: 0; bottom: 0; left: 3px; width: 2px; background: transparent; transition: background 150ms ease; }
+.sidebar-resizer:hover::after, html[data-resizing] .sidebar-resizer::after { background: var(--accent); }
+html[data-resizing], html[data-resizing] * { cursor: col-resize !important; user-select: none !important; }
 /* Visitor light/dark switch (Magic UI Animated Theme Toggler), at the bottom of the sidebar. */
 .theme-toggle { display: inline-grid; place-items: center; width: 20px; height: 20px; margin: -3px 0; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; transition: color 160ms ease, transform 200ms ease; }
 .theme-toggle svg { width: 14px; height: 14px; }
@@ -625,7 +632,7 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
    So the photo is always cut somewhere between 4:5 (tallest) and 3:2 (widest), around its focal point. */
 .about-aside .about-photo { flex: 0 1 auto; min-height: max(180px, 66.667cqw); }
 .about-aside:has(.dock-cards[data-open='true']) .about-photo { aspect-ratio: 1 / 1; }
-.about-aside > .activity-dock { flex: 0 0 auto; max-height: calc(100dvh - 60px - max(180px, 66.667cqw) - 14px); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+.about-aside > .activity-dock { flex: 0 0 auto; }
 /* No overscroll-behavior here: once the cards reach their top or bottom, the page keeps scrolling. */
 .about-photo { position: relative; aspect-ratio: 4 / 5; border-radius: var(--radius); overflow: hidden; background: var(--bg-elevated); border: 1px solid var(--line); isolation: isolate; }
 .about-photo img { width: 100%; height: 100%; object-fit: cover; }
