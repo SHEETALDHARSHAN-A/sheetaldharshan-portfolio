@@ -125,6 +125,7 @@ export interface Config {
     about: About;
     appearance: Appearance;
     'site-settings': SiteSetting;
+    'coding-activity': CodingActivity;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
@@ -132,6 +133,7 @@ export interface Config {
     about: AboutSelect<false> | AboutSelect<true>;
     appearance: AppearanceSelect<false> | AppearanceSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'coding-activity': CodingActivitySelect<false> | CodingActivitySelect<true>;
   };
   locale: null;
   widgets: {
@@ -2489,6 +2491,39 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
+ * Cards in the sidebar, under the pet. Turn each one on or off; the pet resizes to fit whatever is shown.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coding-activity".
+ */
+export interface CodingActivity {
+  id: number;
+  githubEnabled?: boolean | null;
+  /**
+   * Contributions from every included account are added together, day by day. Private work only counts if "Private contributions" is turned on in that GitHub profile.
+   */
+  githubAccounts?:
+    | {
+        username: string;
+        enabled?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  leetcodeEnabled?: boolean | null;
+  /**
+   * Solved counts from every included account are added together.
+   */
+  leetcodeAccounts?:
+    | {
+        username: string;
+        enabled?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage_select".
  */
@@ -2629,6 +2664,31 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   resume?: T;
   ogImage?: T;
   footerNote?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coding-activity_select".
+ */
+export interface CodingActivitySelect<T extends boolean = true> {
+  githubEnabled?: T;
+  githubAccounts?:
+    | T
+    | {
+        username?: T;
+        enabled?: T;
+        id?: T;
+      };
+  leetcodeEnabled?: T;
+  leetcodeAccounts?:
+    | T
+    | {
+        username?: T;
+        enabled?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -2,9 +2,12 @@ import Link from 'next/link'
 import { BrandIcon } from '@/components/BrandIcon'
 import { MobileMenu } from '@/components/shell/MobileMenu'
 import { NavLinks } from '@/components/shell/NavLinks'
+import { GithubHeatmap } from '@/components/activity/GithubHeatmap'
+import { LeetcodeCard } from '@/components/activity/LeetcodeCard'
+import type { CodingActivity } from '@/data/activity'
 import type { Site } from '@/data/types'
 
-export function Sidebar({ site }: { site: Site }) {
+export function Sidebar({ site, activity }: { site: Site; activity?: CodingActivity }) {
   return (
     <aside className="sidebar" style={{ viewTransitionName: 'site-sidebar' }}>
       <Link href="/" className="wordmark" aria-label={`${site.displayName}, home`}>
@@ -13,6 +16,13 @@ export function Sidebar({ site }: { site: Site }) {
       </Link>
       {/* The pet (components/pet) lives here; it is positioned over this slot. */}
       <div className="sidebar-avatar" aria-hidden="true" />
+      {/* Optional cards (Coding activity in the admin); the pet shrinks to the space left above them. */}
+      {activity?.github || activity?.leetcode ? (
+        <div className="sidebar-activity">
+          {activity.github ? <GithubHeatmap data={activity.github} /> : null}
+          {activity.leetcode ? <LeetcodeCard data={activity.leetcode} /> : null}
+        </div>
+      ) : null}
       <div>
         <nav className="sidebar-nav" aria-label="Primary">
           <NavLinks items={site.nav} />

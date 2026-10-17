@@ -83,14 +83,16 @@ export function Pet() {
     const layout = () => {
       const isMobile = mq.matches
       setMobile(isMobile)
-      c.setSize(isMobile ? 76 : 184)
       if (isMobile) {
+        c.setSize(76)
         const bar = document.querySelector('.tabbar')?.getBoundingClientRect()
         const floor = bar && bar.height > 0 ? bar.top : window.innerHeight
         c.setHome(window.innerWidth - c.w - 6, floor - c.h + 4, 0)
       } else {
         const slot = document.querySelector('.sidebar-avatar')?.getBoundingClientRect()
         if (slot && slot.width > 0) {
+          // Fill the space left above the optional cards: full size with none, smaller with one or two.
+          c.setSize(Math.round(Math.max(84, Math.min(184, slot.height * 0.96 * (SHEET.cellWidth / SHEET.cellHeight)))))
           // The figure fills the middle of its cell, so it can stroll a little past the cell edges.
           // The figure is about 45% of its cell, so it may stroll until it nearly reaches the sidebar edges.
           const sidebar = document.querySelector('.sidebar')?.getBoundingClientRect() ?? slot

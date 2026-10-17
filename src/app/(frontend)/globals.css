@@ -168,6 +168,38 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .sidebar-nav a:hover, .sidebar-nav a[aria-current='page'] { color: var(--accent); }
 .sidebar-nav a[aria-current='page'] .n { color: var(--accent); }
 .sidebar-avatar { display: flex; justify-content: center; align-items: center; flex: 1; min-height: 0; padding: 12px 0; }
+.sidebar-activity { display: grid; gap: 14px; margin-bottom: 26px; }
+.activity-card { display: grid; gap: 7px; min-width: 0; }
+.activity-head { display: flex; align-items: center; gap: 0; font-family: var(--font-condensed); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
+.activity-head .brand-icon { margin-right: 6px; }
+.activity-title { flex: none; }
+.activity-sub { margin-left: auto; font-weight: 400; letter-spacing: 0.04em; color: var(--muted); font-variant-numeric: tabular-nums; }
+.activity-head:hover .activity-title { color: var(--accent); }
+/* GitHub heatmap, after the shadcn calendar-heatmap: rounded squares, one per day, columns are weeks. */
+.gh-months, .gh-grid { display: grid; gap: 2px; }
+.gh-months { font-size: 8.5px; line-height: 1; color: var(--faint); letter-spacing: 0.02em; }
+.gh-months span { white-space: nowrap; overflow: visible; }
+.gh-grid { grid-template-rows: repeat(7, auto); grid-auto-flow: column; }
+.gh-grid span { aspect-ratio: 1; border-radius: 2px; background: var(--surface); }
+.gh-grid span.gh-pad { background: transparent; }
+.gh-grid span[data-level='1'] { background: color-mix(in srgb, var(--accent) 32%, var(--surface)); }
+.gh-grid span[data-level='2'] { background: color-mix(in srgb, var(--accent) 55%, var(--surface)); }
+.gh-grid span[data-level='3'] { background: color-mix(in srgb, var(--accent) 78%, var(--surface)); }
+.gh-grid span[data-level='4'] { background: var(--accent); }
+/* LeetCode, after react-leetcode: a ring of solved by difficulty, and a progress bar per level. */
+.lc-body { display: grid; grid-template-columns: 46px 1fr; align-items: center; gap: 10px; }
+.lc-ring { width: 46px; height: 46px; }
+.lc-ring-num { font: 600 11px var(--font-sans); fill: var(--text); }
+.lc-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; min-width: 0; }
+.lc-bars li { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 2px 6px; font-size: 10.5px; line-height: 1.1; }
+.lc-label { font-weight: 600; }
+.lc-count { justify-self: end; color: var(--text); font-variant-numeric: tabular-nums; }
+.lc-count small { color: var(--faint); font-size: 9.5px; }
+.lc-track { grid-column: 1 / -1; height: 3px; border-radius: 3px; background: var(--surface); overflow: hidden; }
+.lc-track i { display: block; height: 100%; border-radius: 3px; }
+/* Short windows: keep the pet and nav readable before the cards. */
+@media (max-height: 760px) { .sidebar-activity .activity-card + .activity-card { display: none; } }
+@media (max-height: 640px) { .sidebar-activity { display: none; } }
 .sidebar-foot { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--font-condensed); font-weight: 600; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
 .sidebar-foot a:hover { color: var(--text); }
 .topbar, .tabbar { display: none; }

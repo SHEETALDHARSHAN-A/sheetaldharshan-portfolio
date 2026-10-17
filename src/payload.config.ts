@@ -22,6 +22,7 @@ import { getServerSideURL } from './utilities/getURL'
 import { Appearance } from './globals/Appearance'
 import { Homepage } from './globals/Homepage'
 import { SiteSettings } from './globals/SiteSettings'
+import { CodingActivity } from './globals/CodingActivity'
 import { Navigation } from './globals/Navigation'
 import { About } from './globals/About'
 
@@ -75,7 +76,7 @@ export default buildConfig({
   }),
   collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Homepage, Navigation, About, Appearance, SiteSettings],
+  globals: [Homepage, Navigation, About, Appearance, SiteSettings, CodingActivity],
   plugins: [
     ...plugins,
     // Persistent media in production. Enabled only when a Vercel Blob token is present; local dev writes to public/media.
