@@ -179,4 +179,13 @@ test.describe('Public site', () => {
     await expect(page).toHaveURL(new RegExp(`${base}/?$`))
     await expect(page.locator('.jg-messages')).toBeVisible()
   })
+  test('coding activity cards show where their numbers come from', async ({ page }) => {
+    await page.goto(`${base}/research`)
+    const cards = page.locator('.sidebar-activity .activity-details')
+    if ((await cards.count()) === 0) test.skip(true, 'Coding activity is turned off')
+    await cards.first().locator('summary').click()
+    const links = cards.first().locator('.activity-sources a')
+    await expect(links.first()).toBeVisible()
+    await expect(links.first()).toHaveAttribute('href', /^https:\/\/(github|leetcode)\.com\//)
+  })
 })

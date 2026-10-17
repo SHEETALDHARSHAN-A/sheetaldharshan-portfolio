@@ -1,5 +1,6 @@
 import { BrandIcon } from '@/components/BrandIcon'
 import type { GithubActivity } from '@/data/activity'
+import { ActivitySources } from './ActivitySources'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const label = (iso: string) => {
@@ -24,15 +25,18 @@ export function GithubHeatmap({ data, weeks = 18 }: { data: GithubActivity; week
     return !prev || new Date(`${prev.date}T00:00:00Z`).getUTCMonth() !== m ? MONTHS[m] : ''
   })
   const recent = days.reduce((n, d) => n + d.count, 0)
-  const profile = `https://github.com/${data.profiles[0]}`
 
   return (
     <section className="activity-card" aria-label="GitHub contributions">
-      <a className="activity-head" href={profile} rel="noreferrer" target="_blank">
-        <BrandIcon href={profile} size={13} />
-        <span className="activity-title">GitHub</span>
-        <span className="activity-sub">{data.total.toLocaleString('en')} this year</span>
-      </a>
+      <details className="activity-details">
+        <summary className="activity-head" title="Where these numbers come from">
+          <BrandIcon name="GitHub" size={13} />
+          <span className="activity-title">GitHub</span>
+          <span className="activity-sub">{data.total.toLocaleString('en')} this year</span>
+          <span className="activity-chev" aria-hidden="true" />
+        </summary>
+        <ActivitySources sources={data.sources} unit="Contributions this year" site="GitHub" checkedAt={data.checkedAt} />
+      </details>
       <div className="gh-months" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }} aria-hidden="true">
         {months.map((m, i) => (
           <span key={i}>{m}</span>

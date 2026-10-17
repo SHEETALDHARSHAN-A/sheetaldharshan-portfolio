@@ -170,11 +170,24 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .sidebar-avatar { display: flex; justify-content: center; align-items: center; flex: 1; min-height: 0; padding: 12px 0; }
 .sidebar-activity { display: grid; gap: 14px; margin-bottom: 26px; }
 .activity-card { display: grid; gap: 7px; min-width: 0; }
-.activity-head { display: flex; align-items: center; gap: 0; font-family: var(--font-condensed); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
+.activity-head { display: flex; align-items: center; gap: 0; cursor: pointer; list-style: none; user-select: none; font-family: var(--font-condensed); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
 .activity-head .brand-icon { margin-right: 6px; }
 .activity-title { flex: none; }
 .activity-sub { margin-left: auto; font-weight: 400; letter-spacing: 0.04em; color: var(--muted); font-variant-numeric: tabular-nums; }
 .activity-head:hover .activity-title { color: var(--accent); }
+.activity-head::-webkit-details-marker { display: none; }
+.activity-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+.activity-chev { width: 6px; height: 6px; margin-left: 6px; border-right: 1.5px solid var(--faint); border-bottom: 1.5px solid var(--faint); transform: translateY(-2px) rotate(45deg); transition: transform 200ms ease; flex: none; }
+.activity-details[open] .activity-chev { transform: translateY(1px) rotate(-135deg); }
+/* Sources: every account behind a card, linked to its public profile. */
+.activity-sources { margin-top: 7px; padding: 8px 9px; border-radius: 8px; background: var(--surface); display: grid; gap: 6px; font-size: 10.5px; line-height: 1.35; animation: el-in 220ms var(--ease-out) both; }
+.activity-sources p { margin: 0; color: var(--muted); }
+.activity-sources ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.activity-sources li { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; min-width: 0; }
+.activity-sources a { display: inline-flex; align-items: center; min-width: 0; color: var(--text); }
+.activity-sources a:hover .src-name { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.src-name { white-space: nowrap; font-size: 10px; letter-spacing: -0.01em; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
+.src-value { margin-left: auto; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 /* GitHub heatmap, after the shadcn calendar-heatmap: rounded squares, one per day, columns are weeks. */
 .gh-months, .gh-grid { display: grid; gap: 2px; }
 .gh-months { font-size: 8.5px; line-height: 1; color: var(--faint); letter-spacing: 0.02em; }

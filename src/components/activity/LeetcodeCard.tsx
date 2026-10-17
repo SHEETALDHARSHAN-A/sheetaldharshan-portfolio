@@ -1,5 +1,6 @@
 import { BrandIcon } from '@/components/BrandIcon'
 import type { LeetcodeStats } from '@/data/activity'
+import { ActivitySources } from './ActivitySources'
 
 const LEVELS = [
   { key: 'easy', label: 'Easy', color: '#00b8a3' },
@@ -10,7 +11,6 @@ const LEVELS = [
 /** LeetCode progress for the sidebar: solved split by difficulty around a ring, and a bar per level. */
 export function LeetcodeCard({ data }: { data: LeetcodeStats }) {
   const { solved, available } = data
-  const profile = `https://leetcode.com/u/${data.profiles[0]}/`
   const r = 20
   const c = 2 * Math.PI * r
   let offset = 0
@@ -23,11 +23,15 @@ export function LeetcodeCard({ data }: { data: LeetcodeStats }) {
 
   return (
     <section className="activity-card" aria-label="LeetCode progress">
-      <a className="activity-head" href={profile} rel="noreferrer" target="_blank">
-        <BrandIcon href={profile} size={13} />
-        <span className="activity-title">LeetCode</span>
-        <span className="activity-sub">{solved.all} solved</span>
-      </a>
+      <details className="activity-details">
+        <summary className="activity-head" title="Where these numbers come from">
+          <BrandIcon name="LeetCode" size={13} />
+          <span className="activity-title">LeetCode</span>
+          <span className="activity-sub">{solved.all} solved</span>
+          <span className="activity-chev" aria-hidden="true" />
+        </summary>
+        <ActivitySources sources={data.sources} unit="Problems solved" site="LeetCode" checkedAt={data.checkedAt} />
+      </details>
       <div className="lc-body">
         <svg className="lc-ring" viewBox="0 0 48 48" role="img" aria-label={`${solved.all} of ${available.all} problems solved`}>
           <circle cx="24" cy="24" r={r} fill="none" stroke="var(--surface)" strokeWidth="4" />
