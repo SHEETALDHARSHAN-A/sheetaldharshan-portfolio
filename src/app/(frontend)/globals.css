@@ -268,8 +268,9 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .lcg-ring:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 50%; }
 .lcg-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .lcg-track, .lcg-fill { fill: none; stroke-width: 4.5; stroke-linecap: round; }
-/* The background never animates; the progress line grows from where its arc starts. */
-.lcg-fill { animation: lcg-grow 750ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+/* Two steps on every switch: the arc reshapes first, then the progress line grows along it. */
+.lcg-track { transition: stroke-dasharray 420ms cubic-bezier(0.65, 0, 0.35, 1), stroke-dashoffset 420ms cubic-bezier(0.65, 0, 0.35, 1), stroke 300ms ease, opacity 300ms ease; }
+.lcg-fill { animation: lcg-grow 700ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both; }
 @keyframes lcg-grow { from { stroke-dasharray: var(--from); } }
 .lcg-track[data-dim='true'] { opacity: 0.22; }
 .lcg-center { position: relative; display: grid; justify-items: center; gap: 2px; text-align: center; animation: lcg-swap 260ms ease both; }
@@ -287,7 +288,7 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .lcg-level { font-size: 12.5px; font-weight: 600; }
 .lcg-count { font-size: 13px; font-variant-numeric: tabular-nums; }
 @keyframes lcg-swap { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .lcg-fill, .lcg-center { animation: none !important; } .dock-logos .activity-logo { width: 30px !important; height: 30px !important; } }
+@media (prefers-reduced-motion: reduce) { .lcg-fill, .lcg-center { animation: none !important; } .lcg-track { transition: none !important; } .dock-logos .activity-logo { width: 30px !important; height: 30px !important; } }
 /* In the sidebar the gauge stacks: the ring, then the three levels in a row. */
 .sidebar-activity .lcg { grid-template-columns: 1fr; gap: 8px; }
 .sidebar-activity .lcg-ring { max-width: 130px; }

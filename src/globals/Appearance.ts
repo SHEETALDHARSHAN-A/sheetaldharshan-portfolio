@@ -159,6 +159,7 @@ export const Appearance: GlobalConfig = {
       type: 'collapsible',
       label: 'Custom colours (override the presets above; empty keeps the preset)',
       fields: [
+        { name: 'themePicker', type: 'ui', admin: { components: { Field: '@/components/admin/ThemePresets#ThemePresets' } } },
         colorField('colorBackground', 'Page background'),
         colorField('colorSurface', 'Panels, cards and chips'),
         colorField('colorText', 'Main text'),
