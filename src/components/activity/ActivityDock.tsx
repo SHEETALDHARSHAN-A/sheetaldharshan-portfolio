@@ -1,47 +1,45 @@
 'use client'
 
-import { useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 export type DockItem = { id: string; title: string; summary: string; icon: ReactNode; body: ReactNode; defaultOpen: boolean }
 
-const BASE = 32 // px, resting icon size
-const MAX = 38 // px, size right under the pointer (a gentle swell)
-const REACH = 60 // px, how far the swell spreads to neighbours
-
 /**
- * Sidebar dock: overlapping round logos like Magic UI's AvatarCircles, each gently swelling as the
- * pointer nears it. Clicking one opens its card below; clicking again closes it.
+ * Sidebar dock: overlapping round logos like Magic UI's AvatarCircles. With two or more, hovering the
+ * stack spreads them apart so every logo shows in full. Clicking one opens its card below; clicking
+ * again closes it. The card floats up above the logos, over the avatar, so opening it never moves
+ * anything in the sidebar; clicking elsewhere or Escape closes it.
  * One card is open at a time so the pet keeps its space; which one starts open is set in the admin.
  */
 export function ActivityDock({ items }: { items: DockItem[] }) {
   const [open, setOpen] = useState<string | null>(items.find((i) => i.defaultOpen)?.id ?? null)
-  const row = useRef<HTMLDivElement>(null)
-  const raf = useRef(0)
   const current = items.find((i) => i.id === open)
+  const root = useRef<HTMLDivElement>(null)
 
-  const swell = (x: number | null) => {
-    cancelAnimationFrame(raf.current)
-    raf.current = requestAnimationFrame(() => {
-      row.current?.querySelectorAll<HTMLElement>('.activity-logo').forEach((el) => {
-        const r = el.getBoundingClientRect()
-        const d = x === null ? REACH : Math.abs(x - (r.left + r.width / 2))
-        const size = BASE + (MAX - BASE) * Math.max(0, 1 - d / REACH) ** 2
-        el.style.setProperty('--dock-size', `${size.toFixed(1)}px`)
-      })
-    })
-  }
+  // The card opens where the pet stands, so the pet moves up above it while it is open (see Pet.tsx).
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-dock-open', Boolean(open))
+    return () => document.documentElement.removeAttribute('data-dock-open')
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: PointerEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(null)
+    }
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(null)
+    document.addEventListener('pointerdown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
 
   return (
-    <div className="activity-dock">
+    <div className="activity-dock" ref={root}>
       <div className="dock-row">
-      <div
-        ref={row}
-        className="dock-logos"
-        role="toolbar"
-        aria-label="Coding activity"
-        onPointerMove={(e) => e.pointerType === 'mouse' && swell(e.clientX)}
-        onPointerLeave={() => swell(null)}
-      >
+      <div className="dock-logos" role="toolbar" aria-label="Coding activity" data-stacked={items.length > 1 ? 'true' : undefined}>
         {items.map((i) => (
           <button
             key={i.id}
@@ -59,15 +57,17 @@ export function ActivityDock({ items }: { items: DockItem[] }) {
       </div>
         {!current ? <span className="dock-hint">Coding activity</span> : null}
       </div>
-      {current ? (
-        <div className="dock-card" id={`dock-${current.id}`} key={current.id}>
-          <p className="dock-head">
-            <span className="activity-title">{current.title}</span>
-            <span className="activity-sub">{current.summary}</span>
-          </p>
-          {current.body}
-        </div>
-      ) : null}
+      <div className="dock-cards" data-open={current ? 'true' : 'false'}>
+        {items.map((i) => (
+          <div key={i.id} className="dock-card" id={`dock-${i.id}`} data-open={open === i.id ? 'true' : 'false'} aria-hidden={open !== i.id} inert={open !== i.id}>
+            <p className="dock-head">
+              <span className="activity-title">{i.title}</span>
+              <span className="activity-sub">{i.summary}</span>
+            </p>
+            {i.body}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

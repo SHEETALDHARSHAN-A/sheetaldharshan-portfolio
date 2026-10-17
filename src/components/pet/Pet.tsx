@@ -98,7 +98,13 @@ export function Pet({
         const floor = bar && bar.height > 0 ? bar.top : window.innerHeight
         c.setHome(window.innerWidth - c.w - 6, floor - c.h + 4, 0)
       } else {
-        const slot = document.querySelector('.sidebar-avatar')?.getBoundingClientRect()
+        let slot = document.querySelector('.sidebar-avatar')?.getBoundingClientRect()
+        // A coding-activity card is open over the pet's spot: stand in the space above it instead.
+        const card = document.documentElement.hasAttribute('data-dock-open') ? document.querySelector('.dock-cards')?.getBoundingClientRect() : undefined
+        if (slot && card && card.height > 0) {
+          const top = (document.querySelector('.sidebar .wordmark')?.getBoundingClientRect().bottom ?? 0) + 8
+          slot = new DOMRect(slot.left, top, slot.width, Math.max(60, card.top - top - 8))
+        }
         if (slot && slot.width > 0) {
           // Fill the space left above the optional cards: full size with none, smaller with one or two.
           c.setSize(Math.round(Math.max(84, Math.min(184, slot.height * 0.96 * (SHEET.cellWidth / SHEET.cellHeight)))))
@@ -150,6 +156,13 @@ export function Pet({
       restoreSaved()
     }
     const onMotion = () => c.setReduced(motion.matches)
+    // Opening or closing a card moves the pet up or back down, smoothly.
+    const dockWatch = new MutationObserver(() => {
+      el.style.transition = 'transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1), width 360ms ease, height 360ms ease'
+      requestAnimationFrame(() => requestAnimationFrame(layout))
+      window.setTimeout(() => (el.style.transition = ''), 420)
+    })
+    dockWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-dock-open'] })
     const ro = new ResizeObserver(layout)
     const slot = document.querySelector('.sidebar-avatar')
     if (slot) ro.observe(slot)
@@ -162,6 +175,7 @@ export function Pet({
       alive = false
       cancelAnimationFrame(raf)
       ro.disconnect()
+      dockWatch.disconnect()
       window.removeEventListener('resize', layout)
       window.removeEventListener('pointermove', onPointer)
       document.removeEventListener('visibilitychange', onVisibility)
