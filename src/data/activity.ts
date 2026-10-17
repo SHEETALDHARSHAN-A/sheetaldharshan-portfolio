@@ -11,7 +11,19 @@ export type ContributionDay = { date: string; count: number }
 export type ActivitySource = { username: string; url: string; value: number }
 export type GithubActivity = { days: ContributionDay[]; total: number; sources: ActivitySource[]; checkedAt: number }
 export type LeetcodeTotals = { all: number; easy: number; medium: number; hard: number }
-export type LeetcodeStats = { solved: LeetcodeTotals; available: LeetcodeTotals; sources: ActivitySource[]; checkedAt: number }
+export type LeetcodeStats = {
+  solved: LeetcodeTotals
+  available: LeetcodeTotals
+  /** Problems tried but not yet accepted, per difficulty. */
+  attempting: LeetcodeTotals
+  /** Accepted and total submissions, for the acceptance rate. */
+  submissions: { accepted: number; total: number }
+  /** "Beats x%" per difficulty, from the account with the most solved (percentiles cannot be added). */
+  beats: { easy: number; medium: number; hard: number }
+  sources: ActivitySource[]
+  checkedAt: number
+}
+type LeetcodeProfile = Omit<LeetcodeStats, 'sources' | 'checkedAt'> & { checkedAt: number }
 export type CodingActivity = { github?: GithubActivity; leetcode?: LeetcodeStats }
 
 const SIX_HOURS = 6 * 60 * 60
@@ -42,36 +54,55 @@ const githubCalendar = unstable_cache(
   { revalidate: SIX_HOURS },
 )
 
+type Row = { difficulty: string; count: number; submissions?: number; percentage?: number | null }
 type LeetcodeResponse = {
   data?: {
-    allQuestionsCount?: { difficulty: string; count: number }[]
-    matchedUser?: { submitStatsGlobal?: { acSubmissionNum?: { difficulty: string; count: number }[] } } | null
+    allQuestionsCount?: Row[]
+    matchedUser?: { submitStatsGlobal?: { acSubmissionNum?: Row[]; totalSubmissionNum?: Row[] }; problemsSolvedBeatsStats?: Row[] } | null
   }
 }
 
 /** Solved and available counts per difficulty from LeetCode's public GraphQL endpoint. */
 const leetcodeProfile = unstable_cache(
-  async (username: string): Promise<{ solved: LeetcodeTotals; available: LeetcodeTotals; checkedAt: number } | null> => {
+  async (username: string): Promise<LeetcodeProfile | null> => {
     const res = await fetch('https://leetcode.com/graphql', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Referer: 'https://leetcode.com', 'User-Agent': 'Mozilla/5.0 (sheetaldharshan.me portfolio)' },
       body: JSON.stringify({
-        query: 'query($u:String!){allQuestionsCount{difficulty count} matchedUser(username:$u){submitStatsGlobal{acSubmissionNum{difficulty count}}}}',
+        query:
+          'query($u:String!){allQuestionsCount{difficulty count} matchedUser(username:$u){submitStatsGlobal{acSubmissionNum{difficulty count submissions} totalSubmissionNum{difficulty count submissions}} problemsSolvedBeatsStats{difficulty percentage}}}',
         variables: { u: username },
       }),
       signal: AbortSignal.timeout(8000),
     }).catch(() => null)
     if (!res?.ok) return null
     const json = (await res.json().catch(() => null)) as LeetcodeResponse | null
-    const solvedRows = json?.data?.matchedUser?.submitStatsGlobal?.acSubmissionNum
-    if (!solvedRows) return null
-    const pick = (rows: { difficulty: string; count: number }[] = []): LeetcodeTotals => {
-      const get = (d: string) => rows.find((r) => r.difficulty === d)?.count ?? 0
+    const user = json?.data?.matchedUser
+    const ac = user?.submitStatsGlobal?.acSubmissionNum
+    const tried = user?.submitStatsGlobal?.totalSubmissionNum ?? []
+    if (!ac) return null
+    const pick = (rows: Row[] = [], key: 'count' | 'submissions' = 'count'): LeetcodeTotals => {
+      const get = (d: string) => rows.find((r) => r.difficulty === d)?.[key] ?? 0
       return { all: get('All'), easy: get('Easy'), medium: get('Medium'), hard: get('Hard') }
     }
-    return { solved: pick(solvedRows), available: pick(json?.data?.allQuestionsCount), checkedAt: Date.now() }
+    const solved = pick(ac)
+    const touched = pick(tried)
+    const beat = (d: string) => user?.problemsSolvedBeatsStats?.find((r) => r.difficulty === d)?.percentage ?? 0
+    return {
+      solved,
+      available: pick(json?.data?.allQuestionsCount),
+      attempting: {
+        all: Math.max(0, touched.all - solved.all),
+        easy: Math.max(0, touched.easy - solved.easy),
+        medium: Math.max(0, touched.medium - solved.medium),
+        hard: Math.max(0, touched.hard - solved.hard),
+      },
+      submissions: { accepted: pick(ac, 'submissions').all, total: pick(tried, 'submissions').all },
+      beats: { easy: beat('Easy'), medium: beat('Medium'), hard: beat('Hard') },
+      checkedAt: Date.now(),
+    }
   },
-  ['leetcode-profile'],
+  ['leetcode-profile-v2'],
   { revalidate: SIX_HOURS },
 )
 
@@ -105,9 +136,21 @@ export const getCodingActivity = cache(async (): Promise<CodingActivity> => {
   if (lc.length) {
     const loaded = (await Promise.all(lc.map(async (u) => ({ u, p: await leetcodeProfile(u).catch(() => null) })))).filter((x) => x.p)
     if (loaded.length) {
-      const sum = (key: keyof LeetcodeTotals) => loaded.reduce((n, { p }) => n + p!.solved[key], 0)
+      const total = (pick: (p: LeetcodeProfile) => LeetcodeTotals): LeetcodeTotals => ({
+        all: loaded.reduce((n, { p }) => n + pick(p!).all, 0),
+        easy: loaded.reduce((n, { p }) => n + pick(p!).easy, 0),
+        medium: loaded.reduce((n, { p }) => n + pick(p!).medium, 0),
+        hard: loaded.reduce((n, { p }) => n + pick(p!).hard, 0),
+      })
+      const top = loaded.reduce((a, b) => (b.p!.solved.all > a.p!.solved.all ? b : a)).p!
       result.leetcode = {
-        solved: { all: sum('all'), easy: sum('easy'), medium: sum('medium'), hard: sum('hard') },
+        solved: total((p) => p.solved),
+        attempting: total((p) => p.attempting),
+        submissions: {
+          accepted: loaded.reduce((n, { p }) => n + p!.submissions.accepted, 0),
+          total: loaded.reduce((n, { p }) => n + p!.submissions.total, 0),
+        },
+        beats: top.beats,
         available: loaded[0].p!.available,
         sources: loaded.map(({ u, p }) => ({ username: u, url: `https://leetcode.com/u/${u}/`, value: p!.solved.all })),
         checkedAt: Math.min(...loaded.map(({ p }) => p!.checkedAt)),

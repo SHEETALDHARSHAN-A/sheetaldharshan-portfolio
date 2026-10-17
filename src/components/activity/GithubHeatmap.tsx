@@ -1,11 +1,17 @@
 import { BrandIcon } from '@/components/BrandIcon'
 import type { GithubActivity } from '@/data/activity'
 import { ActivitySources } from './ActivitySources'
+import { HeatmapTooltip } from './HeatmapTooltip'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const label = (iso: string) => {
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const ordinal = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th'}`
+
+/** The same wording github.com uses: "34 contributions on July 16th." */
+const tipText = (iso: string, count: number) => {
   const d = new Date(`${iso}T00:00:00Z`)
-  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`
+  const n = count === 0 ? 'No contributions' : `${count} contribution${count === 1 ? '' : 's'}`
+  return `${n} on ${MONTH_NAMES[d.getUTCMonth()]} ${ordinal(d.getUTCDate())}.`
 }
 
 /** Contribution calendar for the sidebar: the last few weeks as a grid, one square per day. */
@@ -42,14 +48,16 @@ export function GithubHeatmap({ data, weeks = 18 }: { data: GithubActivity; week
           <span key={i}>{m}</span>
         ))}
       </div>
+      <HeatmapTooltip>
       <div className="gh-grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }} role="img" aria-label={`${recent} contributions in the last ${weeks} weeks`}>
         {Array.from({ length: lead }, (_, i) => (
           <span key={`pad-${i}`} className="gh-pad" />
         ))}
         {days.map((d) => (
-          <span key={d.date} data-level={level(d.count)} title={`${d.count === 0 ? 'No' : d.count} contribution${d.count === 1 ? '' : 's'} on ${label(d.date)}`} />
+          <span key={d.date} data-level={level(d.count)} data-tip={tipText(d.date, d.count)} />
         ))}
       </div>
+      </HeatmapTooltip>
     </section>
   )
 }
