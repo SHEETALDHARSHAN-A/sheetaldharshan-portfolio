@@ -110,6 +110,7 @@ export const getHomepage = cache(async (): Promise<Conversation> => {
     typingIndicator: (homepage?.typingIndicator ?? 'dots') as Conversation['typingIndicator'],
     startDelay: Math.max(0, Math.min(5000, homepage?.startDelay ?? 400)),
     meta: { title: homepage?.meta?.title ?? undefined, description: homepage?.meta?.description ?? undefined },
+    look: { pageBackground: hex(homepage?.pageBackground), bubbleColor: hex(homepage?.bubbleColor), textColor: hex(homepage?.textColor), linkColor: hex(homepage?.linkColor) },
   }
 })
 
@@ -407,4 +408,29 @@ export const getProjectsLook = cache(async (): Promise<ProjectsLook> => {
     zoom: doc?.imageZoom !== false,
     zoomSeconds: Math.min(40, Math.max(3, Number(doc?.zoomSeconds) || 14)),
   }
+})
+
+/* ------------------------------------------------------------------ sidebar look */
+
+/** Sidebar → Menu links → Sidebar look, as CSS variables (validated; empty keeps the theme). */
+export const getSidebarStyle = cache(async (): Promise<Record<string, string>> => {
+  const payload = await getClient()
+  const nav = (await payload.findGlobal({ slug: 'navigation', depth: 0 }).catch(() => null)) as Record<string, unknown> | null
+  const vars: Record<string, string> = {}
+  const color = (key: string, v: unknown) => {
+    const h = hex(v)
+    if (h) vars[key] = h
+  }
+  color('--sb-bg', nav?.sidebarBackground)
+  color('--sb-wordmark', nav?.wordmarkColor)
+  color('--sb-dot', nav?.wordmarkDotColor)
+  color('--sb-menu', nav?.menuColor)
+  color('--sb-active', nav?.menuActiveColor)
+  const size = (key: string, v: unknown, lo: number, hi: number) => {
+    const n = Number(v)
+    if (Number.isFinite(n) && n >= lo && n <= hi) vars[key] = `${n}px`
+  }
+  size('--sb-menu-size', nav?.menuFontSize, 14, 36)
+  size('--sb-wordmark-size', nav?.wordmarkFontSize, 16, 40)
+  return vars
 })

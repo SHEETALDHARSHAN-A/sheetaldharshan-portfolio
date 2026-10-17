@@ -25,6 +25,8 @@ export type Conversation = {
   typingIndicator: 'dots' | 'none'
   startDelay: number
   meta: { title?: string; description?: string }
+  /** Colours from Homepage → Conversation look (validated #rrggbb). */
+  look: { pageBackground?: string; bubbleColor?: string; textColor?: string; linkColor?: string }
 }
 
 export type NavItem = { label: string; href: string; newTab?: boolean }

@@ -157,16 +157,16 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .sidebar {
   position: relative; height: 100dvh;
   display: flex; flex-direction: column; justify-content: space-between;
-  padding: 40px 30px 24px; border-right: 1px solid var(--line); background: var(--bg);
+  padding: 40px 30px 24px; border-right: 1px solid var(--line); background: var(--sb-bg, var(--bg));
 }
-.wordmark { font-family: var(--font-condensed); font-weight: 600; font-size: 24px; letter-spacing: 0.01em; text-transform: uppercase; line-height: 1; display: inline-flex; align-items: baseline; gap: 2px; }
-.wordmark .dot { color: var(--accent); }
+.wordmark { color: var(--sb-wordmark, inherit); font-family: var(--font-condensed); font-weight: 600; font-size: var(--sb-wordmark-size, 24px); letter-spacing: 0.01em; text-transform: uppercase; line-height: 1; display: inline-flex; align-items: baseline; gap: 2px; }
+.wordmark .dot { color: var(--sb-dot, var(--accent)); }
 .sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
 .sidebar-nav { gap: 12px; }
-.sidebar-nav a { display: grid; grid-template-columns: 32px 1fr; align-items: baseline; font-family: var(--font-condensed); font-weight: 600; font-size: 22px; letter-spacing: 0.01em; text-transform: uppercase; color: var(--text); transition: color 0.2s ease; }
+.sidebar-nav a { display: grid; grid-template-columns: 32px 1fr; align-items: baseline; font-family: var(--font-condensed); font-weight: 600; font-size: var(--sb-menu-size, 22px); letter-spacing: 0.01em; text-transform: uppercase; color: var(--sb-menu, var(--text)); transition: color 0.2s ease; }
 .sidebar-nav a .n { font-size: 13px; font-weight: 300; color: var(--muted); letter-spacing: 0.02em; }
-.sidebar-nav a:hover, .sidebar-nav a[aria-current='page'] { color: var(--accent); }
-.sidebar-nav a[aria-current='page'] .n { color: var(--accent); }
+.sidebar-nav a:hover, .sidebar-nav a[aria-current='page'] { color: var(--sb-active, var(--accent)); }
+.sidebar-nav a[aria-current='page'] .n { color: var(--sb-active, var(--accent)); }
 .sidebar-avatar { display: flex; justify-content: center; align-items: center; flex: 1; min-height: 0; padding: 12px 0; }
 .sidebar-activity { display: grid; gap: 14px; margin-bottom: 22px; }
 /* Round logos for each showcase card; the open one gets a ring. */
@@ -611,6 +611,8 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 @media (prefers-reduced-motion: reduce) { .photo-shimmer { animation: none; } .photo-progressive .photo-sharp { transform: none; filter: none; } }
 .about-photo .placeholder { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(70% 50% at 50% 40%, var(--accent-soft), transparent 70%); color: var(--faint); font-family: var(--font-condensed); font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; }
 .about-intro p { font-size: clamp(17px, 1.4vw, 20px); color: var(--text-soft); line-height: 1.55; margin: 0 0 1em; max-width: 640px; }
+/* The first line of the About intro is the pitch: a little larger and brighter for a quick skim. */
+.about-intro p:first-child { font-size: clamp(20px, 1.75vw, 25px); line-height: 1.4; font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
 .section { border-top: 1px solid var(--line); padding: 24px 0; }
 .section h2 { font-family: var(--font-condensed); font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin: 0 0 14px; }
 .entry { display: grid; grid-template-columns: 150px 1fr; gap: 14px; padding: 10px 0; }

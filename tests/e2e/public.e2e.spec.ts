@@ -70,7 +70,7 @@ test.describe('Public site', () => {
 
   test('about, research and contact render CMS content', async ({ page }) => {
     await page.goto(`${base}/about`)
-    await expect(page.locator('.about-intro p').first()).toContainText('developer tools')
+    await expect(page.locator('.about-intro p').first()).toContainText('AI agents')
     await page.goto(`${base}/research`)
     await expect(page.locator('.pub h2')).toContainText('Autonomous Hiring Intelligence')
     await page.goto(`${base}/contact`)

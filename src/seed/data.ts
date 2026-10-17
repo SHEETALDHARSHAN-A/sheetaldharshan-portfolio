@@ -241,8 +241,9 @@ export const about = {
   eyebrow: 'About',
   title: 'Sheetaldharshan A',
   intro: [
-    'I’m Sheetal. I build developer tools and AI agents that work over real databases, and I focus on the parts most demos skip: an installer that works on any laptop, a read-only login that can’t be misused, SQL you see before it runs.',
-    'Before Exasol, I spent a year at Prayag.AI building Python backends and LLM agents. B.Tech in IT, 2026. Next, I want to do forward-deployed and backend engineering.',
+    'I’m Sheetal. I build AI agents that work on real databases, and the tooling that makes them safe to ship.',
+    'At Exasol I co-built the Personal Local Starter Kit: one command sets up an analytics database on any laptop, with Claude, Codex and Cursor connected. On my own I built Exasol Studio, a desktop AI assistant that writes the SQL and asks before changing anything.',
+    'Before that, a year at Prayag.AI shipping LLM agents and Python backends, plus a co-authored IEEE paper on AI hiring agents. Open to forward-deployed and backend roles.',
   ].join('\n\n'),
   sections: [
     { title: 'Experience', kind: 'experience', visible: true },

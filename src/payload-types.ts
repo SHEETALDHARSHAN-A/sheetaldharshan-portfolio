@@ -2388,6 +2388,25 @@ export interface Navigation {
         id?: string | null;
       }[]
     | null;
+  sidebarBackground?: string | null;
+  wordmarkColor?: string | null;
+  /**
+   * Default: the accent colour.
+   */
+  wordmarkDotColor?: string | null;
+  menuColor?: string | null;
+  /**
+   * Default: the accent colour.
+   */
+  menuActiveColor?: string | null;
+  /**
+   * Default 22.
+   */
+  menuFontSize?: number | null;
+  /**
+   * Default 24.
+   */
+  wordmarkFontSize?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2549,6 +2568,19 @@ export interface Homepage {
     title?: string | null;
     description?: string | null;
   };
+  /**
+   * Default black (white in the light theme).
+   */
+  pageBackground?: string | null;
+  /**
+   * Default a translucent grey.
+   */
+  bubbleColor?: string | null;
+  textColor?: string | null;
+  /**
+   * Default #0076ff.
+   */
+  linkColor?: string | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2697,6 +2729,13 @@ export interface NavigationSelect<T extends boolean = true> {
         href?: T;
         id?: T;
       };
+  sidebarBackground?: T;
+  wordmarkColor?: T;
+  wordmarkDotColor?: T;
+  menuColor?: T;
+  menuActiveColor?: T;
+  menuFontSize?: T;
+  wordmarkFontSize?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2815,6 +2854,10 @@ export interface HomepageSelect<T extends boolean = true> {
         title?: T;
         description?: T;
       };
+  pageBackground?: T;
+  bubbleColor?: T;
+  textColor?: T;
+  linkColor?: T;
   _status?: T;
   updatedAt?: T;
   createdAt?: T;

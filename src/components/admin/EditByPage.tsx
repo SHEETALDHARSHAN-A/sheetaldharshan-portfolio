@@ -17,8 +17,8 @@ export async function EditByPage({ payload }: { payload: Payload }) {
     .catch(() => null)
   const tree: Branch[] = [
     { label: 'Site-wide', items: [{ label: 'Theme: colours, fonts, shape', href: g('appearance') }, { label: 'Name & profiles', href: g('site-settings') }, { label: 'Favicon & icons', href: g('brand') }] },
-    { label: 'Sidebar', items: [{ label: 'Menu links', href: g('navigation') }, { label: 'Pet', href: g('pet') }, { label: 'Coding activity', href: g('coding-activity') }] },
-    { label: 'Homepage', view: '/', items: [{ label: 'Conversation', href: g('homepage') }] },
+    { label: 'Sidebar', items: [{ label: 'Menu links & sidebar look', href: g('navigation') }, { label: 'Pet', href: g('pet') }, { label: 'Coding activity', href: g('coding-activity') }] },
+    { label: 'Homepage', view: '/', items: [{ label: 'Conversation & its colours', href: g('homepage') }] },
     {
       label: 'Projects page',
       view: '/projects',

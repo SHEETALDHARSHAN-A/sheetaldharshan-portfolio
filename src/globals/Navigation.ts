@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
+import { colorField } from '@/fields/color'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
 
 export const Navigation: GlobalConfig = {
@@ -42,6 +43,19 @@ export const Navigation: GlobalConfig = {
             { name: 'href', type: 'text', required: true, admin: { width: '50%' } },
           ],
         },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Sidebar look (empty uses the theme)',
+      fields: [
+        colorField('sidebarBackground', 'Sidebar background'),
+        colorField('wordmarkColor', 'Name (wordmark) colour'),
+        colorField('wordmarkDotColor', 'Dot after the name', 'Default: the accent colour.'),
+        colorField('menuColor', 'Menu text colour'),
+        colorField('menuActiveColor', 'Menu hover and current page', 'Default: the accent colour.'),
+        { name: 'menuFontSize', type: 'number', min: 14, max: 36, label: 'Menu font size (px)', admin: { description: 'Default 22.' } },
+        { name: 'wordmarkFontSize', type: 'number', min: 16, max: 40, label: 'Name font size (px)', admin: { description: 'Default 24.' } },
       ],
     },
   ],

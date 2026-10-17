@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
+import { colorField } from '@/fields/color'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
 import { previewUrl } from '@/utilities/previewUrl'
 
@@ -115,6 +116,16 @@ export const Homepage: GlobalConfig = {
       fields: [
         { name: 'title', type: 'text' },
         { name: 'description', type: 'textarea' },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Conversation look (empty keeps the original colours)',
+      fields: [
+        colorField('pageBackground', 'Page background', 'Default black (white in the light theme).'),
+        colorField('bubbleColor', 'Bubble colour', 'Default a translucent grey.'),
+        colorField('textColor', 'Text colour'),
+        colorField('linkColor', 'Link colour', 'Default #0076ff.'),
       ],
     },
   ],
