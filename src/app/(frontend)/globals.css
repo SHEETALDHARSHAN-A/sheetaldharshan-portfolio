@@ -625,7 +625,9 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); grid-template-rows: auto 1fr; column-gap: clamp(24px, 4vw, 60px); align-items: start; }
 .about-head, .about-main { grid-column: 1; }
 .about-aside { grid-column: 2; grid-row: 1 / span 2; }
-.about-aside { position: sticky; top: 30px; display: flex; flex-direction: column; gap: 14px; min-width: 0; max-height: calc(100dvh - 60px); container-type: inline-size; }
+/* One screen tall with its contents centred, so the photo, cards and logos always sit in the middle of the
+   screen (the photo shrinks first when space is short). */
+.about-aside { position: sticky; top: 30px; display: flex; flex-direction: column; justify-content: center; gap: 14px; min-width: 0; height: calc(100dvh - 60px); max-height: calc(100dvh - 60px); container-type: inline-size; }
 /* The column stays beside the text while scrolling, sized to the screen: open cards shrink the
    photo first (never wider than 3:2), and only then does the card area scroll on its own.
    So the photo is always cut somewhere between 4:5 (tallest) and 3:2 (widest), around its focal point. */
@@ -722,7 +724,7 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
   .about-head, .about-main, .about-aside { grid-column: 1; grid-row: auto; }
   /* Phones: title, then the photo, then the text. */
   .about-head { order: 0; } .about-aside { order: 1; } .about-main { order: 2; }
-  .about-aside { position: relative; top: auto; width: min(100%, 340px); margin: 0 auto 28px; max-height: none; }
+  .about-aside { position: relative; top: auto; width: min(100%, 340px); margin: 0 auto 28px; height: auto; max-height: none; }
   .about-aside > .activity-dock { max-height: none; overflow: visible; }
   .about-photo { aspect-ratio: 1 / 1; }
   .about { gap: 0; }
