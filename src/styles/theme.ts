@@ -3,7 +3,8 @@
  * Only values listed here are ever applied, so CMS input can never inject arbitrary CSS.
  */
 export type ThemeSettings = {
-  theme: 'dark' | 'light'
+  /** The default mode; 'system' follows the visitor's device. */
+  theme: 'dark' | 'light' | 'system'
   accent: 'blue' | 'orange' | 'green' | 'violet' | 'neutral'
   fontPreset: 'inter' | 'geist' | 'system'
   headingScale: 'compact' | 'regular' | 'large'
@@ -14,8 +15,11 @@ export type ThemeSettings = {
   animationIntensity: 'reduced' | 'normal' | 'expressive'
   animationSpeed: 'slow' | 'normal' | 'fast'
   projectDisplayStyle: 'explorer' | 'grid'
-  /** Custom colours from the admin (#rrggbb only); empty keys keep the preset. */
-  colors: Partial<Record<'background' | 'surface' | 'text' | 'muted' | 'accent' | 'line', string>>
+  /** Custom colours from the admin (#rrggbb only), for dark and for light mode; empty keys keep the preset. */
+  colors: Palette
+  lightColors: Palette
+  /** Show the visitor light/dark switch in the sidebar. */
+  toggle: boolean
   bodyFont: keyof typeof BODY_FONTS | 'preset'
   headingFont: keyof typeof HEADING_FONTS
 }
@@ -39,6 +43,8 @@ export const HEADING_FONTS = {
 
 export const HEX = /^#[0-9a-fA-F]{6}$/
 
+type Palette = Partial<Record<'background' | 'surface' | 'text' | 'muted' | 'accent' | 'line', string>>
+
 export const defaultTheme: ThemeSettings = {
   theme: 'dark',
   accent: 'blue',
@@ -52,12 +58,14 @@ export const defaultTheme: ThemeSettings = {
   animationSpeed: 'normal',
   projectDisplayStyle: 'explorer',
   colors: {},
+  lightColors: {},
+  toggle: true,
   bodyFont: 'preset',
   headingFont: 'barlow-condensed',
 }
 
-const allowed: { [K in Exclude<keyof ThemeSettings, 'colors' | 'bodyFont' | 'headingFont'>]: readonly ThemeSettings[K][] } = {
-  theme: ['dark', 'light'],
+const allowed: { [K in Exclude<keyof ThemeSettings, 'colors' | 'lightColors' | 'toggle' | 'bodyFont' | 'headingFont'>]: readonly ThemeSettings[K][] } = {
+  theme: ['dark', 'light', 'system'],
   accent: ['blue', 'orange', 'green', 'violet', 'neutral'],
   fontPreset: ['inter', 'geist', 'system'],
   headingScale: ['compact', 'regular', 'large'],
@@ -81,12 +89,17 @@ export function resolveTheme(input: Partial<Record<keyof ThemeSettings, unknown>
     }
   }
   const raw = input as Record<string, unknown>
-  const colors: ThemeSettings['colors'] = {}
-  for (const [key, field] of [['background', 'colorBackground'], ['surface', 'colorSurface'], ['text', 'colorText'], ['muted', 'colorMuted'], ['accent', 'colorAccent'], ['line', 'colorLine']] as const) {
-    const v = raw[field]
-    if (typeof v === 'string' && HEX.test(v)) colors[key] = v
+  const palette = (prefix: 'color' | 'light'): Palette => {
+    const colors: Palette = {}
+    for (const key of ['background', 'surface', 'text', 'muted', 'accent', 'line'] as const) {
+      const v = raw[`${prefix}${key[0].toUpperCase()}${key.slice(1)}`]
+      if (typeof v === 'string' && HEX.test(v)) colors[key] = v
+    }
+    return colors
   }
-  out.colors = colors
+  out.colors = palette('color')
+  out.lightColors = palette('light')
+  out.toggle = raw.themeToggle !== false
   if (typeof raw.bodyFont === 'string' && raw.bodyFont in BODY_FONTS) out.bodyFont = raw.bodyFont as ThemeSettings['bodyFont']
   if (typeof raw.headingFont === 'string' && raw.headingFont in HEADING_FONTS) out.headingFont = raw.headingFont as ThemeSettings['headingFont']
   return out
@@ -94,7 +107,8 @@ export function resolveTheme(input: Partial<Record<keyof ThemeSettings, unknown>
 
 export function themeAttributes(theme: ThemeSettings): Record<string, string> {
   return {
-    'data-theme': theme.theme,
+    // "system" renders dark on the server; the head script switches it before the first paint.
+    'data-theme': theme.theme === 'system' ? 'dark' : theme.theme,
     'data-accent': theme.accent,
     'data-font': theme.fontPreset,
     'data-heading': theme.headingScale,
@@ -111,18 +125,39 @@ export function themeAttributes(theme: ThemeSettings): Record<string, string> {
  * CSS for the admin's custom colours and fonts. Values were validated above (#rrggbb and whitelisted
  * font keys), so nothing arbitrary reaches the stylesheet. The doubled :root outranks the presets.
  */
-export function themeCss(theme: ThemeSettings): string {
-  const c = theme.colors
+function paletteVars(c: Palette, mode: 'dark' | 'light'): string[] {
+  // Hover and stronger shades go lighter in dark mode and darker in light mode.
+  const lift = mode === 'dark' ? '#fff' : '#000'
   const vars: string[] = []
   if (c.background) vars.push(`--bg: ${c.background}`, `--bg-elevated: color-mix(in srgb, ${c.background} 94%, #fff)`)
-  if (c.surface) vars.push(`--surface: ${c.surface}`, `--surface-hover: color-mix(in srgb, ${c.surface} 88%, #fff)`, `--surface-strong: color-mix(in srgb, ${c.surface} 80%, #fff)`)
+  if (c.surface) vars.push(`--surface: ${c.surface}`, `--surface-hover: color-mix(in srgb, ${c.surface} 92%, ${lift})`, `--surface-strong: color-mix(in srgb, ${c.surface} 85%, ${lift})`)
   if (c.text) vars.push(`--text: ${c.text}`, `--text-soft: color-mix(in srgb, ${c.text} 80%, transparent)`)
   if (c.muted) vars.push(`--muted: ${c.muted}`, `--faint: color-mix(in srgb, ${c.muted} 65%, transparent)`)
   if (c.accent) vars.push(`--accent: ${c.accent}`, `--accent-soft: color-mix(in srgb, ${c.accent} 18%, transparent)`)
-  if (c.line) vars.push(`--line: ${c.line}`, `--line-strong: color-mix(in srgb, ${c.line} 100%, #fff 12%)`)
+  if (c.line) vars.push(`--line: ${c.line}`, `--line-strong: color-mix(in srgb, ${c.line} 85%, ${mode === 'dark' ? '#fff' : '#000'})`)
+  return vars
+}
+
+export function themeCss(theme: ThemeSettings): string {
+  const vars: string[] = []
+  const css: string[] = []
+  const dark = paletteVars(theme.colors, 'dark')
+  const light = paletteVars(theme.lightColors, 'light')
+  if (dark.length) css.push(`:root:root:root[data-theme='dark'] { ${dark.join('; ')}; }`)
+  if (light.length) css.push(`:root:root:root[data-theme='light'] { ${light.join('; ')}; }`)
   if (theme.bodyFont !== 'preset') vars.push(`--font-sans: '${BODY_FONTS[theme.bodyFont].family}', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`)
   if (theme.headingFont !== 'barlow-condensed') vars.push(`--font-condensed: '${HEADING_FONTS[theme.headingFont].family}', 'Arial Narrow', Impact, sans-serif`)
-  return vars.length ? `:root:root:root { ${vars.join('; ')}; }` : ''
+  if (vars.length) css.push(`:root:root:root { ${vars.join('; ')}; }`)
+  return css.join('\n')
+}
+
+/**
+ * Runs in <head> before the first paint: applies the visitor's saved light/dark choice (when the
+ * switch is on) or the device setting (default mode "system"), so the page never flashes the wrong mode.
+ */
+export function themeBootScript(theme: ThemeSettings): string {
+  const def = JSON.stringify(theme.theme)
+  return `(function(){try{var d=document.documentElement,s=${theme.toggle ? "localStorage.getItem('site-theme')" : 'null'},m=${def};var t=s==='dark'||s==='light'?s:m==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):m;d.dataset.theme=t;d.style.colorScheme=t}catch(e){}})()`
 }
 
 /** Google Fonts stylesheet for any chosen non-default fonts, or null. */

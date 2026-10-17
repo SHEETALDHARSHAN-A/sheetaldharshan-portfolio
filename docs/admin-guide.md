@@ -81,6 +81,8 @@ Markdown import: paste the text into the editor; the Lexical editor converts com
 **Navigation**: the sidebar items in order (label, href, visible). Pages with **Show in navigation** are appended automatically. **Footer links** show under the social links.
 
 ## Appearance
+**Theme → Colours** has one-click themes (Yakudoo, Midnight, Graphite, Forest, Ember, Ocean), each with a dark and a light version, plus separate **Dark mode colours** and **Light mode colours** to fine-tune. **Default mode** is what a first-time visitor sees: dark, light, or their device's setting. **Show the light/dark switch** adds the animated sun/moon button at the bottom of the sidebar (top bar on phones); each visitor's choice is remembered in their browser.
+
 **Appearance**: theme (dark/light), accent, font preset, heading scale, spacing, radius, link style, bubble style, animation intensity and speed, project display style (explorer or grid). All are fixed presets; save and the public site changes on the next load.
 
 ## About, Research, Site settings

@@ -9,7 +9,7 @@ import { AdminBar } from '@/components/AdminBar'
 import { getAppearance, getSite } from '@/data/content'
 import { brandName, defaultTitle, nameVariants } from '@/data/seo'
 import { getBrandIcons } from '@/data/brand'
-import { themeAttributes, themeCss, themeFontsHref } from '@/styles/theme'
+import { themeAttributes, themeBootScript, themeCss, themeFontsHref } from '@/styles/theme'
 import { cn } from '@/utilities/ui'
 import { getServerSideURL } from '@/utilities/getURL'
 
@@ -32,6 +32,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {themeFontsHref(theme) ? <link rel="stylesheet" href={themeFontsHref(theme)!} /> : null}
         {themeCss(theme) ? <style dangerouslySetInnerHTML={{ __html: themeCss(theme) }} /> : null}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* The visitor's light/dark choice (or the device setting), applied before the first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript(theme) }} />
         <link href="/rss.xml" rel="alternate" title="Blog RSS" type="application/rss+xml" />
       </head>
       <body>
@@ -48,7 +50,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 /** Bump when the favicon changes: browsers cache favicons separately and only refetch a new address. */
 const ICON_VERSION = 'sd1'
 
-export const viewport: Viewport = { themeColor: '#000000', colorScheme: 'dark' }
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+    { media: '(prefers-color-scheme: light)', color: '#f1f2e9' },
+  ],
+  colorScheme: 'dark light',
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const [site, brand] = await Promise.all([getSite(), getBrandIcons()])

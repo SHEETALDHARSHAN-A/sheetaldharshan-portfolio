@@ -4,15 +4,15 @@ import { NavFlag } from '@/components/shell/NavFlag'
 import { Sidebar, Topbar } from '@/components/shell/Sidebar'
 import { getCodingActivity } from '@/data/activity'
 import { getPetSettings } from '@/data/brand'
-import { getSidebarStyle, getSite } from '@/data/content'
+import { getAppearance, getSidebarStyle, getSite } from '@/data/content'
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [site, activity, pet, sidebarStyle] = await Promise.all([getSite(), getCodingActivity(), getPetSettings(), getSidebarStyle()])
+  const [site, activity, pet, sidebarStyle, theme] = await Promise.all([getSite(), getCodingActivity(), getPetSettings(), getSidebarStyle(), getAppearance()])
   return (
     <div className="shell" style={sidebarStyle as React.CSSProperties}>
-      <Sidebar site={site} activity={activity} />
+      <Sidebar site={site} activity={activity} themeToggle={theme.toggle} />
       <div className="main">
-        <Topbar site={site} />
+        <Topbar site={site} themeToggle={theme.toggle} />
         <main id="main">
           <NavFlag />
           {children}

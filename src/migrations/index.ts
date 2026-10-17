@@ -11,6 +11,7 @@ import * as migration_20261017_235000_admin_look from './20261017_235000_admin_l
 import * as migration_20261018_010000_about_photo_focal from './20261018_010000_about_photo_focal';
 import * as migration_20261018_020000_admin_security from './20261018_020000_admin_security';
 import * as migration_20261018_030000_user_github from './20261018_030000_user_github';
+import * as migration_20261018_040000_theme_modes from './20261018_040000_theme_modes';
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20261018_030000_user_github.up,
     down: migration_20261018_030000_user_github.down,
     name: '20261018_030000_user_github',
+  },
+  {
+    up: migration_20261018_040000_theme_modes.up,
+    down: migration_20261018_040000_theme_modes.down,
+    name: '20261018_040000_theme_modes',
   },
 ];

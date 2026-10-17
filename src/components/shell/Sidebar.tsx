@@ -6,8 +6,9 @@ import { ActivityDock } from '@/components/activity/ActivityDock'
 import { activityCards } from '@/components/activity/cards'
 import type { CodingActivity } from '@/data/activity'
 import type { Site } from '@/data/types'
+import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler'
 
-export function Sidebar({ site, activity }: { site: Site; activity?: CodingActivity }) {
+export function Sidebar({ site, activity, themeToggle = false }: { site: Site; activity?: CodingActivity; themeToggle?: boolean }) {
   return (
     <aside className="sidebar" style={{ viewTransitionName: 'site-sidebar' }}>
       <Link href="/" className="wordmark" aria-label={`${site.displayName}, home`}>
@@ -44,13 +45,15 @@ export function Sidebar({ site, activity }: { site: Site; activity?: CodingActiv
             </Link>
           ))}
         </div>
+        {/* Light/dark switch for visitors (Site-wide → Theme). */}
+        {themeToggle ? <AnimatedThemeToggler className="theme-toggle" /> : null}
       </div>
     </aside>
   )
 }
 
 /** Phone chrome: a slim top bar with the wordmark, and a bottom tab bar so every section is one tap away. */
-export function Topbar({ site }: { site: Site }) {
+export function Topbar({ site, themeToggle = false }: { site: Site; themeToggle?: boolean }) {
   const primary = site.nav.slice(0, 5)
   return (
     <>
@@ -59,6 +62,7 @@ export function Topbar({ site }: { site: Site }) {
           {site.displayName}
           <span className="dot">.</span>
         </Link>
+        {themeToggle ? <AnimatedThemeToggler className="theme-toggle" /> : null}
         <MobileMenu>
           <NavLinks items={site.nav} />
         </MobileMenu>

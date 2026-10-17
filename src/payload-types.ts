@@ -2528,7 +2528,10 @@ export interface Brand {
  */
 export interface Appearance {
   id: number;
-  theme?: ('dark' | 'light') | null;
+  /**
+   * What a first-time visitor sees. With the switch on, their own choice is remembered.
+   */
+  theme?: ('dark' | 'light' | 'system') | null;
   accent?: ('blue' | 'orange' | 'green' | 'violet' | 'neutral') | null;
   fontPreset?: ('inter' | 'geist' | 'system') | null;
   headingScale?: ('compact' | 'regular' | 'large') | null;
@@ -2539,6 +2542,7 @@ export interface Appearance {
   animationIntensity?: ('reduced' | 'normal' | 'expressive') | null;
   animationSpeed?: ('slow' | 'normal' | 'fast') | null;
   projectDisplayStyle?: ('explorer' | 'grid') | null;
+  themeToggle?: boolean | null;
   colorBackground?: string | null;
   colorSurface?: string | null;
   colorText?: string | null;
@@ -2548,6 +2552,15 @@ export interface Appearance {
    */
   colorAccent?: string | null;
   colorLine?: string | null;
+  lightBackground?: string | null;
+  lightSurface?: string | null;
+  lightText?: string | null;
+  lightMuted?: string | null;
+  /**
+   * Links, highlights, the active menu item.
+   */
+  lightAccent?: string | null;
+  lightLine?: string | null;
   /**
    * "Preset" uses the Font choice above.
    */
@@ -2907,12 +2920,19 @@ export interface AppearanceSelect<T extends boolean = true> {
   animationIntensity?: T;
   animationSpeed?: T;
   projectDisplayStyle?: T;
+  themeToggle?: T;
   colorBackground?: T;
   colorSurface?: T;
   colorText?: T;
   colorMuted?: T;
   colorAccent?: T;
   colorLine?: T;
+  lightBackground?: T;
+  lightSurface?: T;
+  lightText?: T;
+  lightMuted?: T;
+  lightAccent?: T;
+  lightLine?: T;
   bodyFont?: T;
   headingFont?: T;
   updatedAt?: T;

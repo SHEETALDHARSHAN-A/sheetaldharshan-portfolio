@@ -22,12 +22,14 @@ export const Appearance: GlobalConfig = {
         {
           name: 'theme',
           type: 'select',
+          label: 'Default mode',
           defaultValue: 'dark',
           options: [
-            { label: 'Dark (default)', value: 'dark' },
+            { label: 'Dark', value: 'dark' },
             { label: 'Light', value: 'light' },
+            { label: "Match the visitor's device", value: 'system' },
           ],
-          admin: { width: '50%' },
+          admin: { width: '50%', description: 'What a first-time visitor sees. With the switch on, their own choice is remembered.' },
         },
         {
           name: 'accent',
@@ -156,16 +158,60 @@ export const Appearance: GlobalConfig = {
       ],
     },
     {
+      name: 'themeToggle',
+      type: 'checkbox',
+      label: 'Show the light/dark switch at the bottom of the sidebar',
+      defaultValue: true,
+    },
+    {
       type: 'collapsible',
-      label: 'Custom colours (override the presets above; empty keeps the preset)',
+      label: 'Colours: a theme, or your own for dark and light mode (empty keeps the preset)',
       fields: [
         { name: 'themePicker', type: 'ui', admin: { components: { Field: '@/components/admin/ThemePresets#ThemePresets' } } },
-        colorField('colorBackground', 'Page background'),
-        colorField('colorSurface', 'Panels, cards and chips'),
-        colorField('colorText', 'Main text'),
-        colorField('colorMuted', 'Secondary text'),
-        colorField('colorAccent', 'Accent', 'Links, highlights, the active menu item.'),
-        colorField('colorLine', 'Lines and borders'),
+        {
+          type: 'collapsible',
+          label: 'Dark mode colours',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                colorField('colorBackground', 'Page background', undefined, '33%'),
+                colorField('colorSurface', 'Panels, cards and chips', undefined, '33%'),
+                colorField('colorText', 'Main text', undefined, '33%'),
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                colorField('colorMuted', 'Secondary text', undefined, '33%'),
+                colorField('colorAccent', 'Accent', 'Links, highlights, the active menu item.', '33%'),
+                colorField('colorLine', 'Lines and borders', undefined, '33%'),
+              ],
+            },
+          ],
+        },
+        {
+          type: 'collapsible',
+          label: 'Light mode colours',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                colorField('lightBackground', 'Page background', undefined, '33%'),
+                colorField('lightSurface', 'Panels, cards and chips', undefined, '33%'),
+                colorField('lightText', 'Main text', undefined, '33%'),
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                colorField('lightMuted', 'Secondary text', undefined, '33%'),
+                colorField('lightAccent', 'Accent', 'Links, highlights, the active menu item.', '33%'),
+                colorField('lightLine', 'Lines and borders', undefined, '33%'),
+              ],
+            },
+          ],
+        },
       ],
     },
     {
