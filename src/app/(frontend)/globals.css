@@ -332,7 +332,9 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .sidebar-activity .lcg-count { font-size: 9.5px; }
 /* Short windows: keep the pet and nav readable before the card. */
 @media (max-height: 640px) { .sidebar-activity { display: none; } }
-.sidebar-foot { margin-top: 34px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-family: var(--font-condensed); font-weight: 600; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
+/* Profile links fill the sidebar's width (switch at the end), in a brighter, larger type. */
+.sidebar-foot { margin-top: 34px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--font-condensed); font-weight: 600; font-size: 14px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-soft); }
+.sidebar-foot a { display: inline-flex; align-items: center; gap: 6px; transition: color 160ms ease; }
 .sidebar-foot a:hover { color: var(--text); }
 .topbar, .tabbar { display: none; }
 /* Drag handle on the sidebar's right edge. */
@@ -659,6 +661,10 @@ html[data-about-aside='collapsed'] .about-aside > * { opacity: 0; }
 /* With the room, the intro widens too (still a comfortable line length). */
 .about-intro p { transition: max-width 360ms var(--ease-out); }
 html[data-about-aside='collapsed'] .about-intro p { max-width: 860px; }
+/* With the column hidden, the résumé button moves to the top right, beside the name. */
+html[data-about-aside='collapsed'] .about-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 24px; }
+html[data-about-aside='collapsed'] .about-head > * { grid-column: 1; }
+html[data-about-aside='collapsed'] .about-head .resume-btn { grid-column: 2; grid-row: 1 / span 3; align-self: start; justify-self: end; margin-top: 4px; animation: el-in 300ms var(--ease-out) both; }
 .about-aside { grid-column: 2; grid-row: 1 / span 2; }
 /* One screen tall with its contents centred, so the photo, cards and logos always sit in the middle of the
    screen (the photo shrinks first when space is short). */
@@ -759,6 +765,8 @@ html[data-about-aside='collapsed'] .about-intro p { max-width: 860px; }
   .about-head, .about-main, .about-aside { grid-column: 1; grid-row: auto; }
   /* Phones: the column is stacked under the title, so there is nothing to hide. */
   .aside-toggle, .aside-resizer { display: none !important; }
+  html[data-about-aside='collapsed'] .about-head { display: block; }
+  html[data-about-aside='collapsed'] .about-head .resume-btn { margin-top: 18px; animation: none; }
   html[data-about-aside='collapsed'] .about-aside { overflow: visible; pointer-events: auto; }
   html[data-about-aside='collapsed'] .about-aside > * { opacity: 1; }
   html[data-about-aside='collapsed'] .about { grid-template-columns: minmax(0, 1fr); }

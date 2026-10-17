@@ -38,7 +38,7 @@ export function Sidebar({ site, activity, themeToggle = false }: { site: Site; a
         <div className="sidebar-foot">
           {site.socialLinks.map((link) => (
             <a key={link.href} href={link.href} rel="noreferrer" target="_blank">
-              <BrandIcon href={link.href} name={link.label} size={13} />
+              <BrandIcon href={link.href} name={link.label} size={16} />
               {link.label}
             </a>
           ))}
