@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ProjectExplorer } from '@/components/projects/ProjectExplorer'
 import { ProjectGrid } from '@/components/projects/ProjectGrid'
 import { PageFrame } from '@/components/shell/PageFrame'
-import { getAppearance, getProjects } from '@/data/content'
+import { getAppearance, getProjects, getProjectsLook } from '@/data/content'
 
 export const revalidate = 300
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ProjectsPage() {
-  const [projects, theme] = await Promise.all([getProjects(), getAppearance()])
+  const [projects, theme, look] = await Promise.all([getProjects(), getAppearance(), getProjectsLook()])
 
   if (projects.length === 0) {
     return (
@@ -44,7 +44,7 @@ export default async function ProjectsPage() {
   return (
     <PageFrame>
       <h1 className="sr-only">Projects by Sheetal (Sheetaldharshan A)</h1>
-      <ProjectExplorer projects={projects} />
+      <ProjectExplorer projects={projects} look={look} />
     </PageFrame>
   )
 }

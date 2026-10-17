@@ -42,6 +42,9 @@ const defaultNav: NavItem[] = [
   { label: 'Contact', href: '/contact' },
 ]
 
+/** A colour from the admin, only if it is a #rrggbb value. */
+const hex = (v: unknown) => (typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v) ? v : undefined)
+
 const names = (rows: { name?: string | null }[] | null | undefined) => (rows ?? []).map((row) => row.name ?? '').filter(Boolean)
 
 /* ------------------------------------------------------------------ globals */
@@ -133,6 +136,14 @@ function toProjectSummary(doc: ProjectDoc): ProjectSummary {
     thumbnail: toMediaRef(doc.thumbnail),
     heroImage: toMediaRef(doc.heroImage),
     heroVideo: toMediaRef(doc.heroVideo),
+    style: {
+      cardColor: hex(doc.cardColor),
+      cardTextColor: hex(doc.cardTextColor),
+      pageBackground: hex(doc.pageBackground),
+      pageTextColor: hex(doc.pageTextColor),
+    },
+    heroLoop: (doc.heroLoop ?? []).map((row) => toMediaRef(row.image)).filter((m): m is NonNullable<typeof m> => Boolean(m)),
+    loopSeconds: Math.min(30, Math.max(2, Number(doc.loopSeconds) || 5)),
     githubUrl: doc.githubUrl ?? undefined,
     liveDemoUrl: doc.liveDemoUrl ?? undefined,
     documentationUrl: doc.documentationUrl ?? undefined,
@@ -377,3 +388,23 @@ export function formatDate(date?: string | null): string {
   if (Number.isNaN(parsed.getTime())) return date
   return parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
+
+/* ------------------------------------------------------------------ projects page */
+
+export type ProjectsLook = { cardColor?: string; cardTextColor?: string; arrowColor?: string; stageBackground?: string; transition: 'wipe' | 'fade' | 'none'; zoom: boolean; zoomSeconds: number }
+
+/** Projects page settings (Projects page → Page settings), validated. */
+export const getProjectsLook = cache(async (): Promise<ProjectsLook> => {
+  const payload = await getClient()
+  const doc = (await payload.findGlobal({ slug: 'projects-page', depth: 0 }).catch(() => null)) as Record<string, unknown> | null
+  const t = doc?.imageTransition
+  return {
+    cardColor: hex(doc?.cardColor),
+    cardTextColor: hex(doc?.cardTextColor),
+    arrowColor: hex(doc?.arrowColor),
+    stageBackground: hex(doc?.stageBackground),
+    transition: t === 'fade' || t === 'none' ? t : 'wipe',
+    zoom: doc?.imageZoom !== false,
+    zoomSeconds: Math.min(40, Math.max(3, Number(doc?.zoomSeconds) || 14)),
+  }
+})

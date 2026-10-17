@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ProjectSummary } from '@/data/types'
+import type { ProjectsLook } from '@/data/content'
 import { Picture } from '@/components/Media/Picture'
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -32,7 +33,7 @@ function RollingNumber({ from, to }: { from: string; to: string }) {
  * squeezes into a sliver, and the large title, category and arrow cross-fade in. The visual
  * wipes in from the right.
  */
-export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
+export function ProjectExplorer({ projects, look }: { projects: ProjectSummary[]; look?: ProjectsLook }) {
   const [active, setActive] = useState(0)
   const [previous, setPrevious] = useState<number | null>(null)
   const [intro, setIntro] = useState(true)
@@ -125,7 +126,21 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
   const rollFrom = previous === null ? '00' : pad(previous + 1)
 
   return (
-    <section className={`yk${intro ? ' yk-intro' : ''}${loaded[active] ? ' yk-ready' : ''}`} aria-label="Project explorer">
+    <section
+      className={`yk${intro ? ' yk-intro' : ''}${loaded[active] ? ' yk-ready' : ''}`}
+      aria-label="Project explorer"
+      data-transition={look?.transition ?? 'wipe'}
+      data-zoom={look?.zoom === false ? 'off' : 'on'}
+      style={
+        {
+          ...(look?.cardColor ? { '--pp-card': look.cardColor } : {}),
+          ...(look?.cardTextColor ? { '--pp-card-text': look.cardTextColor } : {}),
+          ...(look?.arrowColor ? { '--pp-arrow': look.arrowColor } : {}),
+          ...(look?.stageBackground ? { '--pp-stage': look.stageBackground } : {}),
+          '--pp-zoom': `${look?.zoomSeconds ?? 14}s`,
+        } as React.CSSProperties
+      }
+    >
       <div className="yk-stage" aria-live="polite" ref={stageRef}>
         {projects.map((item, index) => {
           const state = index === active ? 'active' : index === previous ? 'leaving' : 'idle'
@@ -157,7 +172,7 @@ export function ProjectExplorer({ projects }: { projects: ProjectSummary[] }) {
               transitionTypes={['nav-forward']}
               className={`project-row${current ? ' active' : ''}`}
               data-accent={item.accent}
-              style={{ '--i': index } as React.CSSProperties}
+              style={{ '--i': index, ...(item.style.cardColor ? { '--row-card': item.style.cardColor } : {}), ...(item.style.cardTextColor ? { '--row-card-text': item.style.cardTextColor } : {}) } as React.CSSProperties}
               onMouseEnter={() => select(index)}
               onFocus={() => select(index)}
               aria-current={current ? 'true' : undefined}

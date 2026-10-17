@@ -23,6 +23,7 @@ export async function EditByPage({ payload }: { payload: Payload }) {
       label: 'Projects page',
       view: '/projects',
       items: [
+        { label: 'Page settings: colours & animation', href: g('projects-page') },
         { label: 'All projects', href: c('projects') },
         ...((projects?.docs ?? []) as unknown as { id: number; title: string }[]).map((p) => ({ label: `↳ ${p.title}`, href: `${c('projects')}/${p.id}` })),
         { label: '+ New project', href: `${c('projects')}/create` },

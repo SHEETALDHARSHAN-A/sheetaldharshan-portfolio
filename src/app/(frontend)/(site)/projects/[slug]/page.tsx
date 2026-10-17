@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RenderProjectBlocks } from '@/components/blocks/RenderProjectBlocks'
 import { VideoPlayer } from '@/components/projects/VideoPlayer'
+import { HeroLoop } from '@/components/projects/HeroLoop'
 import { HeroImage } from '@/components/projects/HeroImage'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { MediaAny, Picture } from '@/components/Media/Picture'
@@ -52,7 +53,16 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <PageFrame>
-    <article className={`case ${project.layoutPreset === 'article' ? 'article' : ''}`}>
+    <article
+      className={`case ${project.layoutPreset === 'article' ? 'article' : ''}`}
+      data-styled={project.style.pageBackground || project.style.pageTextColor ? '' : undefined}
+      style={
+        {
+          ...(project.style.pageBackground ? { '--bg': project.style.pageBackground, background: project.style.pageBackground } : {}),
+          ...(project.style.pageTextColor ? { '--text': project.style.pageTextColor, color: project.style.pageTextColor } : {}),
+        } as React.CSSProperties
+      }
+    >
       {draft && <LivePreviewListener />}
       <JsonLd
         data={{
@@ -131,7 +141,11 @@ export default async function ProjectPage({ params }: Props) {
             <video autoPlay loop muted playsInline poster={project.heroImage?.url} src={project.heroVideo.url} />
           </div>
         ) : project.heroImage ? (
-          <HeroImage media={project.heroImage} title={project.title} />
+          project.heroLoop.length ? (
+            <HeroLoop images={[project.heroImage, ...project.heroLoop]} title={project.title} seconds={project.loopSeconds} />
+          ) : (
+            <HeroImage media={project.heroImage} title={project.title} />
+          )
         ) : (
           <div className="case-hero placeholder" data-accent={project.accent}>
             <span className="mark">{project.title}</span>

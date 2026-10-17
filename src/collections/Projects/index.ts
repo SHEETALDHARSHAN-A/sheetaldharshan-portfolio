@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { colorField } from '@/fields/color'
 import { slugField } from 'payload'
 import { MetaDescriptionField, MetaImageField, MetaTitleField, OverviewField, PreviewField } from '@payloadcms/plugin-seo/fields'
 
@@ -91,6 +92,25 @@ export const Projects: CollectionConfig<'projects'> = {
               ],
             },
             { name: 'demoVideoUrl', type: 'text', admin: { description: 'The film shown in a pop-up player: a YouTube or Vimeo link, or a direct MP4 link from Media.' } },
+          ],
+        },
+        {
+          label: 'Style & images',
+          description: 'Colours for this project only (empty uses the Projects page settings and the theme), and extra images that loop at the top of its page.',
+          fields: [
+            colorField('cardColor', 'Card colour in the projects list'),
+            colorField('cardTextColor', 'Card text colour'),
+            colorField('pageBackground', 'Project page background'),
+            colorField('pageTextColor', 'Project page text'),
+            {
+              name: 'heroLoop',
+              type: 'array',
+              label: 'Image loop on the project page',
+              labels: { singular: 'Image', plural: 'Images' },
+              admin: { description: 'Shown after the main image, one after another, then back to the start. Leave empty for a single image.' },
+              fields: [{ name: 'image', type: 'upload', relationTo: 'media', required: true }],
+            },
+            { name: 'loopSeconds', type: 'number', defaultValue: 5, min: 2, max: 30, label: 'Seconds per image' },
           ],
         },
         {

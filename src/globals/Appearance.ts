@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
 import { previewUrl } from '@/utilities/previewUrl'
+import { colorField } from '@/fields/color'
 
 /**
  * Appearance uses whitelisted presets only. Each value maps to CSS variables in
@@ -151,6 +152,59 @@ export const Appearance: GlobalConfig = {
             { label: 'Grid', value: 'grid' },
           ],
           admin: { width: '33%' },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Custom colours (override the presets above; empty keeps the preset)',
+      fields: [
+        colorField('colorBackground', 'Page background'),
+        colorField('colorSurface', 'Panels, cards and chips'),
+        colorField('colorText', 'Main text'),
+        colorField('colorMuted', 'Secondary text'),
+        colorField('colorAccent', 'Accent', 'Links, highlights, the active menu item.'),
+        colorField('colorLine', 'Lines and borders'),
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Fonts',
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'bodyFont',
+              type: 'select',
+              defaultValue: 'preset',
+              label: 'Body text',
+              admin: { width: '50%', description: '"Preset" uses the Font choice above.' },
+              options: [
+                { label: 'Preset', value: 'preset' },
+                { label: 'IBM Plex Sans', value: 'ibm-plex-sans' },
+                { label: 'DM Sans', value: 'dm-sans' },
+                { label: 'Manrope', value: 'manrope' },
+                { label: 'Work Sans', value: 'work-sans' },
+                { label: 'Source Sans 3', value: 'source-sans-3' },
+              ],
+            },
+            {
+              name: 'headingFont',
+              type: 'select',
+              defaultValue: 'barlow-condensed',
+              label: 'Headings, menu and labels',
+              admin: { width: '50%' },
+              options: [
+                { label: 'Barlow Condensed (default)', value: 'barlow-condensed' },
+                { label: 'Oswald', value: 'oswald' },
+                { label: 'Bebas Neue', value: 'bebas-neue' },
+                { label: 'Anton', value: 'anton' },
+                { label: 'Archivo Narrow', value: 'archivo-narrow' },
+                { label: 'Inter Tight', value: 'inter-tight' },
+              ],
+            },
+          ],
         },
       ],
     },

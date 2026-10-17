@@ -9,7 +9,16 @@ import type { CodingActivity as CodingActivityDoc } from '@/payload-types'
 export type ContributionDay = { date: string; count: number }
 /** One account behind a card, with its own number and a link anyone can open to check it. */
 export type ActivitySource = { username: string; url: string; value: number }
-export type GithubActivity = { days: ContributionDay[]; total: number; sources: ActivitySource[]; checkedAt: number }
+export type GithubActivity = {
+  days: ContributionDay[]
+  /** Last 12 months, as GitHub's graph counts. */
+  total: number
+  /** This calendar year so far, e.g. 959 in 2026. */
+  year: number
+  yearTotal: number
+  sources: ActivitySource[]
+  checkedAt: number
+}
 export type LeetcodeTotals = { all: number; easy: number; medium: number; hard: number }
 export type LeetcodeStats = {
   solved: LeetcodeTotals
@@ -140,6 +149,8 @@ export const getCodingActivity = cache(async (): Promise<CodingActivity> => {
       result.github = {
         days,
         total: days.reduce((n, d) => n + d.count, 0),
+        year: Number(days[days.length - 1].date.slice(0, 4)),
+        yearTotal: days.filter((d) => d.date.startsWith(days[days.length - 1].date.slice(0, 4))).reduce((n, d) => n + d.count, 0),
         sources: loaded.map(({ u, cal }) => ({ username: u, url: `https://github.com/${u}`, value: cal!.days.reduce((n, d) => n + d.count, 0) })),
         checkedAt: Math.min(...loaded.map(({ cal }) => cal!.checkedAt)),
         show: ghShow,

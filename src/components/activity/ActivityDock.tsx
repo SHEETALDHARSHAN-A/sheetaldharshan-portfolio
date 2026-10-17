@@ -33,6 +33,7 @@ export function ActivityDock({ items }: { items: DockItem[] }) {
 
   return (
     <div className="activity-dock">
+      <div className="dock-row">
       <div
         ref={row}
         className="dock-logos"
@@ -55,6 +56,7 @@ export function ActivityDock({ items }: { items: DockItem[] }) {
             <span className="sr-only">{i.title}</span>
           </button>
         ))}
+      </div>
         {!current ? <span className="dock-hint">Coding activity</span> : null}
       </div>
       {current ? (

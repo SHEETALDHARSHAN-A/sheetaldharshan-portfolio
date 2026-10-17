@@ -68,6 +68,11 @@ export type ProjectSummary = {
   heroImage?: MediaRef
   heroVideo?: MediaRef
   updatedAt?: string
+  /** Per-project colours from the admin (validated #rrggbb); empty uses the page settings. */
+  style: { cardColor?: string; cardTextColor?: string; pageBackground?: string; pageTextColor?: string }
+  /** Extra images that loop after the hero on the project page. */
+  heroLoop: MediaRef[]
+  loopSeconds: number
   githubUrl?: string
   liveDemoUrl?: string
   documentationUrl?: string

@@ -23,7 +23,7 @@ export function activityCards(activity: CodingActivity): ActivityCard[] {
   const cards: ActivityCard[] = []
   if (activity.github) {
     const gh = activity.github
-    cards.push({ id: 'github', title: 'GitHub', brand: 'GitHub', summary: `${gh.total.toLocaleString('en')} this year`, show: gh.show, body: (place) => <GithubBody data={gh} weeks={place === 'about' ? 30 : 18} /> })
+    cards.push({ id: 'github', title: 'GitHub', brand: 'GitHub', summary: `${gh.yearTotal.toLocaleString('en')} in ${gh.year}`, show: gh.show, body: (place) => <GithubBody data={gh} weeks={place === 'about' ? 30 : 18} /> })
   }
   if (activity.leetcode) {
     const lc = activity.leetcode

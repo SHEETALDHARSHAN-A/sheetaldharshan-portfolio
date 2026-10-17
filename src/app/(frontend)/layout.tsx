@@ -9,7 +9,7 @@ import { AdminBar } from '@/components/AdminBar'
 import { getAppearance, getSite } from '@/data/content'
 import { brandName, defaultTitle, nameVariants } from '@/data/seo'
 import { getBrandIcons } from '@/data/brand'
-import { themeAttributes } from '@/styles/theme'
+import { themeAttributes, themeCss, themeFontsHref } from '@/styles/theme'
 import { cn } from '@/utilities/ui'
 import { getServerSideURL } from '@/utilities/getURL'
 
@@ -29,6 +29,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       {...themeAttributes(theme)}
     >
       <head>
+        {themeFontsHref(theme) ? <link rel="stylesheet" href={themeFontsHref(theme)!} /> : null}
+        {themeCss(theme) ? <style dangerouslySetInnerHTML={{ __html: themeCss(theme) }} /> : null}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
         <link href="/rss.xml" rel="alternate" title="Blog RSS" type="application/rss+xml" />
       </head>

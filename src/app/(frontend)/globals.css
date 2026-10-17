@@ -176,7 +176,9 @@ button.activity-logo:hover { border-color: var(--text-soft); }
 button.activity-logo[aria-expanded='true'] { border-color: var(--accent); background: var(--accent-soft); }
 button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .activity-dock { display: grid; gap: 10px; }
-.dock-logos { display: flex; align-items: flex-end; gap: 8px; height: 46px; padding: 0 2px 2px; }
+.activity-dock .dock-row { display: flex; align-items: center; gap: 10px; }
+/* After Magic UI's Dock: the logos sit in a frosted, rounded bar. */
+.dock-logos { display: flex; align-items: flex-end; gap: 8px; width: max-content; height: 46px; padding: 0 7px 7px; border: 1px solid var(--line-strong); border-radius: 16px; background: color-mix(in srgb, var(--surface) 55%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 /* Magnification: each logo's size follows the pointer (set by ActivityDock), springing back on leave. */
 .dock-logos .activity-logo { width: var(--dock-size, 30px); height: var(--dock-size, 30px); transition: width 140ms cubic-bezier(0.2, 0.9, 0.3, 1.2), height 140ms cubic-bezier(0.2, 0.9, 0.3, 1.2), border-color 160ms ease, background 160ms ease; }
 .dock-logos .activity-logo .brand-icon { width: 52%; height: 52%; }
@@ -189,9 +191,10 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 /* "Updated 2 days ago · Sources" under every card. */
 .activity-footer > summary { display: flex; align-items: center; gap: 6px; list-style: none; cursor: pointer; font-size: 10px; color: var(--faint); }
 .activity-footer > summary::-webkit-details-marker { display: none; }
-.activity-footer-src { margin-left: auto; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
-.activity-footer > summary:hover .activity-footer-src { color: var(--accent); }
-.activity-footer[open] .activity-footer-src { color: var(--text-soft); }
+.activity-footer-src { color: var(--accent); font-weight: 600; }
+.activity-footer-time { color: var(--faint); }
+.activity-footer > summary:hover .activity-footer-src { text-decoration: underline; text-underline-offset: 2px; }
+.activity-footer[open] .activity-footer-src { text-decoration: underline; text-underline-offset: 2px; }
 /* About: collapsible panels under the photo. */
 .activity-panels { display: grid; gap: 12px; }
 .activity-panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elevated); }
@@ -226,6 +229,25 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .src-value { margin-left: auto; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 /* GitHub heatmap, after the shadcn calendar-heatmap: rounded squares, one per day, columns are weeks. */
 .gh-months, .gh-grid { display: grid; gap: 2px; }
+/* Day labels on the left, months on top, like github.com. */
+.gh-frame { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 4px; row-gap: 3px; min-width: 0; }
+.gh-months span { min-width: 0; }
+.activity-footer > summary { flex-wrap: wrap; row-gap: 4px; }
+.activity-footer-time { white-space: nowrap; }
+/* Narrow sidebar: smaller day labels, legend on its own line. */
+.sidebar-activity .gh-days { font-size: 7.5px; }
+.sidebar-activity .activity-legend { margin-left: 0; flex-basis: 100%; justify-content: flex-end; }
+.gh-days { display: grid; grid-template-rows: repeat(7, 1fr); gap: 2px; font-size: 8.5px; line-height: 1; color: var(--faint); }
+.gh-days span { display: flex; align-items: center; }
+.gh-tip-host { min-width: 0; }
+.activity-legend { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; color: var(--faint); }
+.activity-legend i { width: 8px; height: 8px; border-radius: 2px; background: var(--surface); }
+.activity-legend i:first-of-type { margin-left: 4px; }
+.activity-legend i:last-of-type { margin-right: 4px; }
+.activity-legend i[data-level='1'] { background: color-mix(in srgb, var(--accent) 32%, var(--surface)); }
+.activity-legend i[data-level='2'] { background: color-mix(in srgb, var(--accent) 55%, var(--surface)); }
+.activity-legend i[data-level='3'] { background: color-mix(in srgb, var(--accent) 78%, var(--surface)); }
+.activity-legend i[data-level='4'] { background: var(--accent); }
 .gh-months { font-size: 8.5px; line-height: 1; color: var(--faint); letter-spacing: 0.02em; }
 .gh-months span { white-space: nowrap; overflow: visible; }
 .gh-grid { grid-template-rows: repeat(7, auto); grid-auto-flow: column; }
@@ -301,9 +323,16 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .stage-media img, .stage-media video { width: 100%; height: 100%; object-fit: cover; }
 .stage-media.active { opacity: 1; z-index: 2; clip-path: inset(0 0 0 0); animation: wipe-in calc(600ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both; }
 /* The leaving visual keeps the identical animation declaration so it holds its current zoom under the wipe instead of snapping back. */
-.stage-media.active img, .stage-media.active video, .stage-media.active .stage-placeholder, .stage-media.leaving img, .stage-media.leaving video, .stage-media.leaving .stage-placeholder { animation: wipe-settle calc(600ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both, kenburns 14s cubic-bezier(0.25, 0.4, 0.3, 1) calc(600ms * var(--speed)) forwards; transform-origin: 58% 50%; will-change: transform; }
+.stage-media.active img, .stage-media.active video, .stage-media.active .stage-placeholder, .stage-media.leaving img, .stage-media.leaving video, .stage-media.leaving .stage-placeholder { animation: wipe-settle calc(600ms * var(--speed)) cubic-bezier(0.77, 0, 0.18, 1) both, kenburns var(--pp-zoom, 14s) cubic-bezier(0.25, 0.4, 0.3, 1) calc(600ms * var(--speed)) forwards; transform-origin: 58% 50%; will-change: transform; }
 .stage-media.leaving { opacity: 1; z-index: 1; }
 @keyframes wipe-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+/* Projects page → Page settings: cross-fade or instant instead of the wipe, and zoom off. */
+.yk[data-transition='fade'] .stage-media.active { animation-name: stage-fade; }
+.yk[data-transition='none'] .stage-media.active { animation: none; }
+.yk[data-transition='fade'] .stage-media.active img, .yk[data-transition='none'] .stage-media.active img { animation-name: none, kenburns; }
+.yk[data-zoom='off'] .stage-media.active img, .yk[data-zoom='off'] .stage-media.leaving img { animation-name: wipe-settle, none; }
+.yk[data-zoom='off'][data-transition='fade'] .stage-media.active img, .yk[data-zoom='off'][data-transition='none'] .stage-media.active img { animation: none; }
+@keyframes stage-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes wipe-settle { from { transform: translateX(-6%); } to { transform: none; } }
 .stage-placeholder { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(70% 60% at 65% 35%, var(--accent-soft), transparent 62%), var(--bg-elevated); }
 .stage-placeholder[data-accent='orange'], [data-accent='orange'] > .stage-placeholder { --accent-soft: rgba(255, 90, 31, 0.18); }
@@ -320,8 +349,9 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .project-row {
   --n-w: 56px; --thumb-w: 100px; --row-h: 56px; --card-h: 76px; --card-num-w: 72px; --sliver-w: 6px;
   --tint: #3d8bff;
-  --card: #3a3d44;
-  --card-text: #f3f3eb; --card-sub: #d5d6cf; --card-line: rgba(255, 255, 255, 0.08);
+  /* Colours come from Projects page → Page settings, and each project's Style tab. */
+  --card: var(--row-card, var(--pp-card, #3a3d44));
+  --card-text: var(--row-card-text, var(--pp-card-text, #f3f3eb)); --card-sub: #d5d6cf; --card-line: rgba(255, 255, 255, 0.08);
   pointer-events: auto; position: relative; display: flex; align-items: stretch; height: var(--row-h); width: 100%;
   color: var(--text); text-decoration: none; transition: height 420ms var(--ease-out);
 }
@@ -344,7 +374,7 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .project-row[data-accent='orange'] { --tint: #ff5a1f; }
 .project-row[data-accent='violet'] { --tint: #a78bfa; }
 .project-row[data-accent='neutral'] { --tint: #9a9a9a; }
-.project-row .card-arrow { color: #ff3d00; }
+.project-row .card-arrow { color: var(--pp-arrow, #ff3d00); }
 .project-row .card-n { width: var(--card-num-w); flex: none; display: flex; align-items: center; justify-content: flex-start; padding-left: 12px; }
 .project-row .roll { display: inline-flex; height: 1em; overflow: hidden; font-family: var(--font-condensed); font-weight: 300; font-size: 44px; line-height: 1; color: var(--card-text); letter-spacing: -0.01em; }
 .project-row .roll-digit { display: block; width: 0.52em; animation: roll-up 640ms cubic-bezier(0.22, 0.8, 0.2, 1) both; }
@@ -419,7 +449,7 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .skeleton-row .sk-line { display: block; width: 140px; height: 12px; }
 .skeleton-row .n { color: transparent; }
 .yk-loading .project-row { animation: none; }
-.stage-media img { background: #0b0f14; }
+.stage-media img { background: var(--pp-stage, #0b0f14); }
 
 /* ------------------------------------------------------------------ project detail (case study) */
 .case { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100dvh; min-width: 0; background: var(--bg); }
@@ -448,6 +478,15 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .case-hero.placeholder { aspect-ratio: 16 / 9; display: grid; place-items: center; background: radial-gradient(70% 60% at 65% 35%, var(--accent-soft), transparent 62%), var(--bg-elevated); }
 .case-hero.placeholder .mark { font-family: var(--font-condensed); font-size: clamp(40px, 7vw, 110px); text-transform: uppercase; color: var(--surface-strong); line-height: 0.95; text-align: center; padding: 0 6vw; }
 .case-hero-blank { aspect-ratio: 16 / 9; background: var(--bg-elevated); }
+/* Project image loop (each project's Style & images tab): stacked images cross-fade in turn. */
+.hero-loop { position: relative; aspect-ratio: 16 / 10; }
+.hero-loop img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 900ms ease; }
+.hero-loop img.is-on { opacity: 1; }
+.hero-dots { position: absolute; left: 50%; bottom: 12px; display: flex; gap: 6px; transform: translateX(-50%); padding: 5px 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); }
+.hero-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.4); transition: background 300ms ease, transform 300ms ease; }
+.hero-dots i[data-on='true'] { background: #fff; transform: scale(1.2); }
+/* A project with its own page colours fills the content column. */
+.case[data-styled] { min-height: 100dvh; }
 /* Project film, played in place: thumbnail with a frosted play button, then the player in the same frame. */
 .case-body > .video-player { animation: visual-in 720ms var(--ease-out) both; }
 .video-player { position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #000; }
@@ -549,10 +588,12 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); gap: clamp(24px, 4vw, 60px); align-items: start; }
 .about-aside { position: sticky; top: 30px; display: grid; gap: 20px; min-width: 0; }
 /* With the LeetCode card below it, a square photo keeps both in view. */
-.about-aside:has(.activity-panel) .about-photo { aspect-ratio: 1 / 1; }
+.about-photo { transition: aspect-ratio 380ms var(--ease-out); }
+/* The photo shares the column with the panels: tall when they are closed, shorter as they open. */
+.about-aside:has(.activity-panel[open]) .about-photo { aspect-ratio: 1 / 1; }
 /* Both cards on About: a shorter photo, and the column scrolls with the page (it is taller than a screen). */
 .about-aside:has(.activity-panel + .activity-panel[open]), .about-aside:has(.activity-panel[open] + .activity-panel) { position: relative; top: auto; }
-.about-aside:has(.activity-panel + .activity-panel) .about-photo { aspect-ratio: 5 / 4; }
+.about-aside:has(.activity-panel[open] + .activity-panel[open]) .about-photo { aspect-ratio: 5 / 4; }
 .about-aside { gap: 14px; }
 .about-photo { position: relative; aspect-ratio: 4 / 5; border-radius: var(--radius); overflow: hidden; background: var(--bg-elevated); border: 1px solid var(--line); isolation: isolate; }
 .about-photo img { width: 100%; height: 100%; object-fit: cover; }

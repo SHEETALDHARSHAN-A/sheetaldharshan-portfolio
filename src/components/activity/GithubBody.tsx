@@ -33,13 +33,25 @@ export function GithubBody({ data, weeks = 18 }: { data: GithubActivity; weeks?:
 
   return (
     <div className="activity-body">
-      <div className="gh-months" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }} aria-hidden="true">
+      <div className="gh-frame">
+      <span className="gh-corner" aria-hidden="true" />
+      <div className="gh-months" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }} aria-hidden="true">
         {months.map((m, i) => (
           <span key={i}>{m}</span>
         ))}
       </div>
+      {/* Weekday labels like GitHub's: Mon, Wed and Fri on rows 2, 4 and 6 (weeks start on Sunday). */}
+      <div className="gh-days" aria-hidden="true">
+        <span />
+        <span>Mon</span>
+        <span />
+        <span>Wed</span>
+        <span />
+        <span>Fri</span>
+        <span />
+      </div>
       <HeatmapTooltip>
-      <div className="gh-grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }} role="img" aria-label={`${recent} contributions in the last ${weeks} weeks`}>
+      <div className="gh-grid" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }} role="img" aria-label={`${recent} contributions in the last ${weeks} weeks`}>
         {Array.from({ length: lead }, (_, i) => (
           <span key={`pad-${i}`} className="gh-pad" />
         ))}
@@ -48,7 +60,22 @@ export function GithubBody({ data, weeks = 18 }: { data: GithubActivity; weeks?:
         ))}
       </div>
       </HeatmapTooltip>
-      <ActivityFooter checkedAt={data.checkedAt} sources={data.sources} unit="Contributions this year" site="GitHub" />
+      </div>
+      <ActivityFooter
+        checkedAt={data.checkedAt}
+        sources={data.sources}
+        unit="Contributions in the last year"
+        site="GitHub"
+        legend={
+          <>
+            Less
+            {[0, 1, 2, 3, 4].map((l) => (
+              <i key={l} data-level={l} />
+            ))}
+            More
+          </>
+        }
+      />
     </div>
   )
 }

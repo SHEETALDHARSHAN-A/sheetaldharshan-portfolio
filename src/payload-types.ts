@@ -127,6 +127,7 @@ export interface Config {
     brand: Brand;
     appearance: Appearance;
     homepage: Homepage;
+    'projects-page': ProjectsPage;
     about: About;
   };
   globalsSelect: {
@@ -137,6 +138,7 @@ export interface Config {
     brand: BrandSelect<false> | BrandSelect<true>;
     appearance: AppearanceSelect<false> | AppearanceSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
+    'projects-page': ProjectsPageSelect<false> | ProjectsPageSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
   };
   locale: null;
@@ -244,6 +246,20 @@ export interface Project {
    * The film shown in a pop-up player: a YouTube or Vimeo link, or a direct MP4 link from Media.
    */
   demoVideoUrl?: string | null;
+  cardColor?: string | null;
+  cardTextColor?: string | null;
+  pageBackground?: string | null;
+  pageTextColor?: string | null;
+  /**
+   * Shown after the main image, one after another, then back to the start. Leave empty for a single image.
+   */
+  heroLoop?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  loopSeconds?: number | null;
   /**
    * Add, reorder and remove blocks. The page renders them in order under the hero.
    */
@@ -1482,6 +1498,17 @@ export interface ProjectsSelect<T extends boolean = true> {
         id?: T;
       };
   demoVideoUrl?: T;
+  cardColor?: T;
+  cardTextColor?: T;
+  pageBackground?: T;
+  pageTextColor?: T;
+  heroLoop?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  loopSeconds?: T;
   layout?:
     | T
     | {
@@ -2460,6 +2487,20 @@ export interface Appearance {
   animationIntensity?: ('reduced' | 'normal' | 'expressive') | null;
   animationSpeed?: ('slow' | 'normal' | 'fast') | null;
   projectDisplayStyle?: ('explorer' | 'grid') | null;
+  colorBackground?: string | null;
+  colorSurface?: string | null;
+  colorText?: string | null;
+  colorMuted?: string | null;
+  /**
+   * Links, highlights, the active menu item.
+   */
+  colorAccent?: string | null;
+  colorLine?: string | null;
+  /**
+   * "Preset" uses the Font choice above.
+   */
+  bodyFont?: ('preset' | 'ibm-plex-sans' | 'dm-sans' | 'manrope' | 'work-sans' | 'source-sans-3') | null;
+  headingFont?: ('barlow-condensed' | 'oswald' | 'bebas-neue' | 'anton' | 'archivo-narrow' | 'inter-tight') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2509,6 +2550,36 @@ export interface Homepage {
     description?: string | null;
   };
   _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * How the Projects page looks. Each project can override its own colours in its Style & images tab. List or grid layout is under Site-wide → Theme.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects-page".
+ */
+export interface ProjectsPage {
+  id: number;
+  /**
+   * The card that slides out behind the selected project. Default #3a3d44.
+   */
+  cardColor?: string | null;
+  /**
+   * Default #f3f3eb.
+   */
+  cardTextColor?: string | null;
+  /**
+   * Default #ff3d00.
+   */
+  arrowColor?: string | null;
+  /**
+   * Shown behind images while they load.
+   */
+  stageBackground?: string | null;
+  imageTransition?: ('wipe' | 'fade' | 'none') | null;
+  imageZoom?: boolean | null;
+  zoomSeconds?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2701,6 +2772,14 @@ export interface AppearanceSelect<T extends boolean = true> {
   animationIntensity?: T;
   animationSpeed?: T;
   projectDisplayStyle?: T;
+  colorBackground?: T;
+  colorSurface?: T;
+  colorText?: T;
+  colorMuted?: T;
+  colorAccent?: T;
+  colorLine?: T;
+  bodyFont?: T;
+  headingFont?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2737,6 +2816,22 @@ export interface HomepageSelect<T extends boolean = true> {
         description?: T;
       };
   _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects-page_select".
+ */
+export interface ProjectsPageSelect<T extends boolean = true> {
+  cardColor?: T;
+  cardTextColor?: T;
+  arrowColor?: T;
+  stageBackground?: T;
+  imageTransition?: T;
+  imageZoom?: T;
+  zoomSeconds?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
