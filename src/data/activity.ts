@@ -24,7 +24,9 @@ export type LeetcodeStats = {
   checkedAt: number
 }
 type LeetcodeProfile = Omit<LeetcodeStats, 'sources' | 'checkedAt'> & { checkedAt: number }
-export type CodingActivity = { github?: GithubActivity; leetcode?: LeetcodeStats }
+/** Where each card is switched on in the admin. */
+export type Placement = { sidebar: boolean; about: boolean }
+export type CodingActivity = { github?: GithubActivity & { show: Placement }; leetcode?: LeetcodeStats & { show: Placement } }
 
 const SIX_HOURS = 6 * 60 * 60
 
@@ -116,7 +118,9 @@ export const getCodingActivity = cache(async (): Promise<CodingActivity> => {
   if (!settings) return {}
   const result: CodingActivity = {}
 
-  const gh = settings.githubEnabled ? usernames(settings.githubAccounts) : []
+  const ghShow: Placement = { sidebar: settings.githubInSidebar ?? true, about: settings.githubOnAbout ?? true }
+  const lcShow: Placement = { sidebar: settings.leetcodeInSidebar ?? false, about: settings.leetcodeOnAbout ?? true }
+  const gh = ghShow.sidebar || ghShow.about ? usernames(settings.githubAccounts) : []
   if (gh.length) {
     const loaded = (await Promise.all(gh.map(async (u) => ({ u, cal: await githubCalendar(u).catch(() => null) })))).filter((x) => x.cal)
     if (loaded.length) {
@@ -128,11 +132,12 @@ export const getCodingActivity = cache(async (): Promise<CodingActivity> => {
         total: days.reduce((n, d) => n + d.count, 0),
         sources: loaded.map(({ u, cal }) => ({ username: u, url: `https://github.com/${u}`, value: cal!.days.reduce((n, d) => n + d.count, 0) })),
         checkedAt: Math.min(...loaded.map(({ cal }) => cal!.checkedAt)),
+        show: ghShow,
       }
     }
   }
 
-  const lc = settings.leetcodeEnabled ? usernames(settings.leetcodeAccounts) : []
+  const lc = lcShow.sidebar || lcShow.about ? usernames(settings.leetcodeAccounts) : []
   if (lc.length) {
     const loaded = (await Promise.all(lc.map(async (u) => ({ u, p: await leetcodeProfile(u).catch(() => null) })))).filter((x) => x.p)
     if (loaded.length) {
@@ -154,6 +159,7 @@ export const getCodingActivity = cache(async (): Promise<CodingActivity> => {
         available: loaded[0].p!.available,
         sources: loaded.map(({ u, p }) => ({ username: u, url: `https://leetcode.com/u/${u}/`, value: p!.solved.all })),
         checkedAt: Math.min(...loaded.map(({ p }) => p!.checkedAt)),
+        show: lcShow,
       }
     }
   }

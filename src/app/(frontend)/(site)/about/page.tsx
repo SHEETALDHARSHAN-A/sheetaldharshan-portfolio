@@ -5,6 +5,7 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { AboutPhoto } from '@/components/Media/AboutPhoto'
+import { GithubHeatmap } from '@/components/activity/GithubHeatmap'
 import { LeetcodeCard } from '@/components/activity/LeetcodeCard'
 import { getCodingActivity } from '@/data/activity'
 import { PageFrame } from '@/components/shell/PageFrame'
@@ -193,8 +194,13 @@ export default async function AboutPage() {
           <div className="about-photo" aria-hidden={!about.photo}>
             {about.photo ? <AboutPhoto media={about.photo} /> : <div className="placeholder">Photo coming soon</div>}
           </div>
-          {/* Optional LeetCode card (Coding activity in the admin). */}
-          {activity.leetcode ? (
+          {/* Optional cards (Coding activity in the admin). */}
+          {activity.github?.show.about ? (
+            <div className="about-activity">
+              <GithubHeatmap data={activity.github} weeks={30} />
+            </div>
+          ) : null}
+          {activity.leetcode?.show.about ? (
             <div className="about-activity">
               <LeetcodeCard data={activity.leetcode} />
             </div>

@@ -1,6 +1,7 @@
 import * as migration_20261014_182700_initial from './20261014_182700_initial';
 import * as migration_20261015_000000_enable_rls from './20261015_000000_enable_rls';
 import * as migration_20261017_163947_coding_activity from './20261017_163947_coding_activity';
+import * as migration_20261017_190000_coding_activity_placement from './20261017_190000_coding_activity_placement';
 
 export const migrations = [
   {
@@ -17,5 +18,10 @@ export const migrations = [
     up: migration_20261017_163947_coding_activity.up,
     down: migration_20261017_163947_coding_activity.down,
     name: '20261017_163947_coding_activity'
+  },
+  {
+    up: migration_20261017_190000_coding_activity_placement.up,
+    down: migration_20261017_190000_coding_activity_placement.down,
+    name: '20261017_190000_coding_activity_placement',
   },
 ];

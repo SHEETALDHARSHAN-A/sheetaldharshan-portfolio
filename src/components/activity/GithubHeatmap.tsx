@@ -1,6 +1,7 @@
 import { BrandIcon } from '@/components/BrandIcon'
 import type { GithubActivity } from '@/data/activity'
 import { ActivitySources } from './ActivitySources'
+import { TimeAgo } from './TimeAgo'
 import { HeatmapTooltip } from './HeatmapTooltip'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -58,6 +59,9 @@ export function GithubHeatmap({ data, weeks = 18 }: { data: GithubActivity; week
         ))}
       </div>
       </HeatmapTooltip>
+      <p className="activity-updated">
+        Updated <TimeAgo at={data.checkedAt} />
+      </p>
     </section>
   )
 }

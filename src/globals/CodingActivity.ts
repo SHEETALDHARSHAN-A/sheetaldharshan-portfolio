@@ -27,13 +27,19 @@ export const CodingActivity: GlobalConfig = {
   label: 'Coding activity',
   access: { read: () => true, update: authenticated },
   hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/blog', '/about', '/contact', '/research'])] },
-  admin: { description: 'GitHub shows in the sidebar under the pet (the pet resizes to fit); LeetCode shows on the About page under the photo. Turn each one on or off.' },
+  admin: { description: 'Choose where each card appears: the sidebar (under the pet, which resizes to fit) and/or the About page (under the photo). Untick both to hide a card.' },
   fields: [
     {
       type: 'collapsible',
       label: 'GitHub activity',
       fields: [
-        { name: 'githubEnabled', type: 'checkbox', defaultValue: true, label: 'Show the GitHub contribution heatmap' },
+        {
+          type: 'row',
+          fields: [
+            { name: 'githubInSidebar', type: 'checkbox', defaultValue: true, label: 'Show in the sidebar', admin: { width: '50%' } },
+            { name: 'githubOnAbout', type: 'checkbox', defaultValue: true, label: 'Show on the About page', admin: { width: '50%' } },
+          ],
+        },
         accounts('githubAccounts', 'Contributions from every included account are added together, day by day. Private work only counts if "Private contributions" is turned on in that GitHub profile.'),
       ],
     },
@@ -41,7 +47,13 @@ export const CodingActivity: GlobalConfig = {
       type: 'collapsible',
       label: 'LeetCode',
       fields: [
-        { name: 'leetcodeEnabled', type: 'checkbox', defaultValue: true, label: 'Show LeetCode progress' },
+        {
+          type: 'row',
+          fields: [
+            { name: 'leetcodeInSidebar', type: 'checkbox', defaultValue: false, label: 'Show in the sidebar', admin: { width: '50%' } },
+            { name: 'leetcodeOnAbout', type: 'checkbox', defaultValue: true, label: 'Show on the About page', admin: { width: '50%' } },
+          ],
+        },
         accounts('leetcodeAccounts', 'Solved counts from every included account are added together.'),
       ],
     },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { LeetcodeStats } from '@/data/activity'
 
 type Level = 'easy' | 'medium' | 'hard'
@@ -25,16 +25,32 @@ const pct = (n: number) => {
 
 /**
  * LeetCode-style progress gauge. At rest: solved out of all problems, one arc per difficulty sized by
- * how many problems that level has. Hover the ring for the acceptance rate; hover a level for its
- * "Beats x%". Taps do the same on touch screens. Arcs draw in on load and glide between views.
+ * how many problems that level has. Hover the ring for the acceptance rate, or a level for its
+ * "Beats x%"; a click keeps that view, and clicking it again goes back to the total. The ring's
+ * background stays still; only the progress line grows, from the bottom of the gauge upward.
  */
 export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
-  const [view, setView] = useState<View>('solved')
-  const [drawn, setDrawn] = useState(false)
-  useEffect(() => {
-    const t = window.setTimeout(() => setDrawn(true), 80)
-    return () => window.clearTimeout(t)
-  }, [])
+  const [selected, setSelected] = useState<View | null>(null)
+  const [hovered, setHovered] = useState<View | null>(null)
+  const view: View = hovered ?? selected ?? 'solved'
+  // Click selects; clicking the selected one again returns to the total (and drops the hover preview).
+  // After deselecting, the arcs re-render under the cursor and React reports a fresh "enter";
+  // ignore hover on that item until the pointer really leaves it.
+  const quiet = useRef<View | null>(null)
+  const toggle = (v: View) => {
+    if (selected === v) {
+      quiet.current = v
+      setSelected(null)
+      setHovered(null)
+    } else setSelected(v)
+  }
+  const hover = (v: View) => (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse' && quiet.current !== v) setHovered(v)
+  }
+  const unhover = () => {
+    quiet.current = null
+    setHovered(null)
+  }
 
   const { solved, available, attempting, submissions, beats } = data
   const level = view === 'easy' || view === 'medium' || view === 'hard' ? view : null
@@ -53,15 +69,15 @@ export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
   const acceptance = submissions.total ? (submissions.accepted / submissions.total) * 100 : 0
 
   return (
-    <div className="lcg" data-view={view} onPointerLeave={() => setView('solved')}>
+    <div className="lcg" data-view={view} onPointerLeave={unhover}>
       <button
         type="button"
         className="lcg-ring"
         aria-label={`${solved.all} of ${available.all} solved; ${acceptance.toFixed(2)}% acceptance`}
-        onPointerEnter={(e) => e.pointerType === 'mouse' && setView('acceptance')}
-        onFocus={() => setView('acceptance')}
-        onBlur={() => setView('solved')}
-        onClick={() => setView('acceptance')}
+        aria-pressed={selected === 'acceptance'}
+        onPointerEnter={hover('acceptance')}
+        onPointerLeave={unhover}
+        onClick={() => toggle('acceptance')}
       >
         <svg viewBox="0 0 128 128" aria-hidden="true">
           <g transform="rotate(135 64 64)">
@@ -71,12 +87,13 @@ export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
               // Rest: each level owns its arc. Level view: that level spans the whole gauge.
               const track = focused ? arc(0, SWEEP) : showSeg ? arc(s.start, s.len) : arc(s.start, 0)
               const fillLen = focused ? (available[s.key] ? (solved[s.key] / available[s.key]) * SWEEP : 0) : showSeg ? s.fill : 0
-              const fill = focused ? arc(0, drawn ? fillLen : 0) : arc(s.start, drawn && showSeg ? fillLen : 0)
+              const fill = focused ? arc(0, fillLen) : arc(s.start, showSeg ? fillLen : 0)
               return (
                 <g key={s.key}>
                   {/* Zero-length arcs would still draw a dot through their round caps, so they fade out. */}
                   <circle className="lcg-track" cx="64" cy="64" r={R} style={{ ...track, stroke: focused ? 'var(--surface-strong)' : s.color, opacity: focused || showSeg ? undefined : 0 }} data-dim={!focused} />
-                  <circle className="lcg-fill" cx="64" cy="64" r={R} style={{ ...fill, stroke: s.color, opacity: fillLen > 0 && drawn && (focused || showSeg) ? 1 : 0 }} />
+                  {/* Re-mounted on every view change, so the line grows again from its start. */}
+                  <circle key={view} className="lcg-fill" cx="64" cy="64" r={R} style={{ ...fill, stroke: s.color, opacity: fillLen > 0 && (focused || showSeg) ? 1 : 0, ['--from' as string]: `0 ${C}` }} />
                 </g>
               )
             })}
@@ -125,10 +142,10 @@ export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
             <button
               type="button"
               data-active={view === l.key}
-              onPointerEnter={(e) => e.pointerType === 'mouse' && setView(l.key)}
-              onFocus={() => setView(l.key)}
-              onBlur={() => setView('solved')}
-              onClick={() => setView(l.key)}
+              aria-pressed={selected === l.key}
+              onPointerEnter={hover(l.key)}
+              onPointerLeave={unhover}
+              onClick={() => toggle(l.key)}
             >
               <span className="lcg-level" style={{ color: l.color }}>
                 {l.label}

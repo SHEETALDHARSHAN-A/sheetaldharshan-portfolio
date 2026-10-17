@@ -1,6 +1,7 @@
 import { BrandIcon } from '@/components/BrandIcon'
 import type { LeetcodeStats } from '@/data/activity'
 import { ActivitySources } from './ActivitySources'
+import { TimeAgo } from './TimeAgo'
 import { LeetcodeGauge } from './LeetcodeGauge'
 
 /** LeetCode progress, after LeetCode's own profile widget: a gauge plus a tile per difficulty. */
@@ -17,6 +18,9 @@ export function LeetcodeCard({ data }: { data: LeetcodeStats }) {
         <ActivitySources sources={data.sources} unit="Problems solved" site="LeetCode" checkedAt={data.checkedAt} />
       </details>
       <LeetcodeGauge data={data} />
+      <p className="activity-updated">
+        Updated <TimeAgo at={data.checkedAt} />
+      </p>
     </section>
   )
 }

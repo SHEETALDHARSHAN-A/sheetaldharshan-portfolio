@@ -1,20 +1,13 @@
 import { BrandIcon } from '@/components/BrandIcon'
 import type { ActivitySource } from '@/data/activity'
-
-function ago(ms: number): string {
-  const min = Math.max(0, Math.round((Date.now() - ms) / 60000))
-  if (min < 1) return 'just now'
-  if (min < 60) return `${min} min ago`
-  const h = Math.round(min / 60)
-  return h < 24 ? `${h} h ago` : `${Math.round(h / 24)} d ago`
-}
+import { TimeAgo } from './TimeAgo'
 
 /** The accounts behind a card, each linking to its public profile, so the numbers can be checked. */
 export function ActivitySources({ sources, unit, site, checkedAt }: { sources: ActivitySource[]; unit: string; site: string; checkedAt: number }) {
   return (
     <div className="activity-sources">
       <p>
-        {unit} from {sources.length > 1 ? 'these public profiles' : 'this public profile'} on {site}, checked {ago(checkedAt)}.
+        {unit} from {sources.length > 1 ? 'these public profiles' : 'this public profile'} on {site}, checked <TimeAgo at={checkedAt} />.
       </p>
       <ul>
         {sources.map((s) => (

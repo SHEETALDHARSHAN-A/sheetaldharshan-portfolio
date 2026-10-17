@@ -2491,14 +2491,15 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
- * GitHub shows in the sidebar under the pet (the pet resizes to fit); LeetCode shows on the About page under the photo. Turn each one on or off.
+ * Choose where each card appears: the sidebar (under the pet, which resizes to fit) and/or the About page (under the photo). Untick both to hide a card.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "coding-activity".
  */
 export interface CodingActivity {
   id: number;
-  githubEnabled?: boolean | null;
+  githubInSidebar?: boolean | null;
+  githubOnAbout?: boolean | null;
   /**
    * Contributions from every included account are added together, day by day. Private work only counts if "Private contributions" is turned on in that GitHub profile.
    */
@@ -2509,7 +2510,8 @@ export interface CodingActivity {
         id?: string | null;
       }[]
     | null;
-  leetcodeEnabled?: boolean | null;
+  leetcodeInSidebar?: boolean | null;
+  leetcodeOnAbout?: boolean | null;
   /**
    * Solved counts from every included account are added together.
    */
@@ -2673,7 +2675,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
  * via the `definition` "coding-activity_select".
  */
 export interface CodingActivitySelect<T extends boolean = true> {
-  githubEnabled?: T;
+  githubInSidebar?: T;
+  githubOnAbout?: T;
   githubAccounts?:
     | T
     | {
@@ -2681,7 +2684,8 @@ export interface CodingActivitySelect<T extends boolean = true> {
         enabled?: T;
         id?: T;
       };
-  leetcodeEnabled?: T;
+  leetcodeInSidebar?: T;
+  leetcodeOnAbout?: T;
   leetcodeAccounts?:
     | T
     | {

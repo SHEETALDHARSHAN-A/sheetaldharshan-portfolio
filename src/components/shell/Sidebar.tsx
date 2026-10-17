@@ -3,6 +3,7 @@ import { BrandIcon } from '@/components/BrandIcon'
 import { MobileMenu } from '@/components/shell/MobileMenu'
 import { NavLinks } from '@/components/shell/NavLinks'
 import { GithubHeatmap } from '@/components/activity/GithubHeatmap'
+import { LeetcodeCard } from '@/components/activity/LeetcodeCard'
 import type { CodingActivity } from '@/data/activity'
 import type { Site } from '@/data/types'
 
@@ -15,10 +16,11 @@ export function Sidebar({ site, activity }: { site: Site; activity?: CodingActiv
       </Link>
       {/* The pet (components/pet) lives here; it is positioned over this slot. */}
       <div className="sidebar-avatar" aria-hidden="true" />
-      {/* Optional GitHub card (Coding activity in the admin); the pet shrinks to the space left above it. */}
-      {activity?.github ? (
+      {/* Optional cards (Coding activity in the admin); the pet shrinks to the space left above them. */}
+      {activity?.github?.show.sidebar || activity?.leetcode?.show.sidebar ? (
         <div className="sidebar-activity">
-          <GithubHeatmap data={activity.github} />
+          {activity.github?.show.sidebar ? <GithubHeatmap data={activity.github} /> : null}
+          {activity.leetcode?.show.sidebar ? <LeetcodeCard data={activity.leetcode} /> : null}
         </div>
       ) : null}
       <div>
