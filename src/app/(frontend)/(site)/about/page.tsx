@@ -59,13 +59,14 @@ export default async function AboutPage() {
         }}
       />
       {draft && <LivePreviewListener />}
-      <header className="page-head">
-        <span className="eyebrow">{about.eyebrow}</span>
-        <h1>{about.title}</h1>
-        {site.currentRole && <p>{[site.currentRole, site.location].filter(Boolean).join(' · ')}</p>}
-      </header>
+      {/* The title sits in the left column, so the photo column starts at the top and fits the first screen. */}
       <div className="about">
-        <div>
+        <header className="page-head about-head">
+          <span className="eyebrow">{about.eyebrow}</span>
+          <h1>{about.title}</h1>
+          {site.currentRole && <p>{[site.currentRole, site.location].filter(Boolean).join(' · ')}</p>}
+        </header>
+        <div className="about-main">
           <div className="about-intro">
             {about.intro.map((paragraph, i) => (
               <p key={i}>{paragraph}</p>

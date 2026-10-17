@@ -620,7 +620,9 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .empty { color: var(--muted); border: 1px dashed var(--line-strong); border-radius: var(--radius); padding: 30px; max-width: 640px; }
 
 /* ------------------------------------------------------------------ about / research / contact */
-.about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); gap: clamp(24px, 4vw, 60px); align-items: start; }
+.about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); grid-template-rows: auto 1fr; column-gap: clamp(24px, 4vw, 60px); align-items: start; }
+.about-head, .about-main { grid-column: 1; }
+.about-aside { grid-column: 2; grid-row: 1 / span 2; }
 .about-aside { position: sticky; top: 30px; display: flex; flex-direction: column; gap: 14px; min-width: 0; max-height: calc(100dvh - 60px); container-type: inline-size; }
 /* The column stays beside the text while scrolling, sized to the screen: open cards shrink the
    photo first (never wider than 3:2), and only then does the card area scroll on its own.
@@ -715,7 +717,10 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
   .case-info .case-back { order: -1; width: auto; align-self: flex-start; margin: 0 0 22px; padding: 0; border-top: 0; }
   .topbar .menu { right: 0; top: calc(100% + 8px); min-width: 230px; }
   .about { grid-template-columns: minmax(0, 1fr); }
-  .about-aside { position: relative; top: auto; order: -1; width: min(100%, 340px); margin: 0 auto 28px; max-height: none; }
+  .about-head, .about-main, .about-aside { grid-column: 1; grid-row: auto; }
+  /* Phones: title, then the photo, then the text. */
+  .about-head { order: 0; } .about-aside { order: 1; } .about-main { order: 2; }
+  .about-aside { position: relative; top: auto; width: min(100%, 340px); margin: 0 auto 28px; max-height: none; }
   .about-aside > .activity-dock { max-height: none; overflow: visible; }
   .about-photo { aspect-ratio: 1 / 1; }
   .about { gap: 0; }
