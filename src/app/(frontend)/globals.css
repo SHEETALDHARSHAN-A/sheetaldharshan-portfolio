@@ -168,15 +168,45 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .sidebar-nav a:hover, .sidebar-nav a[aria-current='page'] { color: var(--accent); }
 .sidebar-nav a[aria-current='page'] .n { color: var(--accent); }
 .sidebar-avatar { display: flex; justify-content: center; align-items: center; flex: 1; min-height: 0; padding: 12px 0; }
-.sidebar-activity { display: grid; gap: 14px; margin-bottom: 26px; }
+.sidebar-activity { display: grid; gap: 14px; margin-bottom: 22px; }
+/* Round logos for each showcase card; the open one gets a ring. */
+.activity-logo { display: inline-grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); padding: 0; cursor: pointer; transition: border-color 160ms ease, transform 160ms ease, background 160ms ease; }
+.activity-logo .brand-icon { margin: 0; }
+button.activity-logo:hover { transform: translateY(-1px); border-color: var(--text-soft); }
+button.activity-logo[aria-expanded='true'] { border-color: var(--accent); background: var(--accent-soft); }
+button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.activity-dock { display: grid; gap: 10px; }
+.dock-logos { display: flex; align-items: center; gap: 8px; }
+.dock-hint { font-family: var(--font-condensed); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-left: 2px; }
+.dock-card { display: grid; gap: 7px; animation: el-in 240ms var(--ease-out) both; }
+.dock-head { margin: 0; display: flex; align-items: baseline; font-family: var(--font-condensed); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.dock-head .activity-sub { margin-left: auto; }
+.activity-body { display: grid; gap: 7px; min-width: 0; }
+/* "Updated 2 days ago · Sources" under every card. */
+.activity-footer > summary { display: flex; align-items: center; gap: 6px; list-style: none; cursor: pointer; font-size: 10px; color: var(--faint); }
+.activity-footer > summary::-webkit-details-marker { display: none; }
+.activity-footer-src { margin-left: auto; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
+.activity-footer > summary:hover .activity-footer-src { color: var(--accent); }
+.activity-footer[open] .activity-footer-src { color: var(--text-soft); }
+/* About: collapsible panels under the photo. */
+.activity-panels { display: grid; gap: 12px; }
+.activity-panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elevated); }
+.activity-panel-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; list-style: none; cursor: pointer; font-family: var(--font-condensed); font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.activity-panel-head::-webkit-details-marker { display: none; }
+.activity-panel-head .activity-sub { margin-left: auto; font-size: 13px; }
+.activity-panel-head:hover .activity-title { color: var(--accent); }
+.activity-panel-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: var(--radius); }
+.activity-panel[open] .activity-chev { transform: translateY(1px) rotate(-135deg); }
+.activity-panel > .activity-body { padding: 0 16px 14px; animation: el-in 260ms var(--ease-out) both; }
+.activity-panel .activity-footer > summary { font-size: 11.5px; }
+.activity-panel .gh-months { font-size: 10px; }
 .activity-card { display: grid; gap: 7px; min-width: 0; }
 .activity-head { display: flex; align-items: center; gap: 0; cursor: pointer; list-style: none; user-select: none; font-family: var(--font-condensed); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
 .activity-head .brand-icon { margin-right: 6px; }
 .activity-title { flex: none; }
 .activity-sub { margin-left: auto; font-weight: 400; letter-spacing: 0.04em; color: var(--muted); font-variant-numeric: tabular-nums; }
 .activity-head:hover .activity-title { color: var(--accent); }
-.activity-updated { margin: 0; font-size: 10px; color: var(--faint); letter-spacing: 0.01em; }
-.about-activity .activity-updated { font-size: 11.5px; }
+
 .activity-head::-webkit-details-marker { display: none; }
 .activity-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
 .activity-chev { width: 6px; height: 6px; margin-left: 6px; border-right: 1.5px solid var(--faint); border-bottom: 1.5px solid var(--faint); transform: translateY(-2px) rotate(45deg); transition: transform 200ms ease; flex: none; }
@@ -232,8 +262,6 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .lcg-count { font-size: 13px; font-variant-numeric: tabular-nums; }
 @keyframes lcg-swap { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .lcg-fill, .lcg-center { animation: none !important; } }
-/* On the About page the cards sit in quiet panels. */
-.about-activity .gh-months { font-size: 10px; }
 /* In the sidebar the gauge stacks: the ring, then the three levels in a row. */
 .sidebar-activity .lcg { grid-template-columns: 1fr; gap: 8px; }
 .sidebar-activity .lcg-ring { max-width: 130px; }
@@ -245,12 +273,8 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .sidebar-activity .lcg-levels button { padding: 5px 2px; border-radius: 7px; }
 .sidebar-activity .lcg-level { font-size: 10px; }
 .sidebar-activity .lcg-count { font-size: 9.5px; }
-.about-activity { padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elevated); }
-.about-activity .activity-card { gap: 12px; }
-.about-activity .activity-head { font-size: 14px; }
-.about-activity .activity-sources { font-size: 12px; }
-.about-activity .src-name { font-size: 12px; }
-.about-activity .src-name { font-size: 12px; }
+.activity-panel .activity-sources { font-size: 12px; }
+.activity-panel .src-name { font-size: 12px; }
 /* Short windows: keep the pet and nav readable before the card. */
 @media (max-height: 640px) { .sidebar-activity { display: none; } }
 .sidebar-foot { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--font-condensed); font-weight: 600; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
@@ -521,10 +545,10 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); gap: clamp(24px, 4vw, 60px); align-items: start; }
 .about-aside { position: sticky; top: 30px; display: grid; gap: 20px; min-width: 0; }
 /* With the LeetCode card below it, a square photo keeps both in view. */
-.about-aside:has(.about-activity) .about-photo { aspect-ratio: 1 / 1; }
+.about-aside:has(.activity-panel) .about-photo { aspect-ratio: 1 / 1; }
 /* Both cards on About: a shorter photo, and the column scrolls with the page (it is taller than a screen). */
-.about-aside:has(.about-activity + .about-activity) { position: relative; top: auto; }
-.about-aside:has(.about-activity + .about-activity) .about-photo { aspect-ratio: 5 / 4; }
+.about-aside:has(.activity-panel + .activity-panel[open]), .about-aside:has(.activity-panel[open] + .activity-panel) { position: relative; top: auto; }
+.about-aside:has(.activity-panel + .activity-panel) .about-photo { aspect-ratio: 5 / 4; }
 .about-aside { gap: 14px; }
 .about-photo { position: relative; aspect-ratio: 4 / 5; border-radius: var(--radius); overflow: hidden; background: var(--bg-elevated); border: 1px solid var(--line); isolation: isolate; }
 .about-photo img { width: 100%; height: 100%; object-fit: cover; }

@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { BrandIcon } from '@/components/BrandIcon'
 import { MobileMenu } from '@/components/shell/MobileMenu'
 import { NavLinks } from '@/components/shell/NavLinks'
-import { GithubHeatmap } from '@/components/activity/GithubHeatmap'
-import { LeetcodeCard } from '@/components/activity/LeetcodeCard'
+import { ActivityDock } from '@/components/activity/ActivityDock'
+import { activityCards } from '@/components/activity/cards'
 import type { CodingActivity } from '@/data/activity'
 import type { Site } from '@/data/types'
 
@@ -16,13 +16,17 @@ export function Sidebar({ site, activity }: { site: Site; activity?: CodingActiv
       </Link>
       {/* The pet (components/pet) lives here; it is positioned over this slot. */}
       <div className="sidebar-avatar" aria-hidden="true" />
-      {/* Optional cards (Coding activity in the admin); the pet shrinks to the space left above them. */}
-      {activity?.github?.show.sidebar || activity?.leetcode?.show.sidebar ? (
-        <div className="sidebar-activity">
-          {activity.github?.show.sidebar ? <GithubHeatmap data={activity.github} /> : null}
-          {activity.leetcode?.show.sidebar ? <LeetcodeCard data={activity.leetcode} /> : null}
-        </div>
-      ) : null}
+      {/* Coding activity (set up in the admin): round logos that open a card; the pet resizes to fit. */}
+      {(() => {
+        const cards = activity ? activityCards(activity).filter((c) => c.show.sidebar) : []
+        return cards.length ? (
+          <div className="sidebar-activity">
+            <ActivityDock
+              items={cards.map((c) => ({ id: c.id, title: c.title, summary: c.summary, icon: <BrandIcon name={c.brand} size={15} />, body: c.body('sidebar'), defaultOpen: c.show.sidebarOpen }))}
+            />
+          </div>
+        ) : null
+      })()}
       <div>
         <nav className="sidebar-nav" aria-label="Primary">
           <NavLinks items={site.nav} />

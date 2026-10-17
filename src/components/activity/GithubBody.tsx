@@ -1,7 +1,5 @@
-import { BrandIcon } from '@/components/BrandIcon'
 import type { GithubActivity } from '@/data/activity'
-import { ActivitySources } from './ActivitySources'
-import { TimeAgo } from './TimeAgo'
+import { ActivityFooter } from './ActivityFooter'
 import { HeatmapTooltip } from './HeatmapTooltip'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -15,8 +13,8 @@ const tipText = (iso: string, count: number) => {
   return `${n} on ${MONTH_NAMES[d.getUTCMonth()]} ${ordinal(d.getUTCDate())}.`
 }
 
-/** Contribution calendar for the sidebar: the last few weeks as a grid, one square per day. */
-export function GithubHeatmap({ data, weeks = 18 }: { data: GithubActivity; weeks?: number }) {
+/** Contribution calendar: the last few weeks as a grid, one square per day (the card shell adds the header). */
+export function GithubBody({ data, weeks = 18 }: { data: GithubActivity; weeks?: number }) {
   const all = data.days
   const lastDay = new Date(`${all[all.length - 1].date}T00:00:00Z`).getUTCDay()
   // Whole weeks (Sunday to Saturday), ending with today's partial week.
@@ -34,16 +32,7 @@ export function GithubHeatmap({ data, weeks = 18 }: { data: GithubActivity; week
   const recent = days.reduce((n, d) => n + d.count, 0)
 
   return (
-    <section className="activity-card" aria-label="GitHub contributions">
-      <details className="activity-details">
-        <summary className="activity-head" title="Where these numbers come from">
-          <BrandIcon name="GitHub" size={13} />
-          <span className="activity-title">GitHub</span>
-          <span className="activity-sub">{data.total.toLocaleString('en')} this year</span>
-          <span className="activity-chev" aria-hidden="true" />
-        </summary>
-        <ActivitySources sources={data.sources} unit="Contributions this year" site="GitHub" checkedAt={data.checkedAt} />
-      </details>
+    <div className="activity-body">
       <div className="gh-months" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }} aria-hidden="true">
         {months.map((m, i) => (
           <span key={i}>{m}</span>
@@ -59,9 +48,7 @@ export function GithubHeatmap({ data, weeks = 18 }: { data: GithubActivity; week
         ))}
       </div>
       </HeatmapTooltip>
-      <p className="activity-updated">
-        Updated <TimeAgo at={data.checkedAt} />
-      </p>
-    </section>
+      <ActivityFooter checkedAt={data.checkedAt} sources={data.sources} unit="Contributions this year" site="GitHub" />
+    </div>
   )
 }

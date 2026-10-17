@@ -27,7 +27,7 @@ export const CodingActivity: GlobalConfig = {
   label: 'Coding activity',
   access: { read: () => true, update: authenticated },
   hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/blog', '/about', '/contact', '/research'])] },
-  admin: { description: 'Choose where each card appears: the sidebar (under the pet, which resizes to fit) and/or the About page (under the photo). Untick both to hide a card.' },
+  admin: { description: 'Choose where each card appears and whether it starts open. In the sidebar, cards show as round logos that open on click; on the About page they are collapsible panels under the photo. Untick both places to hide a card.' },
   fields: [
     {
       type: 'collapsible',
@@ -36,8 +36,10 @@ export const CodingActivity: GlobalConfig = {
         {
           type: 'row',
           fields: [
-            { name: 'githubInSidebar', type: 'checkbox', defaultValue: true, label: 'Show in the sidebar', admin: { width: '50%' } },
-            { name: 'githubOnAbout', type: 'checkbox', defaultValue: true, label: 'Show on the About page', admin: { width: '50%' } },
+            { name: 'githubInSidebar', type: 'checkbox', defaultValue: true, label: 'Show in the sidebar', admin: { width: '25%' } },
+            { name: 'githubSidebarOpen', type: 'checkbox', defaultValue: false, label: 'Open there by default', admin: { width: '25%' } },
+            { name: 'githubOnAbout', type: 'checkbox', defaultValue: true, label: 'Show on the About page', admin: { width: '25%' } },
+            { name: 'githubAboutOpen', type: 'checkbox', defaultValue: true, label: 'Open there by default', admin: { width: '25%' } },
           ],
         },
         accounts('githubAccounts', 'Contributions from every included account are added together, day by day. Private work only counts if "Private contributions" is turned on in that GitHub profile.'),
@@ -50,8 +52,10 @@ export const CodingActivity: GlobalConfig = {
         {
           type: 'row',
           fields: [
-            { name: 'leetcodeInSidebar', type: 'checkbox', defaultValue: false, label: 'Show in the sidebar', admin: { width: '50%' } },
-            { name: 'leetcodeOnAbout', type: 'checkbox', defaultValue: true, label: 'Show on the About page', admin: { width: '50%' } },
+            { name: 'leetcodeInSidebar', type: 'checkbox', defaultValue: false, label: 'Show in the sidebar', admin: { width: '25%' } },
+            { name: 'leetcodeSidebarOpen', type: 'checkbox', defaultValue: false, label: 'Open there by default', admin: { width: '25%' } },
+            { name: 'leetcodeOnAbout', type: 'checkbox', defaultValue: true, label: 'Show on the About page', admin: { width: '25%' } },
+            { name: 'leetcodeAboutOpen', type: 'checkbox', defaultValue: true, label: 'Open there by default', admin: { width: '25%' } },
           ],
         },
         accounts('leetcodeAccounts', 'Solved counts from every included account are added together.'),

@@ -25,7 +25,7 @@ export type LeetcodeStats = {
 }
 type LeetcodeProfile = Omit<LeetcodeStats, 'sources' | 'checkedAt'> & { checkedAt: number }
 /** Where each card is switched on in the admin. */
-export type Placement = { sidebar: boolean; about: boolean }
+export type Placement = { sidebar: boolean; about: boolean; sidebarOpen: boolean; aboutOpen: boolean }
 export type CodingActivity = { github?: GithubActivity & { show: Placement }; leetcode?: LeetcodeStats & { show: Placement } }
 
 const SIX_HOURS = 6 * 60 * 60
@@ -118,8 +118,18 @@ export const getCodingActivity = cache(async (): Promise<CodingActivity> => {
   if (!settings) return {}
   const result: CodingActivity = {}
 
-  const ghShow: Placement = { sidebar: settings.githubInSidebar ?? true, about: settings.githubOnAbout ?? true }
-  const lcShow: Placement = { sidebar: settings.leetcodeInSidebar ?? false, about: settings.leetcodeOnAbout ?? true }
+  const ghShow: Placement = {
+    sidebar: settings.githubInSidebar ?? true,
+    about: settings.githubOnAbout ?? true,
+    sidebarOpen: settings.githubSidebarOpen ?? false,
+    aboutOpen: settings.githubAboutOpen ?? true,
+  }
+  const lcShow: Placement = {
+    sidebar: settings.leetcodeInSidebar ?? false,
+    about: settings.leetcodeOnAbout ?? true,
+    sidebarOpen: settings.leetcodeSidebarOpen ?? false,
+    aboutOpen: settings.leetcodeAboutOpen ?? true,
+  }
   const gh = ghShow.sidebar || ghShow.about ? usernames(settings.githubAccounts) : []
   if (gh.length) {
     const loaded = (await Promise.all(gh.map(async (u) => ({ u, cal: await githubCalendar(u).catch(() => null) })))).filter((x) => x.cal)

@@ -2491,7 +2491,7 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
- * Choose where each card appears: the sidebar (under the pet, which resizes to fit) and/or the About page (under the photo). Untick both to hide a card.
+ * Choose where each card appears and whether it starts open. In the sidebar, cards show as round logos that open on click; on the About page they are collapsible panels under the photo. Untick both places to hide a card.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "coding-activity".
@@ -2499,7 +2499,9 @@ export interface SiteSetting {
 export interface CodingActivity {
   id: number;
   githubInSidebar?: boolean | null;
+  githubSidebarOpen?: boolean | null;
   githubOnAbout?: boolean | null;
+  githubAboutOpen?: boolean | null;
   /**
    * Contributions from every included account are added together, day by day. Private work only counts if "Private contributions" is turned on in that GitHub profile.
    */
@@ -2511,7 +2513,9 @@ export interface CodingActivity {
       }[]
     | null;
   leetcodeInSidebar?: boolean | null;
+  leetcodeSidebarOpen?: boolean | null;
   leetcodeOnAbout?: boolean | null;
+  leetcodeAboutOpen?: boolean | null;
   /**
    * Solved counts from every included account are added together.
    */
@@ -2676,7 +2680,9 @@ export interface SiteSettingsSelect<T extends boolean = true> {
  */
 export interface CodingActivitySelect<T extends boolean = true> {
   githubInSidebar?: T;
+  githubSidebarOpen?: T;
   githubOnAbout?: T;
+  githubAboutOpen?: T;
   githubAccounts?:
     | T
     | {
@@ -2685,7 +2691,9 @@ export interface CodingActivitySelect<T extends boolean = true> {
         id?: T;
       };
   leetcodeInSidebar?: T;
+  leetcodeSidebarOpen?: T;
   leetcodeOnAbout?: T;
+  leetcodeAboutOpen?: T;
   leetcodeAccounts?:
     | T
     | {

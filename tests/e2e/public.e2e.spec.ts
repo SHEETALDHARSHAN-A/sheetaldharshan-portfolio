@@ -70,7 +70,7 @@ test.describe('Public site', () => {
 
   test('about, research and contact render CMS content', async ({ page }) => {
     await page.goto(`${base}/about`)
-    await expect(page.locator('.about-intro p').first()).toContainText('software engineer')
+    await expect(page.locator('.about-intro p').first()).toContainText('developer tools')
     await page.goto(`${base}/research`)
     await expect(page.locator('.pub h2')).toContainText('Autonomous Hiring Intelligence')
     await page.goto(`${base}/contact`)
@@ -179,13 +179,18 @@ test.describe('Public site', () => {
     await expect(page).toHaveURL(new RegExp(`${base}/?$`))
     await expect(page.locator('.jg-messages')).toBeVisible()
   })
-  test('coding activity cards show where their numbers come from', async ({ page }) => {
-    await page.goto(`${base}/research`)
-    const cards = page.locator('.sidebar-activity .activity-details')
-    if ((await cards.count()) === 0) test.skip(true, 'Coding activity is turned off')
-    await cards.first().locator('summary').click()
-    const links = cards.first().locator('.activity-sources a')
-    await expect(links.first()).toBeVisible()
-    await expect(links.first()).toHaveAttribute('href', /^https:\/\/(github|leetcode)\.com\//)
+  test('coding activity: sidebar logos open a card, About panels link their sources', async ({ page }) => {
+    await page.goto(`${base}/about`)
+    const logos = page.locator('.dock-logos .activity-logo')
+    if ((await logos.count()) > 0) {
+      await logos.first().click()
+      await expect(page.locator('.dock-card')).toBeVisible()
+      await logos.first().click()
+      await expect(page.locator('.dock-card')).toHaveCount(0)
+    }
+    const panel = page.locator('.activity-panel[open]').first()
+    if ((await panel.count()) === 0) test.skip(true, 'No open About panels')
+    await panel.locator('.activity-footer > summary').click()
+    await expect(panel.locator('.activity-sources a').first()).toHaveAttribute('href', /^https:\/\/(github|leetcode)\.com\//)
   })
 })
