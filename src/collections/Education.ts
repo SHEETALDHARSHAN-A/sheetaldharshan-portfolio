@@ -6,7 +6,7 @@ import { revalidateCollectionDelete, revalidateCollectionPaths } from '@/hooks/r
 export const Education: CollectionConfig = {
   slug: 'education',
   access: { create: authenticated, delete: authenticated, read: authenticatedOrPublished, update: authenticated },
-  admin: { useAsTitle: 'institution', defaultColumns: ['institution', 'degree', 'endDate', '_status'], group: 'Profile' },
+  admin: { useAsTitle: 'institution', defaultColumns: ['institution', 'degree', 'endDate', '_status'], group: 'About page' },
   hooks: { afterChange: [revalidateCollectionPaths(['/about'])], afterDelete: [revalidateCollectionDelete(['/about'])] },
   fields: [
     { name: 'institution', type: 'text', required: true },

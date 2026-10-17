@@ -7,7 +7,7 @@ export const Brand: GlobalConfig = {
   slug: 'brand',
   label: 'Favicon & icons',
   admin: {
-    group: 'Brand',
+    group: 'Site-wide',
     description: 'The icon in browser tabs, Google results and phone home screens. Leave a field empty to keep the current SD logo. Your About photo is under Pages → About; the link-preview image is under Sidebar → Name & profiles.',
   },
   access: { read: () => true, update: authenticated },

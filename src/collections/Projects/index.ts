@@ -21,7 +21,7 @@ export const Projects: CollectionConfig<'projects'> = {
   access: { create: authenticated, delete: authenticated, read: authenticatedOrPublished, update: authenticated },
   defaultPopulate: { title: true, slug: true, summary: true, thumbnail: true, accent: true, kind: true },
   admin: {
-    group: 'Content',
+    group: 'Projects page',
     useAsTitle: 'title',
     defaultColumns: ['title', 'kind', 'featured', 'displayOrder', '_status', 'updatedAt'],
     livePreview: { url: ({ data, req }) => generatePreviewPath({ slug: data?.slug, collection: 'projects', req }) },

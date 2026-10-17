@@ -6,7 +6,7 @@ import { revalidateCollectionDelete, revalidateCollectionPaths } from '@/hooks/r
 export const Experience: CollectionConfig = {
   slug: 'experience',
   access: { create: authenticated, delete: authenticated, read: authenticatedOrPublished, update: authenticated },
-  admin: { useAsTitle: 'role', defaultColumns: ['role', 'company', 'startDate', 'current', '_status'], group: 'Profile' },
+  admin: { useAsTitle: 'role', defaultColumns: ['role', 'company', 'startDate', 'current', '_status'], group: 'About page' },
   hooks: { afterChange: [revalidateCollectionPaths(['/about'])], afterDelete: [revalidateCollectionDelete(['/about'])] },
   fields: [
     {

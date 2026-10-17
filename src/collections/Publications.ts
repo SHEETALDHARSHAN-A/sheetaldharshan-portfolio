@@ -6,7 +6,7 @@ import { revalidateCollectionDelete, revalidateCollectionPaths } from '@/hooks/r
 export const Publications: CollectionConfig = {
   slug: 'publications',
   access: { create: authenticated, delete: authenticated, read: authenticatedOrPublished, update: authenticated },
-  admin: { useAsTitle: 'title', defaultColumns: ['title', 'year', 'featured', '_status'], group: 'Profile' },
+  admin: { useAsTitle: 'title', defaultColumns: ['title', 'year', 'featured', '_status'], group: 'Research page' },
   hooks: { afterChange: [revalidateCollectionPaths(['/research', '/about'])], afterDelete: [revalidateCollectionDelete(['/research', '/about'])] },
   fields: [
     { name: 'title', type: 'text', required: true },

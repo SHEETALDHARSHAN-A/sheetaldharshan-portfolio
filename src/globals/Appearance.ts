@@ -9,10 +9,11 @@ import { previewUrl } from '@/utilities/previewUrl'
  */
 export const Appearance: GlobalConfig = {
   slug: 'appearance',
+  label: 'Theme',
   access: { read: () => true, update: authenticated },
   hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/blog', '/about', '/contact', '/research'])] },
   admin: {
-    group: 'Brand', livePreview: { url: () => previewUrl('/projects') } },
+    group: 'Site-wide', livePreview: { url: () => previewUrl('/projects') } },
   fields: [
     {
       type: 'row',

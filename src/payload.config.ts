@@ -34,7 +34,10 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     meta: { titleSuffix: ' · sheetaldharshan.me' },
-    components: {},
+    components: {
+      // The admin menu, page by page in the site's order (projects listed one by one).
+      beforeNavLinks: ['@/components/admin/EditByPage#EditByPage'],
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },

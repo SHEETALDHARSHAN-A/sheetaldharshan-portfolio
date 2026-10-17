@@ -13,7 +13,7 @@ export const Homepage: GlobalConfig = {
   label: 'Homepage conversation',
   access: { read: () => true, update: authenticated },
   admin: {
-    group: 'Pages', livePreview: { url: () => previewUrl('/') }, preview: () => previewUrl('/') },
+    group: 'Homepage', livePreview: { url: () => previewUrl('/') }, preview: () => previewUrl('/') },
   versions: { drafts: true, max: 30 },
   hooks: { afterChange: [revalidateGlobalPaths(['/'])] },
   fields: [

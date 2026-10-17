@@ -7,7 +7,7 @@ export const About: GlobalConfig = {
   slug: 'about',
   access: { read: () => true, update: authenticated },
   admin: {
-    group: 'Pages', livePreview: { url: () => previewUrl('/about') }, preview: () => previewUrl('/about') },
+    group: 'About page', livePreview: { url: () => previewUrl('/about') }, preview: () => previewUrl('/about') },
   versions: { drafts: true, max: 20 },
   hooks: { afterChange: [revalidateGlobalPaths(['/about'])] },
   fields: [
