@@ -6,6 +6,7 @@ import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { AboutPhoto } from '@/components/Media/AboutPhoto'
 import { ActivityDock } from '@/components/activity/ActivityDock'
+import { AsideResizer } from '@/components/shell/AsideResizer'
 import { AsideToggle } from '@/components/shell/AsideToggle'
 import { activityCards } from '@/components/activity/cards'
 import { getCodingActivity } from '@/data/activity'
@@ -202,6 +203,7 @@ export default async function AboutPage() {
           ))}
         </div>
         <aside className="about-aside">
+          <AsideResizer />
           <div className="about-photo" aria-hidden={!about.photo}>
             {about.photo ? <AboutPhoto media={about.photo} /> : <div className="placeholder">Photo coming soon</div>}
           </div>

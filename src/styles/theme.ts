@@ -157,7 +157,7 @@ export function themeCss(theme: ThemeSettings): string {
  */
 export function themeBootScript(theme: ThemeSettings): string {
   const def = JSON.stringify(theme.theme)
-  return `(function(){try{var d=document.documentElement,s=${theme.toggle ? "localStorage.getItem('site-theme')" : 'null'},m=${def};var t=s==='dark'||s==='light'?s:m==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):m;d.dataset.theme=t;d.style.colorScheme=t;var w=+localStorage.getItem('site-sidebar-w');if(w>=200&&w<=420)d.style.setProperty('--sidebar-w',w+'px');if(localStorage.getItem('about-aside')==='collapsed')d.dataset.aboutAside='collapsed'}catch(e){}})()`
+  return `(function(){try{var d=document.documentElement,s=${theme.toggle ? "localStorage.getItem('site-theme')" : 'null'},m=${def};var t=s==='dark'||s==='light'?s:m==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):m;d.dataset.theme=t;d.style.colorScheme=t;var w=+localStorage.getItem('site-sidebar-w');if(w>=200&&w<=420)d.style.setProperty('--sidebar-w',w+'px');if(localStorage.getItem('about-aside')==='collapsed')d.dataset.aboutAside='collapsed';var a=+localStorage.getItem('about-aside-w');if(a>=240&&a<=640)d.style.setProperty('--about-aside-w',a+'px')}catch(e){}})()`
 }
 
 /** Google Fonts stylesheet for any chosen non-default fonts, or null. */

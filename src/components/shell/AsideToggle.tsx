@@ -1,38 +1,13 @@
 'use client'
 
-import { PanelRightClose, PanelRightOpen } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ChevronLeft } from 'lucide-react'
+import { collapseAside } from './AsideResizer'
 
-export const ASIDE_KEY = 'about-aside'
-
-/**
- * About page: hides the right-hand column (photo and coding activity) so the text gets the full width,
- * and brings it back. The choice is kept in this browser and applied before paint by the head script.
- */
+/** While the About page's photo column is hidden: a tab on the right edge that brings it back. */
 export function AsideToggle() {
-  const [collapsed, setCollapsed] = useState(false)
-
-  useEffect(() => {
-    setCollapsed(document.documentElement.dataset.aboutAside === 'collapsed')
-  }, [])
-
-  const toggle = () => {
-    const next = !collapsed
-    setCollapsed(next)
-    const html = document.documentElement
-    if (next) html.dataset.aboutAside = 'collapsed'
-    else delete html.dataset.aboutAside
-    try {
-      window.localStorage.setItem(ASIDE_KEY, next ? 'collapsed' : 'open')
-    } catch {
-      /* storage blocked: the choice lasts for this page only */
-    }
-  }
-
-  const label = collapsed ? 'Show photo and activity' : 'Hide photo and activity'
   return (
-    <button type="button" className="aside-toggle" onClick={toggle} aria-pressed={collapsed} aria-label={label} title={label}>
-      {collapsed ? <PanelRightOpen aria-hidden="true" /> : <PanelRightClose aria-hidden="true" />}
+    <button type="button" className="aside-toggle" aria-label="Show photo and activity" title="Show photo and activity" onClick={() => collapseAside(false)}>
+      <ChevronLeft aria-hidden="true" />
     </button>
   )
 }
