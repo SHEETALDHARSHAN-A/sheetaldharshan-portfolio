@@ -38,6 +38,9 @@ export default buildConfig({
     components: {
       // The admin menu, page by page in the site's order (projects listed one by one).
       beforeNavLinks: ['@/components/admin/EditByPage#EditByPage'],
+      // GitHub sign-in (Supabase Auth) above the backup password form, and a sign-out that ends both sessions.
+      beforeLogin: ['@/components/admin/GitHubSignIn#GitHubSignIn'],
+      logout: { Button: '@/components/admin/SignOut#SignOut' },
     },
     importMap: {
       baseDir: path.resolve(dirname),
