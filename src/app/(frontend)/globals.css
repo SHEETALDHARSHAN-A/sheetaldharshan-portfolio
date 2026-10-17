@@ -629,7 +629,7 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .empty { color: var(--muted); border: 1px dashed var(--line-strong); border-radius: var(--radius); padding: 30px; max-width: 640px; }
 
 /* ------------------------------------------------------------------ about / research / contact */
-.about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr); grid-template-rows: auto 1fr; column-gap: clamp(24px, 4vw, 60px); align-items: start; }
+.about { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr); grid-template-rows: auto 1fr; column-gap: clamp(24px, 4vw, 60px); align-items: start; }
 .about-head, .about-main { grid-column: 1; }
 /* Hide / show the right-hand column (AsideToggle): the text then takes the full width. */
 .about { position: relative; }
