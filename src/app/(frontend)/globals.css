@@ -173,7 +173,8 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .activity-logo { display: inline-grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 50%; border: 0; background: var(--surface); color: var(--text); padding: 0; cursor: pointer; transition: transform 160ms ease, background 160ms ease; }
 .activity-logo .brand-icon { margin: 0; }
 button.activity-logo:hover { background: var(--surface-hover); }
-button.activity-logo[aria-expanded='true'] { background: var(--accent-soft); color: var(--accent); }
+/* Solid tints (never see-through), so an overlapped logo never shows behind the selected one. */
+button.activity-logo[aria-expanded='true'] { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); color: var(--accent); }
 button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .activity-dock { display: grid; gap: 10px; }
 .activity-dock .dock-row { display: flex; align-items: center; gap: 10px; }
@@ -181,9 +182,7 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .dock-logos { display: flex; align-items: center; height: 44px; padding-left: 2px; }
 .dock-logos .activity-logo { position: relative; }
 /* Two or more: they overlap at rest and spread apart on hover (or keyboard focus) so each shows in full. */
-.dock-logos .activity-logo { box-shadow: 0 0 0 2px var(--sb-bg, var(--bg)); }
-/* Magic UI AvatarCircles: 40px circles overlapping by 16px, each cut out of the one behind by a ring in the
-   background colour. Hovering (or focusing) one keeps it in place and nudges the others 6px away from it,
+/* Magic UI AvatarCircles: 40px circles overlapping by 16px, no borders. Hovering (or focusing) one keeps it in place and nudges the others 6px away from it,
    just enough to make each easy to click. */
 .dock-logos[data-stacked] .activity-logo + .activity-logo { margin-left: -16px; }
 .dock-logos[data-stacked] .activity-logo { transition: transform 260ms var(--ease-out), background 160ms ease, box-shadow 160ms ease; }
@@ -197,7 +196,7 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 /* All cards share one cell, so the space is always kept: opening one fades it in without moving anything. */
 .activity-dock { position: relative; }
 /* The open card floats up above the logos (over the avatar), so nothing in the sidebar moves. Above the pet (z 60). */
-.dock-cards { position: absolute; left: -12px; right: -12px; bottom: calc(100% + 10px); z-index: 70; display: grid; padding: 14px 12px 12px; border-radius: 16px; background: var(--sb-bg, var(--bg-elevated)); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); visibility: hidden; opacity: 0; transform: translateY(8px) scale(0.98); transform-origin: 30px 100%; transition: opacity 200ms var(--ease-out), transform 220ms var(--ease-out), visibility 0s linear 220ms; }
+.dock-cards { position: absolute; left: 0; right: 0; bottom: calc(100% + 10px); z-index: 70; display: grid; padding: 0; visibility: hidden; opacity: 0; transform: translateY(8px) scale(0.98); transform-origin: 30px 100%; transition: opacity 200ms var(--ease-out), transform 220ms var(--ease-out), visibility 0s linear 220ms; }
 .dock-cards[data-open='true'] { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
 /* The cards sit side by side in a scroll-snapping track: a carousel when several are shown. */
 /* Cards stretch to the tallest, so the track keeps one height and nothing around it moves between cards. */
@@ -215,10 +214,8 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .activity-dock[data-variant='inline'] { display: grid; gap: 12px; }
 .activity-dock[data-variant='inline'] .dock-cards { position: static; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; transform: none; }
 .activity-dock[data-variant='inline'] .dock-cards[data-open='false'] { display: none; }
-.activity-dock[data-variant='inline'] .dock-logos .activity-logo { box-shadow: 0 0 0 2px var(--bg); }
-.activity-dock[data-variant='inline'] button.activity-logo[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); }
 .activity-dock[data-variant='inline'] .dock-head { font-size: 14px; }
-button.activity-logo[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--sb-bg, var(--bg)), 0 0 0 4px var(--accent); }
+button.activity-logo[aria-pressed='true'] { background: color-mix(in srgb, var(--accent) 34%, var(--surface)); color: var(--accent); }
 .dock-head { margin: 0; display: flex; align-items: baseline; font-family: var(--font-condensed); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .dock-head .activity-sub { margin-left: auto; }
 .activity-body { display: grid; gap: 7px; min-width: 0; }
