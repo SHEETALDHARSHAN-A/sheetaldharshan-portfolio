@@ -2366,7 +2366,7 @@ export interface SiteSetting {
    */
   contactFormEnabled?: boolean | null;
   /**
-   * PDF shown as a download on the About page.
+   * Shown as a "Download résumé" button under your name on the About page. Upload a PDF; leave empty to hide the button.
    */
   resume?: (number | null) | Media;
   /**

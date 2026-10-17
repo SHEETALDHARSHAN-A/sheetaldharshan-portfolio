@@ -15,6 +15,11 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { BrandIcon } from '@/components/BrandIcon'
 import { formatMonth, getAbout, getCertifications, getEducation, getExperience, getProjects, getPublications, getSite } from '@/data/content'
 
+/** Supabase Storage downloads a public file (with this name) when asked; other hosts get the browser's own handling. */
+function downloadUrl(url: string, name: string) {
+  return /supabase\.co\/storage\/v1\/object\/public\//.test(url) ? `${url}${url.includes('?') ? '&' : '?'}download=${encodeURIComponent(name)}` : url
+}
+
 export const revalidate = 300
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -65,6 +70,16 @@ export default async function AboutPage() {
           <span className="eyebrow">{about.eyebrow}</span>
           <h1>{about.title}</h1>
           {site.currentRole && <p>{[site.currentRole, site.location].filter(Boolean).join(' · ')}</p>}
+          {/* Résumé (Site settings → Résumé): first thing a recruiter looks for, so it sits with the name. */}
+          {site.resume ? (
+            <a className="btn resume-btn" href={downloadUrl(site.resume.url, `${site.fullName} - Résumé.pdf`)} download={`${site.fullName} - Résumé.pdf`} target="_blank" rel="noreferrer">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3" />
+              </svg>
+              Download résumé
+              <span className="resume-meta">PDF</span>
+            </a>
+          ) : null}
         </header>
         <div className="about-main">
           <div className="about-intro">
@@ -183,13 +198,6 @@ export default async function AboutPage() {
               )}
             </section>
           ))}
-          {site.resume && (
-            <section className="section">
-              <a className="btn ghost" href={site.resume.url} rel="noreferrer" target="_blank">
-                Download résumé (PDF)
-              </a>
-            </section>
-          )}
         </div>
         <aside className="about-aside">
           <div className="about-photo" aria-hidden={!about.photo}>
