@@ -40,15 +40,25 @@ export function AdminSearch() {
     const ctrl = new AbortController()
     const t = window.setTimeout(() => {
       setLoading(true)
-      fetch(`/api/admin-search?q=${encodeURIComponent(term)}`, { credentials: 'include', signal: ctrl.signal })
-        .then((r) => (r.ok ? r.json() : { hits: [] }))
-        .then((d: { hits: AdminHit[] }) => {
-          setHits(d.hits)
-          setActive(0)
-        })
-        .catch(() => undefined)
-        .finally(() => setLoading(false))
-    }, 160)
+      const get = (scope: string) =>
+        fetch(`/api/admin-search?scope=${scope}&q=${encodeURIComponent(term)}`, { credentials: 'include', signal: ctrl.signal })
+          .then((r) => (r.ok ? r.json() : { hits: [] }))
+          .then((d: { hits: AdminHit[] }) => d.hits)
+      // Settings and fields answer at once; content (which needs the database) is added when it arrives.
+      let settings: AdminHit[] = []
+      let content: AdminHit[] = []
+      const show = () => setHits([...content, ...settings])
+      setActive(0)
+      const a = get('settings').then((h) => {
+        settings = h
+        show()
+      })
+      const b = get('content').then((h) => {
+        content = h
+        show()
+      })
+      Promise.allSettled([a, b]).then(() => !ctrl.signal.aborted && setLoading(false))
+    }, 120)
     return () => {
       window.clearTimeout(t)
       ctrl.abort()
@@ -134,7 +144,7 @@ export function AdminSearch() {
               })}
             </div>
           ))}
-          {!flat.length ? <p className="empty">{loading ? 'Searching…' : `Nothing matches “${q.trim()}”.`}</p> : null}
+          {!flat.length ? <p className="empty">{loading ? 'Searching…' : `Nothing matches “${q.trim()}”.`}</p> : loading ? <p className="empty">Looking through content…</p> : null}
         </div>
       ) : null}
     </div>

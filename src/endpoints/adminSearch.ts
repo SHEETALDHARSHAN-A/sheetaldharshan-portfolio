@@ -61,6 +61,10 @@ function configEntries(config: SanitizedConfig): Entry[] {
     for (const f of found) add({ kind: 'field', label: f.label, detail: [label, ...f.trail].join(' › '), href }, f.description)
   }
   add({ kind: 'page', label: 'Your account', detail: 'Name, email, password, photo, admin theme', href: `${admin}/account` }, 'profile avatar user dark light')
+  add(
+    { kind: 'page', label: 'Password & two-step sign-in', detail: 'Change your password (Your account); the GitHub step is set up in Supabase', href: `${admin}/account` },
+    '2fa two-factor mfa github security login sign in signin reset forgot otp',
+  )
   cached = { config, entries }
   return entries
 }
@@ -84,10 +88,10 @@ async function documentHits(req: PayloadRequest, q: string): Promise<AdminHit[]>
     .filter((s): s is { c: (typeof s)['c']; title: string } => Boolean(s.title))
     .map(async ({ c, title }) => {
       const res = await payload
-        .find({ collection: c.slug, where: { [title]: { like: q } }, limit: 4, depth: 0, draft: Boolean(c.versions?.drafts), overrideAccess: false, user: req.user, req })
+        .find({ collection: c.slug, where: { [title]: { like: q } }, limit: 4, depth: 0, draft: Boolean(c.versions?.drafts), select: { [title]: true } as never, overrideAccess: false, user: req.user, req })
         .catch(() => null)
       const kind = plain(c.labels?.singular) || humanize(c.slug)
-      return (res?.docs ?? []).map((d) => ({ kind: 'document' as const, label: String((d as unknown as Record<string, unknown>)[title] ?? d.id), detail: kind, href: `${admin}/collections/${c.slug}/${d.id}` }))
+      return ((res?.docs ?? []) as unknown as { id: string | number }[]).map((d) => ({ kind: 'document' as const, label: String((d as unknown as Record<string, unknown>)[title] ?? d.id), detail: kind, href: `${admin}/collections/${c.slug}/${d.id}` }))
     })
   return (await Promise.all(searches)).flat()
 }
@@ -107,7 +111,10 @@ export const adminSearch: Endpoint = {
       .sort((a, b) => b.s - a.s)
       .slice(0, 14)
       .map(({ e: { text: _text, ...hit } }) => hit)
-    const docs = await documentHits(req, q)
+    // Settings come straight from the config; content needs the database, so the bar asks for it separately.
+    if (req.searchParams.get('scope') === 'settings') return Response.json({ hits: settings }, { headers: { 'Cache-Control': 'no-store' } })
+    const docs = await Promise.race([documentHits(req, q), new Promise<AdminHit[]>((r) => setTimeout(() => r([]), 6000))])
+    if (req.searchParams.get('scope') === 'content') return Response.json({ hits: docs }, { headers: { 'Cache-Control': 'no-store' } })
     return Response.json({ hits: [...docs, ...settings] }, { headers: { 'Cache-Control': 'no-store' } })
   },
 }
