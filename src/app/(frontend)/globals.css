@@ -173,23 +173,24 @@ html:not(.js) .jg-bubble:last-of-type { border-bottom-left-radius: 0; }
 .activity-logo { display: inline-grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 50%; border: 0; background: var(--surface); color: var(--text); padding: 0; cursor: pointer; transition: transform 160ms ease, background 160ms ease; }
 .activity-logo .brand-icon { margin: 0; }
 button.activity-logo:hover { background: var(--surface-hover); }
-/* The card in view: a thin ring in the text colour (white in dark mode); the logo keeps its own colours. */
-button.activity-logo[aria-expanded='true'] { box-shadow: inset 0 0 0 1.5px var(--text); }
+/* No rings: while a card is in view, the other logos dim a little, so the selected one stands out. */
+.dock-logos:has(.activity-logo[aria-expanded='true']) .activity-logo:not([aria-expanded='true']) { opacity: 0.45; }
+.dock-logos .activity-logo:hover { opacity: 1 !important; }
 button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .activity-dock { display: grid; gap: 10px; }
 .activity-dock .dock-row { display: flex; align-items: center; gap: 10px; }
 /* After Magic UI's AvatarCircles: overlapping round logos, each ringed in the page colour. */
-.dock-logos { display: flex; align-items: center; height: 44px; padding-left: 2px; }
+.dock-logos { display: flex; align-items: center; height: 36px; padding-left: 2px; }
 .dock-logos .activity-logo { position: relative; }
 /* Two or more: they overlap at rest and spread apart on hover (or keyboard focus) so each shows in full. */
-/* Magic UI AvatarCircles: 40px circles overlapping by 16px, no borders. Hovering (or focusing) one keeps it in place and nudges the others 6px away from it,
+/* Magic UI AvatarCircles: 32px circles overlapping by 12px, no borders. Hovering (or focusing) one keeps it in place and nudges the others 6px away from it,
    just enough to make each easy to click. */
-.dock-logos[data-stacked] .activity-logo + .activity-logo { margin-left: -16px; }
-.dock-logos[data-stacked] .activity-logo { transition: transform 260ms var(--ease-out), background 160ms ease, box-shadow 160ms ease; }
+.dock-logos[data-stacked] .activity-logo + .activity-logo { margin-left: -12px; }
+.dock-logos[data-stacked] .activity-logo { transition: transform 260ms var(--ease-out), background 160ms ease, opacity 200ms ease; }
 .dock-logos[data-stacked][data-spread] .activity-logo { transform: translateX(calc((var(--i) - var(--h)) * 6px)); }
 .dock-logos[data-stacked][data-spread] .activity-logo:not([aria-pressed='true']) { z-index: 0; }
 /* Magnification: each logo's size follows the pointer (set by ActivityDock), springing back on leave. */
-.dock-logos .activity-logo { width: 40px; height: 40px; }
+.dock-logos .activity-logo { width: 32px; height: 32px; }
 .dock-logos .activity-logo .brand-icon { width: 50%; height: 50%; }
 .dock-logos .dock-hint { align-self: center; }
 .dock-hint { font-family: var(--font-condensed); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-left: 2px; }
@@ -216,7 +217,6 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 .activity-dock[data-variant='inline'] .dock-cards { position: static; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; transform: none; }
 .activity-dock[data-variant='inline'] .dock-cards[data-open='false'] { display: none; }
 .activity-dock[data-variant='inline'] .dock-head { font-size: 14px; }
-button.activity-logo[aria-pressed='true'] { box-shadow: inset 0 0 0 2px var(--text); }
 .dock-head { margin: 0; display: flex; align-items: baseline; font-family: var(--font-condensed); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .dock-head .activity-sub { margin-left: auto; }
 .activity-body { display: grid; gap: 7px; min-width: 0; }
@@ -294,7 +294,11 @@ button.activity-logo[aria-pressed='true'] { box-shadow: inset 0 0 0 2px var(--te
 /* View changes: everything in the ring fades out, swaps while faded (no reshaping), then fades back in. */
 .lcg-ring svg, .lcg-center, .lcg-foot { transition: opacity 220ms ease; }
 .lcg[data-fading] .lcg-ring svg, .lcg[data-fading] .lcg-center, .lcg[data-fading] .lcg-foot { opacity: 0.08; transition-duration: 160ms; }
-.lcg-fill { animation: lcg-grow 650ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both; }
+.lcg-track { animation: lcg-grow 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lcg-fill { animation: lcg-grow 650ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both; }
+/* Fading out: every arc and progress line runs back to its start. */
+.lcg[data-fading] .lcg-track, .lcg[data-fading] .lcg-fill { animation: lcg-shrink 160ms ease-in forwards; }
+@keyframes lcg-shrink { to { stroke-dasharray: var(--from); } }
 @keyframes lcg-grow { from { stroke-dasharray: var(--from); } }
 .lcg-track[data-dim='true'] { opacity: 0.22; }
 .lcg-center { position: relative; display: grid; justify-items: center; gap: 2px; text-align: center; }
@@ -310,7 +314,7 @@ button.activity-logo[aria-pressed='true'] { box-shadow: inset 0 0 0 2px var(--te
 .lcg-levels button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .lcg-level { font-size: 12.5px; font-weight: 600; }
 .lcg-count { font-size: 13px; font-variant-numeric: tabular-nums; }
-@media (prefers-reduced-motion: reduce) { .lcg-fill { animation: none !important; } .lcg-ring svg, .lcg-center, .lcg-foot { transition: none !important; } .dock-logos .activity-logo { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .lcg-fill, .lcg-track { animation: none !important; } .lcg-ring svg, .lcg-center, .lcg-foot { transition: none !important; } .dock-logos .activity-logo { transition: none !important; } }
 /* In the sidebar the gauge stacks: the ring, then the three levels in a row. */
 /* LeetCode, compact: the gauge beside the three levels, so the card is no taller than GitHub's. */
 .sidebar-activity .lcg { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); gap: 8px; }

@@ -29,8 +29,9 @@ const pct = (n: number) => {
  * how many problems that level has. Hover the ring for the acceptance rate, or a level for its
  * "Beats x%"; a click keeps that view, and clicking it again goes back to the total.
  *
- * Changing view animates like LeetCode's own widget: the arcs and numbers fade out together, the new
- * view is swapped in while faded, then it fades back in with its progress line growing from the start.
+ * Changing view animates like LeetCode's own widget: the arcs run back to their start while everything
+ * fades out, the new view is swapped in, then its arcs draw in (all three at once at rest) and the
+ * progress lines grow from the start as it fades back in.
  */
 export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
   const [selected, setSelected] = useState<View | null>(null)
@@ -102,7 +103,8 @@ export function LeetcodeGauge({ data }: { data: LeetcodeStats }) {
               return (
                 <g key={s.key}>
                   {/* Zero-length arcs would still draw a dot through their round caps, so they fade out. */}
-                  <circle className="lcg-track" cx="64" cy="64" r={R} style={{ ...track, stroke: focused ? 'var(--surface-strong)' : s.color, opacity: focused || showSeg ? undefined : 0 }} data-dim={!focused} />
+                  {/* Re-mounted per view: the arcs draw in on fade-in and run back to their start on fade-out. */}
+                  <circle key={`t-${view}`} className="lcg-track" cx="64" cy="64" r={R} style={{ ...track, stroke: focused ? 'var(--surface-strong)' : s.color, opacity: focused || showSeg ? undefined : 0, ['--from' as string]: `0 ${C}` }} data-dim={!focused} />
                   {/* Re-mounted on every view change, so the line grows again from its start. */}
                   <circle key={view} className="lcg-fill" cx="64" cy="64" r={R} style={{ ...fill, stroke: s.color, opacity: fillLen > 0 && (focused || showSeg) ? 1 : 0, ['--from' as string]: `0 ${C}` }} />
                 </g>
