@@ -24,10 +24,12 @@ export const About: GlobalConfig = {
             path: '@/components/admin/CropGuide#CropGuide',
             clientProps: {
               watch: 'photo',
+              focalX: 'photoFocalX',
+              focalY: 'photoFocalY',
               frames: [
-                { label: 'Tallest, 4:5: no cards open', ratio: 4 / 5, color: '#4ade80' },
-                { label: 'Square, 1:1: one card open, and on phones', ratio: 1, color: '#60a5fa' },
-                { label: 'Widest, 3:2: cards open on a short screen', ratio: 3 / 2, color: '#f472b6' },
+                { label: 'Tallest, 4:5: no cards open', short: '4:5 tallest', ratio: 4 / 5, color: '#4ade80' },
+                { label: 'Square, 1:1: one card open, and on phones', short: '1:1 square', ratio: 1, color: '#60a5fa' },
+                { label: 'Widest, 3:2: cards open on a short screen', short: '3:2 widest', ratio: 3 / 2, color: '#f472b6' },
               ],
               note: 'Upload a portrait photo, 4:5, at least 1200×1500 px.',
             },
@@ -35,6 +37,9 @@ export const About: GlobalConfig = {
         },
       },
     },
+    // Set with the crop guide above; empty uses the image's own focal point.
+    { name: 'photoFocalX', type: 'number', min: 0, max: 100, admin: { hidden: true } },
+    { name: 'photoFocalY', type: 'number', min: 0, max: 100, admin: { hidden: true } },
     {
       name: 'sections',
       type: 'array',

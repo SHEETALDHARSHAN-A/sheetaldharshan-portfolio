@@ -2690,6 +2690,8 @@ export interface About {
    * Best: a portrait photo, 4:5, at least 1200×1500 px. The site cuts it anywhere from 4:5 (tall) to 3:2 (wide), and 1:1 on phones; the guide below shows each cut.
    */
   photo?: (number | null) | Media;
+  photoFocalX?: number | null;
+  photoFocalY?: number | null;
   /**
    * Ordered sections. Uncheck "visible" to hide one without deleting it.
    */
@@ -2976,6 +2978,8 @@ export interface AboutSelect<T extends boolean = true> {
   title?: T;
   intro?: T;
   photo?: T;
+  photoFocalX?: T;
+  photoFocalY?: T;
   sections?:
     | T
     | {

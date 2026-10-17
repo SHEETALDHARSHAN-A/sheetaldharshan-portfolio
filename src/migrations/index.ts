@@ -8,6 +8,7 @@ import * as migration_20261017_210000_theme_projects_style from './20261017_2100
 import * as migration_20261017_220000_sidebar_homepage_look from './20261017_220000_sidebar_homepage_look';
 import * as migration_20261017_230000_pet_behaviour from './20261017_230000_pet_behaviour';
 import * as migration_20261017_235000_admin_look from './20261017_235000_admin_look';
+import * as migration_20261018_010000_about_photo_focal from './20261018_010000_about_photo_focal';
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261017_235000_admin_look.up,
     down: migration_20261017_235000_admin_look.down,
     name: '20261017_235000_admin_look',
+  },
+  {
+    up: migration_20261018_010000_about_photo_focal.up,
+    down: migration_20261018_010000_about_photo_focal.down,
+    name: '20261018_010000_about_photo_focal',
   },
 ];

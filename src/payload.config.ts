@@ -92,6 +92,13 @@ export default buildConfig({
       // Managed Postgres (Supabase, Neon, RDS) requires TLS; local Postgres does not.
       ssl: process.env.DATABASE_SSL === 'true' || /supabase\.co|neon\.tech|\.rds\.amazonaws\.com/.test(process.env.DATABASE_URL || '') ? { rejectUnauthorized: false } : undefined,
       max: Number(process.env.DATABASE_POOL_MAX || 10),
+      // Serverless functions are frozen between requests while Supabase drops idle connections, so a
+      // kept connection can be dead when the function wakes and a query on it would hang. Drop idle
+      // connections quickly, keep sockets alive, and fail fast instead of waiting forever.
+      idleTimeoutMillis: 5_000,
+      connectionTimeoutMillis: 10_000,
+      keepAlive: true,
+      query_timeout: 20_000,
     },
     migrationDir: path.resolve(dirname, 'migrations'),
     // Production never pushes schema changes; it runs the committed migrations.

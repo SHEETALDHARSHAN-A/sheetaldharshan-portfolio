@@ -13,6 +13,7 @@ import {
   type Conversation,
   type EducationEntry,
   type ExperienceEntry,
+  type MediaRef,
   type NavItem,
   type Post,
   type PostSummary,
@@ -43,6 +44,12 @@ const defaultNav: NavItem[] = [
 ]
 
 /** A colour from the admin, only if it is a #rrggbb value. */
+/** A focal point chosen for this one use (0–100 each) overrides the image's own. */
+const withFocal = (media: MediaRef | undefined, x: unknown, y: unknown): MediaRef | undefined => {
+  const ok = (v: unknown): v is number => typeof v === 'number' && v >= 0 && v <= 100
+  return media && ok(x) && ok(y) ? { ...media, focalX: x, focalY: y } : media
+}
+
 const hex = (v: unknown) => (typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v) ? v : undefined)
 
 const names = (rows: { name?: string | null }[] | null | undefined) => (rows ?? []).map((row) => row.name ?? '').filter(Boolean)
@@ -352,7 +359,7 @@ export const getAbout = cache(async (): Promise<AboutContent> => {
     eyebrow: about?.eyebrow || 'About',
     title: about?.title || 'Sheetaldharshan A',
     intro: (about?.intro ?? '').split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean),
-    photo: toMediaRef(about?.photo),
+    photo: withFocal(toMediaRef(about?.photo), about?.photoFocalX, about?.photoFocalY),
     sections,
     meta: { title: about?.meta?.title ?? undefined, description: about?.meta?.description ?? undefined },
   }
