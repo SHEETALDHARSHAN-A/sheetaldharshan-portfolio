@@ -3,9 +3,11 @@ import { Barlow_Condensed, Inter } from 'next/font/google'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import { draftMode } from 'next/headers'
+import Script from 'next/script'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
+import { ThemeSync } from '@/components/shell/ThemeSync'
 import { getAppearance, getSite } from '@/data/content'
 import { brandName, defaultTitle, nameVariants } from '@/data/seo'
 import { getBrandIcons } from '@/data/brand'
@@ -31,12 +33,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         {themeFontsHref(theme) ? <link rel="stylesheet" href={themeFontsHref(theme)!} /> : null}
         {themeCss(theme) ? <style dangerouslySetInnerHTML={{ __html: themeCss(theme) }} /> : null}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
-        {/* The visitor's light/dark choice (or the device setting), applied before the first paint. */}
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript(theme) }} />
+        {/* Before the first paint, on every page (404 included): the visitor's light/dark choice and saved widths. */}
+        <Script id="boot" strategy="beforeInteractive">{`document.documentElement.classList.add('js');${themeBootScript(theme)}`}</Script>
         <link href="/rss.xml" rel="alternate" title="Blog RSS" type="application/rss+xml" />
       </head>
       <body>
+        <ThemeSync toggle={theme.toggle} fallback={theme.theme} />
         <a className="skip-link" href="#main">
           Skip to content
         </a>
