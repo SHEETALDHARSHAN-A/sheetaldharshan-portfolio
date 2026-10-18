@@ -25,6 +25,10 @@ export type ContactSettings = {
   doneMessage: string
   formNote: string
   fields: ContactField[]
+  /** Email me each new message (needs RESEND_API_KEY). */
+  notify: boolean
+  /** Where alerts go; empty means the email in Site settings. */
+  notifyEmail?: string
 }
 
 export const DEFAULT_FIELDS: ContactField[] = [
@@ -44,6 +48,7 @@ export const DEFAULT_CONTACT: ContactSettings = {
   doneMessage: "Done! Thanks, {first} 🙌 I'll reply to {email} soon.",
   formNote: 'Your details are only used to reply to you.',
   fields: DEFAULT_FIELDS,
+  notify: true,
 }
 
 export const SKIP = /^(skip|no|nope|none|n\/a|na|-|no thanks|not now)$/i
@@ -175,5 +180,7 @@ export function toContactSettings(doc: Record<string, unknown> | null | undefine
     doneMessage: str(doc?.doneMessage, d.doneMessage),
     formNote: str(doc?.formNote, d.formNote),
     fields: usable ? fields : DEFAULT_FIELDS,
+    notify: doc?.notify !== false,
+    notifyEmail: typeof doc?.notifyEmail === 'string' && EMAIL.test(doc.notifyEmail.trim()) ? doc.notifyEmail.trim() : undefined,
   }
 }

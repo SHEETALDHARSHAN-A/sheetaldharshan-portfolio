@@ -54,6 +54,25 @@ export const ContactPage: GlobalConfig = {
       ],
     },
     {
+      type: 'collapsible',
+      label: 'Email alerts',
+      fields: [
+        { name: 'emailAlertStatus', type: 'ui', admin: { components: { Field: '@/components/admin/EmailAlertStatus#EmailAlertStatus' } } },
+        {
+          type: 'row',
+          fields: [
+            { name: 'notify', type: 'checkbox', label: 'Email me each new message', defaultValue: true, admin: { width: '40%' } },
+            {
+              name: 'notifyEmail',
+              type: 'email',
+              label: 'Send alerts to',
+              admin: { width: '60%', description: 'Empty: the email in Site-wide → Name & profiles.' },
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'fields',
       type: 'array',
       label: 'Questions',

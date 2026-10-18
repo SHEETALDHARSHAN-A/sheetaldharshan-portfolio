@@ -40,6 +40,13 @@ A user without a GitHub username falls back to the accounts listed in `src/confi
 
 Nothing needs changing on GitHub or Supabase for a new person: the same OAuth app serves everyone.
 
+## Contact page
+**Contact page → Chat, form & questions** sets the heading and intro, whether visitors write in a chat, a form or both (and which opens first), the chat's greeting and closing lines, and the questions themselves (add, remove, reorder; each with its type, chat question, required or optional, choices, and what the chat says when an answer does not fit).
+
+**Messages** arrive in **Contact page → Messages**, with every answer. Tick **Handled** once you have replied.
+
+**Email alerts:** each new message can also be emailed to you (with Reply-To set to the visitor). To switch this on: create a free account at [resend.com](https://resend.com) using the address you want alerts at, create an API key, add it in Vercel as `RESEND_API_KEY`, and redeploy. Then use **Send test email** under Contact page → Email alerts. Each message shows in its sidebar whether its alert went out.
+
 ## Find anything
 The search box at the top of the admin menu (**⌘K** or **/**) finds settings pages, any field by its label (showing where it lives, for example *Pet › Behaviour*), content by title, and "New …" actions. It reads the CMS setup itself, so pages and fields added later are found without extra work. The **More** group in *Edit by page* lists anything new that hasn't been placed in the menu yet.
 

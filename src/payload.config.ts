@@ -17,7 +17,7 @@ import { Certifications } from './collections/Certifications'
 import { Publications } from './collections/Publications'
 import { Users } from './collections/Users'
 import { Messages } from './collections/Messages'
-import { contact } from './endpoints/contact'
+import { contact, contactTest } from './endpoints/contact'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -120,7 +120,7 @@ export default buildConfig({
   // Order sets the admin menu: Sidebar, Brand, then Pages.
   globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, AdminLook, AdminSecurity, Homepage, ProjectsPage, About, ContactPage],
   // The admin's search bar (src/components/admin/AdminSearch.tsx).
-  endpoints: [adminSearch, ...siteJson, contact],
+  endpoints: [adminSearch, ...siteJson, contact, contactTest],
   plugins: [
     ...plugins,
     // Persistent media in production. Enabled only when a Vercel Blob token is present; local dev writes to public/media.

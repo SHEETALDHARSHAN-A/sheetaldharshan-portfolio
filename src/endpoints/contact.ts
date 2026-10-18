@@ -1,5 +1,6 @@
 import type { Endpoint } from 'payload'
-import { checkAnswer, toContactSettings } from '@/utilities/contactFields'
+import { checkAnswer, toContactSettings, type ContactSettings } from '@/utilities/contactFields'
+import { emailAlertsReady, sendEmailAlert } from '@/utilities/emailAlert'
 
 const recent = new Map<string, number[]>()
 
@@ -49,8 +50,9 @@ export const contact: Endpoint = {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
     if (limited(`${ip}|${email.toLowerCase()}`)) return Response.json({ error: 'That is a lot of messages in a short time. Please try again in a few minutes.' }, { status: 429 })
 
+    let id: number | string
     try {
-      await req.payload.create({
+      const doc = await req.payload.create({
         collection: 'messages' as never,
         data: {
           name,
@@ -63,10 +65,58 @@ export const contact: Endpoint = {
         } as never,
         overrideAccess: true,
       })
+      id = (doc as { id: number | string }).id
     } catch (e) {
       req.payload.logger.error({ err: e }, 'contact form: could not store message')
       return Response.json({ error: 'Your message could not be sent just now. Please email me instead.' }, { status: 500 })
     }
+    // The email alert never holds up or undoes the message; its outcome is noted on the message.
+    const alert = await alertOwner(req.payload, settings, { name, email, topic: clean[first('choice') ?? ''], answers: settings.fields.filter((f) => clean[f.key]).map((f) => ({ label: f.label, value: clean[f.key] })) })
+    await req.payload.update({ collection: 'messages' as never, id, data: { alert } as never, overrideAccess: true }).catch(() => undefined)
     return Response.json({ ok: true })
   },
 }
+
+type PayloadLike = Parameters<Endpoint['handler']>[0]['payload']
+
+/** Who gets alerts: the address set on the Contact page, or the site's email. */
+export async function alertRecipient(payload: PayloadLike, settings: ContactSettings): Promise<string | undefined> {
+  if (settings.notifyEmail) return settings.notifyEmail
+  const site = (await payload.findGlobal({ slug: 'site-settings' as never, depth: 0 }).catch(() => null)) as { email?: string } | null
+  return site?.email || undefined
+}
+
+async function alertOwner(payload: PayloadLike, settings: ContactSettings, m: { name: string; email: string; topic?: string; answers: { label: string; value: string }[] }): Promise<string> {
+  if (!settings.notify) return 'Off (Contact page → Email alerts)'
+  if (!emailAlertsReady()) return 'Not sent: RESEND_API_KEY is not set'
+  const to = await alertRecipient(payload, settings)
+  if (!to) return 'Not sent: no address to send to'
+  const result = await sendEmailAlert({
+    to,
+    replyTo: m.email,
+    subject: `New message from ${m.name}${m.topic ? ` · ${m.topic}` : ''}`,
+    rows: m.answers,
+    footer: 'Sent from the Contact page. Reply to this email to answer them directly.',
+  })
+  return result.ok ? `Emailed to ${to}` : `Not sent: ${result.reason}`
+}
+
+/** POST /api/contact-test: sends a test alert to the configured address. Signed-in admins only. */
+export const contactTest: Endpoint = {
+  path: '/contact-test',
+  method: 'post',
+  handler: async (req) => {
+    if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    const settings = toContactSettings((await req.payload.findGlobal({ slug: 'contact-page' as never, depth: 0 })) as unknown as Record<string, unknown>)
+    if (!emailAlertsReady()) return Response.json({ ok: false, message: 'RESEND_API_KEY is not set yet, so no email can be sent.' })
+    const to = await alertRecipient(req.payload, settings)
+    if (!to) return Response.json({ ok: false, message: 'There is no address to send to: set one here, or an email in Site-wide → Name & profiles.' })
+    const result = await sendEmailAlert({
+      to,
+      subject: 'Test: Contact page email alerts work',
+      rows: [{ label: 'All good', value: 'New messages from your Contact page will arrive like this, with every answer. Reply to one to answer the visitor directly.' }],
+    })
+    return Response.json(result.ok ? { ok: true, message: `Test email sent to ${to}. Check your inbox (and spam, the first time).` } : { ok: false, message: `Not sent: ${result.reason}` })
+  },
+}
+

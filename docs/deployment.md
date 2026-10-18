@@ -42,6 +42,8 @@ From `.env.example`:
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token for persistent uploads |
 | `CRON_SECRET` | only if scheduled jobs are enabled |
 | `SUPABASE_URL`, `SUPABASE_ANON_KEY` | admin GitHub step; optional when the `S3_*` variables point at the same Supabase project |
+| `RESEND_API_KEY` | Contact page email alerts (resend.com); without it messages are only saved in the admin |
+| `CONTACT_FROM_EMAIL` | Optional alert sender once your domain is verified in Resend |
 | `ADMIN_2FA` | leave empty; `off` switches the GitHub sign-in step off in an emergency (redeploy after changing it, and remove it once fixed) |
 
 Never commit `.env`. Set the values in the hosting dashboard.

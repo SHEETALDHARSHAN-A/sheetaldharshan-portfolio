@@ -1220,6 +1220,10 @@ export interface Message {
    * Where it was sent from.
    */
   page?: string | null;
+  /**
+   * Whether the email alert went out.
+   */
+  alert?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2098,6 +2102,7 @@ export interface MessagesSelect<T extends boolean = true> {
       };
   handled?: T;
   page?: T;
+  alert?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2873,6 +2878,11 @@ export interface ContactPage {
    */
   doneMessage?: string | null;
   formNote?: string | null;
+  notify?: boolean | null;
+  /**
+   * Empty: the email in Site-wide → Name & profiles.
+   */
+  notifyEmail?: string | null;
   /**
    * Asked in this order. Keep one name, one required email and one long message field; without them the defaults are used.
    */
@@ -3215,6 +3225,8 @@ export interface ContactPageSelect<T extends boolean = true> {
   greeting?: T;
   doneMessage?: T;
   formNote?: T;
+  notify?: T;
+  notifyEmail?: T;
   fields?:
     | T
     | {
