@@ -103,6 +103,8 @@ Markdown import: paste the text into the editor; the Lexical editor converts com
 - **Publications**, **Experience**, **Education**, **Certifications** (sidebar group "Profile"): one entry each, drafts supported.
 - **Site settings**: names, tagline, description, canonical URL, role, location, social links, optional email, résumé, default social image, footer note.
 
+**Résumé:** upload a PDF, or paste a **Résumé link** (used instead of the upload). A GitHub release link downloads straight away, with no browser warning about an unfamiliar site. To update it later, replace the file on the same release (`gh release upload resume Your_Resume.pdf --clobber -R <you>/<repo>`); the link stays the same.
+
 ## Drafts, preview, versions
 Everything with a status has **Draft** and **Published**. Preview uses a secret URL and shows the draft only to you. Each save creates a version; open **Versions** on a document to compare and restore.
 

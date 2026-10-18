@@ -121,7 +121,12 @@ From now on, every push to the main branch redeploys.
 
 Do it in this order; later items reuse earlier ones. The admin's **Edit by page** menu follows the site's pages. The [admin guide](admin-guide.md) explains every screen.
 
-1. **Site settings**: name, role, location, email, social links, résumé PDF, canonical URL.
+1. **Site settings**: name, role, location, email, social links, résumé, canonical URL.
+   - For the résumé, a GitHub release works best, because browsers trust GitHub downloads:
+     `gh release create resume Your_Resume.pdf --title "Résumé" -R <you>/<you>`
+   - Then paste `https://github.com/<you>/<you>/releases/download/resume/Your_Resume.pdf` into **Résumé link**.
+   - To update it, run `gh release upload resume Your_Resume.pdf --clobber -R <you>/<you>`; the link stays the same.
+   - Or just upload the PDF instead.
 2. **Appearance**: pick a theme preset or set your own colours and fonts.
 3. **Profile**: Experience, Education, Certifications, Publications.
 4. **Projects**: one per project, with a thumbnail, hero image or short video loop, and the story in blocks. Mark the best two or three as **Featured**.

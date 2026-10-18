@@ -65,6 +65,13 @@ const names = (rows: { name?: string | null }[] | null | undefined) => (rows ?? 
 
 /* ------------------------------------------------------------------ globals */
 
+/** The Résumé link when set; otherwise the uploaded PDF, which Supabase Storage downloads under a readable name. */
+function resumeUrl(link: string | null | undefined, uploaded: string | undefined, fullName: string): string | undefined {
+  if (link && /^https?:\/\//.test(link.trim())) return link.trim()
+  if (!uploaded) return undefined
+  return /supabase\.co\/storage\/v1\/object\/public\//.test(uploaded) ? `${uploaded}${uploaded.includes('?') ? '&' : '?'}download=${encodeURIComponent(`${fullName} - Résumé.pdf`)}` : uploaded
+}
+
 export const getSite = cache(async (): Promise<Site> => {
   const payload = await getClient()
   const [settings, navigation, pages] = await Promise.all([
@@ -89,6 +96,7 @@ export const getSite = cache(async (): Promise<Site> => {
     email: settings?.email ?? undefined,
     contactFormEnabled: settings?.contactFormEnabled ?? false,
     resume: toMediaRef(settings?.resume),
+    resumeUrl: resumeUrl(settings?.resumeLink, toMediaRef(settings?.resume)?.url, settings?.fullName || 'Sheetaldharshan A'),
     ogImage: toMediaRef(settings?.ogImage),
     footerNote: settings?.footerNote ?? undefined,
     nav: [...(nav.length ? nav : defaultNav), ...pageLinks],

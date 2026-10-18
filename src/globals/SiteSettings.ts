@@ -38,7 +38,15 @@ export const SiteSettings: GlobalConfig = {
     },
     { name: 'email', type: 'email', admin: { description: 'Optional. Shown on the contact page only when set.' } },
     { name: 'contactFormEnabled', type: 'checkbox', defaultValue: false, admin: { description: 'Requires an email provider configured on the server.' } },
-    { name: 'resume', type: 'upload', relationTo: 'media', label: 'Résumé (PDF)', admin: { description: 'Shown as a "Download résumé" button under your name on the About page. Upload a PDF; leave empty to hide the button.' } },
+    { name: 'resume', type: 'upload', relationTo: 'media', label: 'Résumé (PDF)', admin: { description: 'Shown as a "Download résumé" button on About and Contact. Upload a PDF, or use the link below; leave both empty to hide the button.' } },
+    {
+      name: 'resumeLink',
+      type: 'text',
+      label: 'Résumé link',
+      admin: {
+        description: 'Optional, used instead of the upload: a direct PDF link, e.g. a GitHub release asset (https://github.com/<you>/<repo>/releases/download/<tag>/<file>.pdf). Replace the file on that release to update it; the link stays the same.',
+      },
+    },
     { name: 'ogImage', type: 'upload', relationTo: 'media', admin: { description: 'Default social preview image (1200×630).' } },
     currentImages('ogImageInUse', [{ label: 'Link preview', watch: 'ogImage', fallback: '/icon-512.png', fallbackLabel: 'Built-in SD logo' }]),
     { name: 'footerNote', type: 'text', defaultValue: 'Built with Next.js and Payload. Content managed from /admin.' },

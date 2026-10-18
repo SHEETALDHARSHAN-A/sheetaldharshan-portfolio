@@ -50,7 +50,7 @@ export async function GET() {
   ]
 
   if (site.email) docs.push({ id: 'link:email', type: 'link', title: `Email ${site.email}`, subtitle: 'Opens your mail app', href: `mailto:${site.email}`, external: true, keywords: 'email mail write message contact' })
-  if (site.resume?.url) docs.push({ id: 'link:resume', type: 'link', title: 'Résumé (PDF)', subtitle: 'Download', href: site.resume.url, external: true, keywords: 'resume cv pdf download' })
+  if (site.resumeUrl) docs.push({ id: 'link:resume', type: 'link', title: 'Résumé (PDF)', subtitle: 'Download', href: site.resumeUrl, external: true, keywords: 'resume cv pdf download' })
   for (const link of site.socialLinks) {
     docs.push({ id: `link:${link.href}`, type: 'link', title: link.label, subtitle: link.href.replace(/^https?:\/\/(www\.)?/, ''), href: link.href, external: true, keywords: 'profile social code repositories' })
   }

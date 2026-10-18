@@ -2438,9 +2438,13 @@ export interface SiteSetting {
    */
   contactFormEnabled?: boolean | null;
   /**
-   * Shown as a "Download résumé" button under your name on the About page. Upload a PDF; leave empty to hide the button.
+   * Shown as a "Download résumé" button on About and Contact. Upload a PDF, or use the link below; leave both empty to hide the button.
    */
   resume?: (number | null) | Media;
+  /**
+   * Optional, used instead of the upload: a direct PDF link, e.g. a GitHub release asset (https://github.com/<you>/<repo>/releases/download/<tag>/<file>.pdf). Replace the file on that release to update it; the link stays the same.
+   */
+  resumeLink?: string | null;
   /**
    * Default social preview image (1200×630).
    */
@@ -3004,6 +3008,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   email?: T;
   contactFormEnabled?: T;
   resume?: T;
+  resumeLink?: T;
   ogImage?: T;
   footerNote?: T;
   updatedAt?: T;

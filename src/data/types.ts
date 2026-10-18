@@ -46,6 +46,8 @@ export type Site = {
   email?: string
   contactFormEnabled: boolean
   resume?: MediaRef
+  /** Where the Download résumé buttons point: the Résumé link, or the uploaded PDF. */
+  resumeUrl?: string
   ogImage?: MediaRef
   footerNote?: string
   nav: NavItem[]

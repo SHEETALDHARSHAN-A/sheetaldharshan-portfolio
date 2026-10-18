@@ -53,10 +53,10 @@ export default async function ContactPage() {
               <p>{site.currentRole ?? site.tagline}</p>
               {site.location ? <p className="contact-muted">{site.location}</p> : null}
             </section>
-            {site.resume ? (
+            {site.resumeUrl ? (
               <section>
                 <h2>Résumé</h2>
-                <a className="contact-row" href={site.resume.url} target="_blank" rel="noreferrer">
+                <a className="contact-row" href={site.resumeUrl} download>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                     <path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3" />
                   </svg>
