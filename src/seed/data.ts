@@ -37,7 +37,7 @@ export const siteSettings = {
     { label: 'GitHub', href: 'https://github.com/SHEETALDHARSHAN-A' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/sheetaldharshan' },
   ],
-  email: 'sheetaldharshan@gmail.com',
+  email: 'contact@sheetaldharshan.me',
   contactFormEnabled: false,
   footerNote: 'Built with Next.js and Payload. Content managed from /admin.',
 }
