@@ -35,6 +35,9 @@ export const brands: Brand[] = [
   { id: 'gmail', name: 'Gmail', domains: ['gmail.com'], path: 'M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z', color: '#EA4335' },
 ]
 
+/** Any other email address: a plain envelope (Material Symbols, Apache 2.0), in the text colour. */
+export const EMAIL_BRAND: Brand = { id: 'email', name: 'Email', path: 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z' }
+
 function hostOf(href: string): string | undefined {
   if (href.startsWith('mailto:')) return href.slice(7).split('@')[1]?.split('?')[0]?.toLowerCase()
   try {
@@ -50,6 +53,7 @@ export function findBrand({ href, name }: { href?: string; name?: string }): Bra
   if (host) {
     const byHost = brands.find((b) => b.domains?.some((d) => host === d || host.endsWith(`.${d}`)))
     if (byHost) return byHost
+    if (href?.startsWith('mailto:')) return EMAIL_BRAND
   }
   const key = name?.trim().toLowerCase()
   return key ? brands.find((b) => b.names?.some((n) => n.toLowerCase() === key)) : undefined
