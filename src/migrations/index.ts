@@ -13,6 +13,9 @@ import * as migration_20261018_020000_admin_security from './20261018_020000_adm
 import * as migration_20261018_030000_user_github from './20261018_030000_user_github';
 import * as migration_20261018_040000_theme_modes from './20261018_040000_theme_modes';
 import * as migration_20261018_050000_carousel_seconds from './20261018_050000_carousel_seconds';
+import * as migration_20261018_060000_messages from './20261018_060000_messages';
+import * as migration_20261018_061000_message_phone from './20261018_061000_message_phone';
+import * as migration_20261018_062000_contact_settings from './20261018_062000_contact_settings';
 
 export const migrations = [
   {
@@ -89,5 +92,20 @@ export const migrations = [
     up: migration_20261018_050000_carousel_seconds.up,
     down: migration_20261018_050000_carousel_seconds.down,
     name: '20261018_050000_carousel_seconds',
+  },
+  {
+    up: migration_20261018_060000_messages.up,
+    down: migration_20261018_060000_messages.down,
+    name: '20261018_060000_messages',
+  },
+  {
+    up: migration_20261018_061000_message_phone.up,
+    down: migration_20261018_061000_message_phone.down,
+    name: '20261018_061000_message_phone',
+  },
+  {
+    up: migration_20261018_062000_contact_settings.up,
+    down: migration_20261018_062000_contact_settings.down,
+    name: '20261018_062000_contact_settings',
   },
 ];

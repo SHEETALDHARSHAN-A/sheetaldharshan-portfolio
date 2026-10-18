@@ -16,6 +16,8 @@ import { Education } from './collections/Education'
 import { Certifications } from './collections/Certifications'
 import { Publications } from './collections/Publications'
 import { Users } from './collections/Users'
+import { Messages } from './collections/Messages'
+import { contact } from './endpoints/contact'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -30,6 +32,7 @@ import { Navigation } from './globals/Navigation'
 import { About } from './globals/About'
 import { AdminLook } from './globals/AdminLook'
 import { AdminSecurity } from './globals/AdminSecurity'
+import { ContactPage } from './globals/ContactPage'
 import { adminSearch } from './endpoints/adminSearch'
 import { siteJson } from './endpoints/siteJson'
 
@@ -112,12 +115,12 @@ export default buildConfig({
     // Dev push only against a local database; shared databases (Supabase) change through migrations.
     push: process.env.NODE_ENV !== 'production' && !/supabase\.(co|com)/.test(process.env.DATABASE_URL || ''),
   }),
-  collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, Users],
+  collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, Messages, Users],
   cors: [getServerSideURL()].filter(Boolean),
   // Order sets the admin menu: Sidebar, Brand, then Pages.
-  globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, AdminLook, AdminSecurity, Homepage, ProjectsPage, About],
+  globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, AdminLook, AdminSecurity, Homepage, ProjectsPage, About, ContactPage],
   // The admin's search bar (src/components/admin/AdminSearch.tsx).
-  endpoints: [adminSearch, ...siteJson],
+  endpoints: [adminSearch, ...siteJson, contact],
   plugins: [
     ...plugins,
     // Persistent media in production. Enabled only when a Vercel Blob token is present; local dev writes to public/media.

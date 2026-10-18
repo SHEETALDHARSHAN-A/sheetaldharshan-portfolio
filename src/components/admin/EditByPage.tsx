@@ -39,7 +39,7 @@ export async function EditByPage({ payload }: { payload: Payload }) {
       ],
     },
     { label: 'Research page', view: '/research', items: [{ label: 'Publications', href: c('publications') }] },
-    { label: 'Contact page', view: '/contact', items: [{ label: 'Email & profiles', href: g('site-settings') }] },
+    { label: 'Contact page', view: '/contact', items: [{ label: 'Messages from the form', href: c('messages') }, { label: 'Chat, form & questions', href: g('contact-page') }, { label: 'Email & profiles', href: g('site-settings') }] },
     { label: 'Library', items: [{ label: 'Images, videos & files', href: c('media') }] },
     {
       label: 'Admin panel',

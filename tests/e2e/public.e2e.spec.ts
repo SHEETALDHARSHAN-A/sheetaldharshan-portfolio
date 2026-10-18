@@ -74,7 +74,24 @@ test.describe('Public site', () => {
     await page.goto(`${base}/research`)
     await expect(page.locator('.pub h2')).toContainText('Autonomous Hiring Intelligence')
     await page.goto(`${base}/contact`)
-    await expect(page.locator('.contact-links a', { hasText: 'LinkedIn' })).toBeVisible()
+    await expect(page.locator('.contact-side .contact-row', { hasText: 'LinkedIn' })).toBeVisible()
+  })
+
+  test('contact chat asks again when an answer does not fit (nothing is sent)', async ({ page }) => {
+    await page.goto(`${base}/contact`)
+    await page.evaluate(() => localStorage.setItem('contact-mode', 'chat'))
+    await page.reload()
+    const box = page.locator('.cc-input textarea')
+    await expect(page.locator('.cc-me .cc-bubble').nth(1)).toBeVisible({ timeout: 10000 })
+    await box.fill('12345')
+    await box.press('Enter')
+    await expect(page.locator('.cc-me .cc-bubble').last()).toContainText("doesn't look like a name", { timeout: 5000 })
+    await box.fill('Test Visitor')
+    await box.press('Enter')
+    await expect(page.locator('.cc-me .cc-bubble').last()).toContainText('email', { timeout: 5000 })
+    await box.fill('not-an-email')
+    await box.press('Enter')
+    await expect(page.locator('.cc-me .cc-bubble').last()).toContainText("doesn't look like an email", { timeout: 5000 })
   })
 
   test('system routes and SEO metadata', async ({ page, request }) => {

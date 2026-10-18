@@ -76,6 +76,7 @@ export interface Config {
     certifications: Certification;
     media: Media;
     categories: Category;
+    messages: Message;
     users: User;
     redirects: Redirect;
     forms: Form;
@@ -103,6 +104,7 @@ export interface Config {
     certifications: CertificationsSelect<false> | CertificationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    messages: MessagesSelect<false> | MessagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -131,6 +133,7 @@ export interface Config {
     homepage: Homepage;
     'projects-page': ProjectsPage;
     about: About;
+    'contact-page': ContactPage;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -144,6 +147,7 @@ export interface Config {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     'projects-page': ProjectsPageSelect<false> | ProjectsPageSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
+    'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1183,6 +1187,43 @@ export interface Certification {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Messages from the Contact page form. Reply by email, then tick "Handled".
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "messages".
+ */
+export interface Message {
+  id: number;
+  name: string;
+  email: string;
+  /**
+   * Optional.
+   */
+  phone?: string | null;
+  /**
+   * The first choice question's answer.
+   */
+  topic?: string | null;
+  message: string;
+  /**
+   * Every question asked, as answered (including any added later).
+   */
+  answers?:
+    | {
+        question?: string | null;
+        answer?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  handled?: boolean | null;
+  /**
+   * Where it was sent from.
+   */
+  page?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1407,6 +1448,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categories';
         value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'messages';
+        value: number | Message;
       } | null)
     | ({
         relationTo: 'users';
@@ -2031,6 +2076,28 @@ export interface CategoriesSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "messages_select".
+ */
+export interface MessagesSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  topic?: T;
+  message?: T;
+  answers?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  handled?: T;
+  page?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2783,6 +2850,76 @@ export interface About {
   createdAt?: string | null;
 }
 /**
+ * What the Contact page says and asks. The chat and the form use the same fields; add, remove or reorder them below. Messages arrive in Contact page → Messages.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page".
+ */
+export interface ContactPage {
+  id: number;
+  heading?: string | null;
+  intro?: string | null;
+  mode?: ('both' | 'chat' | 'form') | null;
+  /**
+   * A visitor's own choice is remembered after that.
+   */
+  firstMode?: ('chat' | 'form') | null;
+  /**
+   * The first bubble, before the first question.
+   */
+  greeting?: string | null;
+  /**
+   * After sending. {first}, {name} and {email} are filled in.
+   */
+  doneMessage?: string | null;
+  formNote?: string | null;
+  /**
+   * Asked in this order. Keep one name, one required email and one long message field; without them the defaults are used.
+   */
+  fields?:
+    | {
+        /**
+         * Shown on the form.
+         */
+        label: string;
+        type: 'name' | 'email' | 'phone' | 'text' | 'textarea' | 'choice';
+        /**
+         * A short id, e.g. company. Letters, numbers, _.
+         */
+        key: string;
+        /**
+         * What the chat asks.
+         */
+        question: string;
+        /**
+         * Optional questions can be skipped ("skip" in the chat).
+         */
+        required?: boolean | null;
+        placeholder?: string | null;
+        /**
+         * The buttons to pick from.
+         */
+        options?:
+          | {
+              label: string;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * What the chat says before asking again.
+         */
+        retry?: string | null;
+        /**
+         * Optional. {first} and {answer} are filled in.
+         */
+        reply?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
@@ -3062,6 +3199,41 @@ export interface AboutSelect<T extends boolean = true> {
         description?: T;
       };
   _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page_select".
+ */
+export interface ContactPageSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  mode?: T;
+  firstMode?: T;
+  greeting?: T;
+  doneMessage?: T;
+  formNote?: T;
+  fields?:
+    | T
+    | {
+        label?: T;
+        type?: T;
+        key?: T;
+        question?: T;
+        required?: T;
+        placeholder?: T;
+        options?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        retry?: T;
+        reply?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
