@@ -18,6 +18,7 @@ import * as migration_20261018_061000_message_phone from './20261018_061000_mess
 import * as migration_20261018_062000_contact_settings from './20261018_062000_contact_settings';
 import * as migration_20261018_063000_contact_form_first from './20261018_063000_contact_form_first';
 import * as migration_20261018_064000_email_alerts from './20261018_064000_email_alerts';
+import * as migration_20261018_141416_email_templates from './20261018_141416_email_templates';
 
 export const migrations = [
   {
@@ -119,5 +120,10 @@ export const migrations = [
     up: migration_20261018_064000_email_alerts.up,
     down: migration_20261018_064000_email_alerts.down,
     name: '20261018_064000_email_alerts',
+  },
+  {
+    up: migration_20261018_141416_email_templates.up,
+    down: migration_20261018_141416_email_templates.down,
+    name: '20261018_141416_email_templates'
   },
 ];

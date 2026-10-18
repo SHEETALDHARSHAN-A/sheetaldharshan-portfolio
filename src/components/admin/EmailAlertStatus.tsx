@@ -1,7 +1,6 @@
 import { emailAlertsReady } from '@/utilities/emailAlert'
-import { SendTestEmail } from './SendTestEmail'
 
-/** Contact page → Email alerts: whether alerts can go out, how to switch them on, and a test button. */
+/** Contact page → Email alerts: whether alerts can go out, and how to switch them on. Test buttons sit under each preview. */
 export function EmailAlertStatus() {
   const ready = emailAlertsReady()
   const box: React.CSSProperties = { margin: '0 0 18px', padding: '12px 14px', borderRadius: 8, border: '1px solid var(--theme-elevation-150)', fontSize: 13, lineHeight: 1.5, display: 'grid', gap: 8 }
@@ -17,7 +16,6 @@ export function EmailAlertStatus() {
           create a free account at resend.com with the address you want alerts at, create an API key, and add it in Vercel as <code>RESEND_API_KEY</code> (then redeploy).
         </span>
       )}
-      <SendTestEmail />
     </div>
   )
 }

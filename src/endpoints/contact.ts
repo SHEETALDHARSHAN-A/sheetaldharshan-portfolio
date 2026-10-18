@@ -1,6 +1,7 @@
 import type { Endpoint } from 'payload'
 import { checkAnswer, toContactSettings, type ContactSettings } from '@/utilities/contactFields'
-import { emailAlertsReady, sendEmailAlert } from '@/utilities/emailAlert'
+import { emailAlertsReady, sendTemplate } from '@/utilities/emailAlert'
+import { SAMPLE, type EmailVars } from '@/utilities/emailTemplate'
 
 const recent = new Map<string, number[]>()
 
@@ -70,53 +71,69 @@ export const contact: Endpoint = {
       req.payload.logger.error({ err: e }, 'contact form: could not store message')
       return Response.json({ error: 'Your message could not be sent just now. Please email me instead.' }, { status: 500 })
     }
-    // The email alert never holds up or undoes the message; its outcome is noted on the message.
-    const alert = await alertOwner(req.payload, settings, { name, email, topic: clean[first('choice') ?? ''], answers: settings.fields.filter((f) => clean[f.key]).map((f) => ({ label: f.label, value: clean[f.key] })) })
+    // The emails never hold up or undo the message; how the alert went is noted on the message.
+    const site = await siteInfo(req.payload)
+    const vars: EmailVars = { name, email, topic: clean[first('choice') ?? ''], site: site.name, url: site.url }
+    const answerRows = settings.fields.filter((f) => clean[f.key]).map((f) => ({ label: f.label, value: clean[f.key] }))
+    const [alert] = await Promise.all([alertOwner(settings, site, vars, answerRows), thankVisitor(settings, site, vars, answerRows)])
     await req.payload.update({ collection: 'messages' as never, id, data: { alert } as never, overrideAccess: true }).catch(() => undefined)
     return Response.json({ ok: true })
   },
 }
 
 type PayloadLike = Parameters<Endpoint['handler']>[0]['payload']
+type Site = { name: string; url: string; email?: string }
 
-/** Who gets alerts: the address set on the Contact page, or the site's email. */
-export async function alertRecipient(payload: PayloadLike, settings: ContactSettings): Promise<string | undefined> {
-  if (settings.notifyEmail) return settings.notifyEmail
-  const site = (await payload.findGlobal({ slug: 'site-settings' as never, depth: 0 }).catch(() => null)) as { email?: string } | null
-  return site?.email || undefined
+/** Your name, site address and email from Site-wide → Name & profiles, for the emails. */
+async function siteInfo(payload: PayloadLike): Promise<Site> {
+  const s = (await payload.findGlobal({ slug: 'site-settings' as never, depth: 0 }).catch(() => null)) as { displayName?: string; fullName?: string; canonicalUrl?: string; email?: string } | null
+  return { name: s?.fullName || s?.displayName || 'My website', url: (s?.canonicalUrl || process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/$/, ''), email: s?.email || undefined }
 }
 
-async function alertOwner(payload: PayloadLike, settings: ContactSettings, m: { name: string; email: string; topic?: string; answers: { label: string; value: string }[] }): Promise<string> {
+/** Who gets alerts: the address set on the Contact page, or the site's email. */
+const alertRecipient = (settings: ContactSettings, site: Site) => settings.notifyEmail || site.email
+
+async function alertOwner(settings: ContactSettings, site: Site, vars: EmailVars, answers: { label: string; value: string }[]): Promise<string> {
   if (!settings.notify) return 'Off (Contact page → Email alerts)'
   if (!emailAlertsReady()) return 'Not sent: RESEND_API_KEY is not set'
-  const to = await alertRecipient(payload, settings)
+  const to = alertRecipient(settings, site)
   if (!to) return 'Not sent: no address to send to'
-  const result = await sendEmailAlert({
-    to,
-    replyTo: m.email,
-    subject: `New message from ${m.name}${m.topic ? ` · ${m.topic}` : ''}`,
-    rows: m.answers,
-    footer: 'Sent from the Contact page. Reply to this email to answer them directly.',
-  })
+  const result = await sendTemplate(settings, settings.alertEmail, vars, answers, { to, replyTo: vars.email, buttonHref: `mailto:${vars.email}` })
   return result.ok ? `Emailed to ${to}` : `Not sent: ${result.reason}`
 }
 
-/** POST /api/contact-test: sends a test alert to the configured address. Signed-in admins only. */
+/** The optional "thanks" email to the visitor; replies to it come to you. */
+async function thankVisitor(settings: ContactSettings, site: Site, vars: EmailVars, answers: { label: string; value: string }[]) {
+  if (!settings.confirm || !emailAlertsReady() || !vars.email) return
+  await sendTemplate(settings, settings.confirmEmail, vars, answers, { to: vars.email, replyTo: alertRecipient(settings, site), buttonHref: site.url || undefined })
+}
+
+/**
+ * POST /api/contact-test: sends a sample alert (or "thanks" email) using the settings on screen, saved
+ * or not, so the admin can try them before saving. Signed-in admins only.
+ */
 export const contactTest: Endpoint = {
   path: '/contact-test',
   method: 'post',
   handler: async (req) => {
     if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    const settings = toContactSettings((await req.payload.findGlobal({ slug: 'contact-page' as never, depth: 0 })) as unknown as Record<string, unknown>)
+    const body = ((await req.json?.().catch(() => null)) ?? {}) as { kind?: string; draft?: Record<string, unknown> }
+    const saved = (await req.payload.findGlobal({ slug: 'contact-page' as never, depth: 0 })) as unknown as Record<string, unknown>
+    const settings = toContactSettings({ ...saved, ...(body.draft && typeof body.draft === 'object' ? body.draft : {}) })
     if (!emailAlertsReady()) return Response.json({ ok: false, message: 'RESEND_API_KEY is not set yet, so no email can be sent.' })
-    const to = await alertRecipient(req.payload, settings)
-    if (!to) return Response.json({ ok: false, message: 'There is no address to send to: set one here, or an email in Site-wide → Name & profiles.' })
-    const result = await sendEmailAlert({
+    const site = await siteInfo(req.payload)
+    const to = alertRecipient(settings, site)
+    if (!to) return Response.json({ ok: false, message: 'There is no address to send to: set "Send alerts to", or an email in Site-wide → Name & profiles.' })
+    const vars: EmailVars = { name: SAMPLE.name, email: SAMPLE.email, topic: SAMPLE.topic, site: site.name, url: site.url }
+    const thanks = body.kind === 'confirm'
+    const result = await sendTemplate(settings, thanks ? settings.confirmEmail : settings.alertEmail, vars, SAMPLE.answers, {
       to,
-      subject: 'Test: Contact page email alerts work',
-      rows: [{ label: 'All good', value: 'New messages from your Contact page will arrive like this, with every answer. Reply to one to answer the visitor directly.' }],
+      buttonHref: thanks ? site.url || undefined : `mailto:${SAMPLE.email}`,
     })
-    return Response.json(result.ok ? { ok: true, message: `Test email sent to ${to}. Check your inbox (and spam, the first time).` } : { ok: false, message: `Not sent: ${result.reason}` })
+    return Response.json(
+      result.ok
+        ? { ok: true, message: `Sample ${thanks ? '"thanks" email' : 'alert'} sent to ${to}. Check your inbox (and spam, the first time).` }
+        : { ok: false, message: `Not sent: ${result.reason}` },
+    )
   },
 }
-

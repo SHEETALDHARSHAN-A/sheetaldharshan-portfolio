@@ -83,13 +83,17 @@ export function ContactChat({ settings, email: ownerEmail }: { settings: Contact
 
   const send = async (all: Record<string, string>) => {
     setPhase('sending')
-    say('Sending…')
+    // One status bubble: "Sending…" turns into "Sent ✓", and the thanks follows it.
+    const status = ++ids.current
+    setLines((l) => [...l, { id: status, from: 'me', text: 'Sending…' }])
     const result = await sendMessage(all, { startedAt: startedAt.current })
     if (result.ok) {
       setPhase('sent')
+      setLines((l) => l.map((line) => (line.id === status ? { ...line, text: 'Sent ✓' } : line)))
       say(fillIn(settings.doneMessage, all, fields))
       return
     }
+    setLines((l) => l.filter((line) => line.id !== status))
     // The server disagreed with an answer: ask that question again.
     const wrong = fields.findIndex((f) => result.errors?.[f.key])
     if (wrong >= 0) {

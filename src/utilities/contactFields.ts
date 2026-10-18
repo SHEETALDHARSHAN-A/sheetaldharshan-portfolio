@@ -2,6 +2,8 @@
  * Contact page fields, set in the admin (Contact page → Form & chat). The same definitions drive the
  * chat, the form and the server-side checks, so a field added in the admin works everywhere.
  */
+import { DEFAULT_ACCENT, DEFAULT_ALERT, DEFAULT_CONFIRM, DEFAULT_FROM_NAME, toTemplate, type EmailTemplate } from './emailTemplate'
+
 export type FieldType = 'name' | 'email' | 'phone' | 'text' | 'textarea' | 'choice'
 
 export type ContactField = {
@@ -29,10 +31,19 @@ export type ContactSettings = {
   notify: boolean
   /** Where alerts go; empty means the email in Site settings. */
   notifyEmail?: string
+  /** Sender name; placeholders allowed, e.g. "{site} · Contact". */
+  fromName: string
+  /** Sender address on a domain verified in Resend; empty uses CONTACT_FROM_EMAIL. */
+  fromEmail?: string
+  accent: string
+  alertEmail: EmailTemplate
+  /** Also send the visitor a "thanks" email. */
+  confirm: boolean
+  confirmEmail: EmailTemplate
 }
 
 export const DEFAULT_FIELDS: ContactField[] = [
-  { key: 'name', label: 'Your name', question: "Let's get your message to me. What's your name?", type: 'name', required: true, placeholder: 'Ada Lovelace', options: [], retry: "Hmm, that doesn't look like a name. What should I call you?", reply: 'Nice to meet you, {first}!' },
+  { key: 'name', label: 'Your name', question: "Let's get your message to me. What's your name?", type: 'name', required: true, placeholder: 'Ada Lovelace', options: [], retry: "Hmm, that doesn't look like a name. What should I call you?", reply: 'Nice to meet you, {name}!' },
   { key: 'email', label: 'Your email', question: "What's your email address, so I can reply?", type: 'email', required: true, placeholder: 'ada@example.com', options: [], retry: "That doesn't look like an email address. Could you check it? Something like ada@example.com.", reply: 'Got it.' },
   { key: 'phone', label: 'Phone', question: 'Would you like to add a phone number too? Type it, or say "skip".', type: 'phone', required: false, placeholder: '+91 98765 43210', options: [], retry: 'I couldn\'t read that as a phone number. Type it like +91 98765 43210, or say "skip".', reply: 'Thanks!' },
   { key: 'topic', label: "What's it about?", question: "What's it about?", type: 'choice', required: true, options: ['A role or opportunity', 'A project', 'Exasol or my projects', 'Just saying hi'], retry: 'Pick one of these, or tell me in a few words.', reply: 'Great.' },
@@ -45,10 +56,15 @@ export const DEFAULT_CONTACT: ContactSettings = {
   mode: 'both',
   firstMode: 'form',
   greeting: 'Hi there 👋',
-  doneMessage: "Done! Thanks, {first} 🙌 I'll reply to {email} soon.",
+  doneMessage: "Thanks, {name} 🙌 I'll reply to {email} soon.",
   formNote: 'Your details are only used to reply to you.',
   fields: DEFAULT_FIELDS,
   notify: true,
+  fromName: DEFAULT_FROM_NAME,
+  accent: DEFAULT_ACCENT,
+  alertEmail: DEFAULT_ALERT,
+  confirm: false,
+  confirmEmail: DEFAULT_CONFIRM,
 }
 
 export const SKIP = /^(skip|no|nope|none|n\/a|na|-|no thanks|not now)$/i
@@ -182,5 +198,11 @@ export function toContactSettings(doc: Record<string, unknown> | null | undefine
     fields: usable ? fields : DEFAULT_FIELDS,
     notify: doc?.notify !== false,
     notifyEmail: typeof doc?.notifyEmail === 'string' && EMAIL.test(doc.notifyEmail.trim()) ? doc.notifyEmail.trim() : undefined,
+    fromName: str(doc?.fromName, d.fromName),
+    fromEmail: typeof doc?.fromEmail === 'string' && EMAIL.test(doc.fromEmail.trim()) ? doc.fromEmail.trim() : undefined,
+    accent: str(doc?.emailAccent, d.accent),
+    alertEmail: toTemplate(doc?.alertEmail, DEFAULT_ALERT),
+    confirm: doc?.confirm === true,
+    confirmEmail: toTemplate(doc?.confirmEmail, DEFAULT_CONFIRM),
   }
 }

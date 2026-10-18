@@ -45,7 +45,13 @@ Nothing needs changing on GitHub or Supabase for a new person: the same OAuth ap
 
 **Messages** arrive in **Contact page → Messages**, with every answer. Tick **Handled** once you have replied.
 
-**Email alerts:** each new message can also be emailed to you (with Reply-To set to the visitor). To switch this on: create a free account at [resend.com](https://resend.com) using the address you want alerts at, create an API key, add it in Vercel as `RESEND_API_KEY`, and redeploy. Then use **Send test email** under Contact page → Email alerts. Each message shows in its sidebar whether its alert went out.
+**Email alerts** (Contact page → Email alerts): each new message is emailed to you, and replying answers the visitor.
+- **Send alerts to**, **Sender name** and **Sender address** (on a domain verified in Resend; no mailbox needed).
+- **Alert email (to you)** and the optional **"Thanks" email (to the visitor)**: subject, heading, intro, answer list, button and footer, with `{name}`, `{first}`, `{email}`, `{topic}`, `{site}` and `{url}` filled in.
+- Each has a live preview and a **Send me a sample** button that uses the settings on screen before you save.
+- Each message shows in its sidebar whether its alert went out.
+
+First-time setup (Resend account, API key, verifying your domain): [Make it yours, step 8](make-it-yours.md#8-contact-page-and-email-alerts).
 
 ## Find anything
 The search box at the top of the admin menu (**⌘K** or **/**) finds settings pages, any field by its label (showing where it lives, for example *Pet › Behaviour*), content by title, and "New …" actions. It reads the CMS setup itself, so pages and fields added later are found without extra work. The **More** group in *Edit by page* lists anything new that hasn't been placed in the menu yet.

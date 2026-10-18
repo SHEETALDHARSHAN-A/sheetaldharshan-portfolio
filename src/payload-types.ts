@@ -2880,9 +2880,62 @@ export interface ContactPage {
   formNote?: string | null;
   notify?: boolean | null;
   /**
-   * Empty: the email in Site-wide → Name & profiles.
+   * Empty: the email in Site-wide → Name & profiles. The test buttons use what is typed here, saved or not.
    */
   notifyEmail?: string | null;
+  /**
+   * Shown in the inbox. {site} is your name.
+   */
+  fromName?: string | null;
+  /**
+   * On a domain verified in Resend. No mailbox needed: replies go to the visitor. Empty: CONTACT_FROM_EMAIL.
+   */
+  fromEmail?: string | null;
+  /**
+   * Top bar and button, e.g. #ff3400.
+   */
+  emailAccent?: string | null;
+  /**
+   * Sent to you for each message. Replying answers the visitor.
+   */
+  alertEmail?: {
+    /**
+     * {name}, {first}, {email}, {topic}, {site} and {url} are filled in. An empty placeholder's separator is dropped, e.g. "· {topic}".
+     */
+    subject?: string | null;
+    heading?: string | null;
+    /**
+     * A blank line starts a new paragraph.
+     */
+    intro?: string | null;
+    showAnswers?: boolean | null;
+    /**
+     * Opens a reply to the visitor. Empty hides it.
+     */
+    button?: string | null;
+    footer?: string | null;
+  };
+  /**
+   * A copy of their message, so they know it arrived. Replies to it come to you.
+   */
+  confirm?: boolean | null;
+  confirmEmail?: {
+    /**
+     * {name}, {first}, {email}, {topic}, {site} and {url} are filled in. An empty placeholder's separator is dropped, e.g. "· {topic}".
+     */
+    subject?: string | null;
+    heading?: string | null;
+    /**
+     * A blank line starts a new paragraph.
+     */
+    intro?: string | null;
+    showAnswers?: boolean | null;
+    /**
+     * Opens your site. Empty hides it.
+     */
+    button?: string | null;
+    footer?: string | null;
+  };
   /**
    * Asked in this order. Keep one name, one required email and one long message field; without them the defaults are used.
    */
@@ -3227,6 +3280,30 @@ export interface ContactPageSelect<T extends boolean = true> {
   formNote?: T;
   notify?: T;
   notifyEmail?: T;
+  fromName?: T;
+  fromEmail?: T;
+  emailAccent?: T;
+  alertEmail?:
+    | T
+    | {
+        subject?: T;
+        heading?: T;
+        intro?: T;
+        showAnswers?: T;
+        button?: T;
+        footer?: T;
+      };
+  confirm?: T;
+  confirmEmail?:
+    | T
+    | {
+        subject?: T;
+        heading?: T;
+        intro?: T;
+        showAnswers?: T;
+        button?: T;
+        footer?: T;
+      };
   fields?:
     | T
     | {

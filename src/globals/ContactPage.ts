@@ -1,7 +1,27 @@
 import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
+import type { Field } from 'payload'
 import { DEFAULT_CONTACT, DEFAULT_FIELDS } from '@/utilities/contactFields'
+import { DEFAULT_ACCENT, DEFAULT_ALERT, DEFAULT_CONFIRM, DEFAULT_FROM_NAME, type EmailTemplate } from '@/utilities/emailTemplate'
+
+const PLACEHOLDERS = '{name}, {first}, {email}, {topic}, {site} and {url} are filled in.'
+
+/** The fields of one email; the alert and the "thanks" email share them. */
+const templateFields = (d: EmailTemplate, kind: 'alert' | 'confirm', buttonNote: string): Field[] => [
+  { name: 'subject', type: 'text', defaultValue: d.subject, admin: { description: `${PLACEHOLDERS} An empty placeholder's separator is dropped, e.g. "· {topic}".` } },
+  { name: 'heading', type: 'text', defaultValue: d.heading },
+  { name: 'intro', type: 'textarea', defaultValue: d.intro, admin: { description: 'A blank line starts a new paragraph.' } },
+  {
+    type: 'row',
+    fields: [
+      { name: 'showAnswers', type: 'checkbox', label: 'List every answer', defaultValue: d.showAnswers, admin: { width: '40%' } },
+      { name: 'button', type: 'text', defaultValue: d.button, admin: { width: '60%', description: `${buttonNote} Empty hides it.` } },
+    ],
+  },
+  { name: 'footer', type: 'textarea', defaultValue: d.footer },
+  { name: 'preview', type: 'ui', admin: { components: { Field: { path: '@/components/admin/EmailPreview#EmailPreview', clientProps: { kind } } } } },
+]
 
 /** The Contact page: its wording, whether visitors get a chat, a form or both, and the questions asked. */
 export const ContactPage: GlobalConfig = {
@@ -66,9 +86,37 @@ export const ContactPage: GlobalConfig = {
               name: 'notifyEmail',
               type: 'email',
               label: 'Send alerts to',
-              admin: { width: '60%', description: 'Empty: the email in Site-wide → Name & profiles.' },
+              admin: { width: '60%', description: 'Empty: the email in Site-wide → Name & profiles. The test buttons use what is typed here, saved or not.' },
             },
           ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'fromName', type: 'text', label: 'Sender name', defaultValue: DEFAULT_FROM_NAME, admin: { width: '40%', description: 'Shown in the inbox. {site} is your name.' } },
+            {
+              name: 'fromEmail',
+              type: 'email',
+              label: 'Sender address',
+              admin: { width: '40%', placeholder: 'contact@yourdomain.com', description: 'On a domain verified in Resend. No mailbox needed: replies go to the visitor. Empty: CONTACT_FROM_EMAIL.' },
+            },
+            { name: 'emailAccent', type: 'text', label: 'Accent colour', defaultValue: DEFAULT_ACCENT, admin: { width: '20%', description: 'Top bar and button, e.g. #ff3400.' } },
+          ],
+        },
+        {
+          name: 'alertEmail',
+          type: 'group',
+          label: 'Alert email (to you)',
+          admin: { description: 'Sent to you for each message. Replying answers the visitor.' },
+          fields: templateFields(DEFAULT_ALERT, 'alert', 'Opens a reply to the visitor.'),
+        },
+        { name: 'confirm', type: 'checkbox', label: 'Also send the visitor a "thanks" email', defaultValue: false, admin: { description: 'A copy of their message, so they know it arrived. Replies to it come to you.' } },
+        {
+          name: 'confirmEmail',
+          type: 'group',
+          label: '"Thanks" email (to the visitor)',
+          admin: { condition: (_, s) => Boolean(s?.confirm) },
+          fields: templateFields(DEFAULT_CONFIRM, 'confirm', 'Opens your site.'),
         },
       ],
     },

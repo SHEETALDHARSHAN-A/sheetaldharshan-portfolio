@@ -16,10 +16,11 @@ How to turn this repository into **your** portfolio: what you need, what to chan
 | 5 | [Fill in your content in the admin](#5-fill-in-your-content-in-the-admin) | 1–3 h | Yes |
 | 6 | [Your domain](#6-your-domain) | 15 min, then up to a day for DNS | Recommended |
 | 7 | [Secure the admin: password, then GitHub](#7-secure-the-admin-password-then-github) | 15 min | Recommended |
-| 8 | [Search engines](#8-search-engines) | 30 min, then days or weeks to rank | Recommended |
-| 9 | [Extras: coding activity, LeetCode sync, pet](#9-extras) | 10–30 min each | Optional |
+| 8 | [Contact page and email alerts](#8-contact-page-and-email-alerts) | 20 min, then up to a day for DNS | Recommended |
+| 9 | [Search engines](#9-search-engines) | 30 min, then days or weeks to rank | Recommended |
+| 10 | [Extras: coding activity, LeetCode sync, pet](#10-extras) | 10–30 min each | Optional |
 
-Steps 0–4 have to be done in order. You can do 5–9 any time after the site is live.
+Steps 0–4 have to be done in order. You can do 5–10 any time after the site is live.
 
 ---
 
@@ -175,7 +176,67 @@ It asks for the admin email and a new password (hidden as you type). It uses `DA
 
 While `ADMIN_2FA=off` is set, anyone with the password gets in. Keep it off only as long as you need to.
 
-## 8. Search engines
+## 8. Contact page and email alerts
+
+The Contact page works as soon as the site is live: visitors use a form, a chat, or both, and every message is saved under **Contact page → Messages**. These steps add an email to you for each message, sent from your own domain.
+
+### 8.1 Set up the page
+
+1. **Contact page → Chat, form & questions**: the heading and intro, **Visitors write with** (chat and form, chat only or form only) and **Opens first**.
+2. **Chat wording**: the greeting, and the thanks line shown after sending. `{name}` (full name), `{first}` and `{email}` are filled in.
+3. **Questions**: add, remove or reorder them. Each has a type (name, email, phone, short text, long text, choice), the chat question, whether it is required, and what the chat says when an answer does not fit. Keep one name, one required email and one long-text message.
+4. Save, open `/contact` and send yourself a message. It appears under **Contact page → Messages**.
+
+### 8.2 Create a Resend account and API key
+
+1. Sign up at [resend.com](https://resend.com) (free up to 3,000 emails a month).
+2. **API Keys → Create API key**, with **Sending access**. Copy it; it is shown once.
+3. Vercel → Project → **Settings → Environment Variables** → add `RESEND_API_KEY` (Production) → **Redeploy**.
+
+Alerts now work, but until your domain is verified they come from Resend's shared address and can only go to the email you signed up with.
+
+### 8.3 Verify your domain in Resend
+
+1. Resend → **Domains → Add domain** → `yourdomain.com` → pick a region.
+2. Resend lists the DNS records to add. At the time of writing:
+
+   | Type | Host | Value |
+   |---|---|---|
+   | TXT | `resend._domainkey` | the DKIM key (starts `p=`) |
+   | CNAME | `send` | from Resend |
+   | CNAME | `rsend` | from Resend |
+   | TXT | `_dmarc` | `v=DMARC1; p=none;` (optional, helps with spam folders) |
+
+   Always copy the full values with Resend's copy buttons; they are shortened on screen.
+3. Add them at your DNS provider. Resend's **Go to <provider>** button does it for you on Namecheap, Cloudflare and others. By hand on Namecheap: **Domain List → Manage → Advanced DNS → Add new record**, host without the domain (`send`, not `send.yourdomain.com`), TTL Automatic.
+   - Don't touch your existing `@` records (website, Google verification, mail you already receive).
+   - Leave **Enable Receiving** off in Resend; sending is all the site needs.
+4. Back in Resend, click **Verify**. It usually takes minutes, sometimes a few hours.
+
+Check from a terminal if you like: `dig +short TXT resend._domainkey.yourdomain.com` should print the key.
+
+### 8.4 Choose the sender and the emails
+
+All in **Contact page → Email alerts**:
+
+1. **Send alerts to**: where alerts go. Empty uses the email in **Site-wide → Name & profiles**. With a verified domain this can be any address.
+2. **Sender name**: what the inbox shows, e.g. `{site} · Contact` (becomes "Your Name · Contact").
+3. **Sender address**: any address on the verified domain, e.g. `contact@yourdomain.com`. No mailbox is needed: replying to an alert goes to the visitor. (The `CONTACT_FROM_EMAIL` environment variable is only a fallback when this is empty.)
+4. **Accent colour** for the top bar and button.
+5. **Alert email (to you)**: subject, heading, intro, whether to list every answer, the button (it opens a reply to the visitor) and the footer.
+6. Optional: **Also send the visitor a "thanks" email**, a copy of their message so they know it arrived. Replies to it come to you.
+
+In any of these texts, `{name}`, `{first}`, `{email}`, `{topic}`, `{site}` (your name) and `{url}` (your domain) are filled in. A blank line starts a new paragraph.
+
+Each email has a **live preview** with sample answers, and a **Send me a sample** button that uses what is on screen, saved or not. Send one, check it in your inbox (and spam, the first time), then **Save**.
+
+### 8.5 Day to day
+
+- Each message's sidebar in **Messages** shows whether its alert went out, and why not if it failed.
+- Tick **Handled** once you have replied.
+- Spam protection is built in: a hidden field bots fill, a minimum time to answer, and at most 5 messages per visitor per 10 minutes.
+
+## 9. Search engines
 
 1. **Google Search Console**: add your domain, verify it (a DNS record, or set `GOOGLE_SITE_VERIFICATION` in Vercel), then submit `https://<domain>/sitemap.xml`.
 2. **Bing Webmaster Tools**: import from Google Search Console, or verify with `BING_SITE_VERIFICATION`. Bing also powers ChatGPT search and DuckDuckGo.
@@ -184,7 +245,7 @@ While `ADMIN_2FA=off` is set, anyone with the password gets in. Keep it off only
 
 `/robots.txt`, `/sitemap.xml`, `/rss.xml`, `/llms.txt` (a summary for AI assistants) and structured data (Person, WebSite, breadcrumbs) are generated for you from your content.
 
-## 9. Extras
+## 10. Extras
 
 - **Coding activity** (Sidebar → Coding activity): add your GitHub and LeetCode usernames. Choose whether each card appears in the sidebar and on About, and whether it starts open. The numbers are read from your public profiles and refreshed every 6 hours; no tokens needed.
 - **LeetCode sync**: to keep your accepted solutions in a GitHub repository, create a repo with a workflow using [joshcai/leetcode-sync](https://github.com/joshcai/leetcode-sync) and add your `LEETCODE_SESSION` and `LEETCODE_CSRF_TOKEN` cookies as repository secrets. It runs on a schedule. It is separate from this site.
