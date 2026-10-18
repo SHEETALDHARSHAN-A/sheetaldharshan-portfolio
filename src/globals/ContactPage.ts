@@ -35,7 +35,7 @@ export const ContactPage: GlobalConfig = {
           name: 'firstMode',
           type: 'select',
           label: 'Opens first',
-          defaultValue: 'chat',
+          defaultValue: 'form',
           options: [
             { label: 'Chat', value: 'chat' },
             { label: 'Form', value: 'form' },

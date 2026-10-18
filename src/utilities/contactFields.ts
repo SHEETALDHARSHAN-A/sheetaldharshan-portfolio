@@ -39,7 +39,7 @@ export const DEFAULT_CONTACT: ContactSettings = {
   heading: 'Say hello',
   intro: 'Got a project in mind, a role to talk about, or a question about something I built? Send me a message here, or use whichever channel suits you.',
   mode: 'both',
-  firstMode: 'chat',
+  firstMode: 'form',
   greeting: 'Hi there 👋',
   doneMessage: "Done! Thanks, {first} 🙌 I'll reply to {email} soon.",
   formNote: 'Your details are only used to reply to you.',
@@ -78,6 +78,22 @@ const FORM_ERROR: Record<FieldType, string> = {
   choice: 'Please pick one.',
 }
 
+/** "my name is ada lovelace", "Hi, I'm Ada!" → "Ada Lovelace" / "Ada": drops lead-in phrases and punctuation. */
+export function extractName(text: string): string {
+  let t = text.trim().replace(/^[\s"'“”]+|[\s"'“”.!?,;:]+$/g, '')
+  const lead = /^(?:(?:hi|hello|hey|hiya|yo)[\s,!.]*)?(?:(?:my\s+(?:full\s+)?name\s+is|my\s+name'?s|name\s*[:=-]|i\s*am|i'm|im|this\s+is|it'?s|call\s+me|you\s+can\s+call\s+me|they\s+call\s+me)\s+)/i
+  for (let i = 0; i < 2 && lead.test(t); i++) t = t.replace(lead, '').trim()
+  t = t.replace(/^(?:hi|hello|hey)[\s,!.]+/i, '').replace(/[\s.!?,;:]+$/g, '').trim()
+  // All lower case (or all upper): give it capitals; otherwise keep how they wrote it.
+  if (t === t.toLowerCase() || t === t.toUpperCase()) t = t.toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase())
+  return t
+}
+
+/** "my number is +91 98765 43210, thanks" → "+91 98765 43210". */
+export function extractPhone(text: string): string {
+  return text.match(/\+?\(?\d[\d\s().-]{5,}\d/)?.[0]?.trim() ?? text.trim()
+}
+
 /** Checks one answer. Empty optional answers (or "skip" in chat) pass as blank. */
 export function checkAnswer(field: ContactField, raw: unknown, { chat = false } = {}): { ok: true; value: string } | { ok: false; error: string } {
   const value = typeof raw === 'string' ? raw.trim().slice(0, LIMIT[field.type]) : ''
@@ -87,15 +103,21 @@ export function checkAnswer(field: ContactField, raw: unknown, { chat = false } 
   }
   const fail = { ok: false as const, error: message }
   switch (field.type) {
-    case 'name':
-      return value.length < 2 || EMAIL.test(value) || /^\+?[\d\s().-]+$/.test(value) || value.split(/\s+/).length > 5 ? fail : { ok: true, value }
+    case 'name': {
+      const name = extractName(value)
+      // Only greetings or lead-in words ("hello", "my name is") is not a name yet.
+      const filler = /^(hi|hello|hey|hiya|yo|my|name|names|is|i|im|i'm|am|this|it|it's|its|call|me|you|can|the|a|and|thanks|thank|ok|okay|yes|no)$/i
+      const empty = name.split(/[\s,.!?]+/).filter(Boolean).every((w) => filler.test(w))
+      return empty || name.length < 2 || /\d|@/.test(name) || name.split(/\s+/).length > 5 ? fail : { ok: true, value: name }
+    }
     case 'email': {
       const found = value.match(/[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]{2,}/)?.[0]
       return found && EMAIL.test(found) ? { ok: true, value: found } : fail
     }
     case 'phone': {
-      const digits = value.replace(/\D/g, '')
-      return /^[+()\d\s.-]+$/.test(value) && digits.length >= 7 && digits.length <= 15 ? { ok: true, value } : fail
+      const phone = extractPhone(value)
+      const digits = phone.replace(/\D/g, '')
+      return /^[+()\d\s.-]+$/.test(phone) && digits.length >= 7 && digits.length <= 15 ? { ok: true, value: phone } : fail
     }
     case 'choice': {
       const picked = field.options.length ? matchOption(value, field.options) : value
@@ -148,7 +170,7 @@ export function toContactSettings(doc: Record<string, unknown> | null | undefine
     heading: str(doc?.heading, d.heading),
     intro: str(doc?.intro, d.intro),
     mode,
-    firstMode: doc?.firstMode === 'form' ? 'form' : 'chat',
+    firstMode: doc?.firstMode === 'chat' ? 'chat' : 'form',
     greeting: str(doc?.greeting, d.greeting),
     doneMessage: str(doc?.doneMessage, d.doneMessage),
     formNote: str(doc?.formNote, d.formNote),

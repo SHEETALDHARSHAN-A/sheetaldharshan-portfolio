@@ -79,7 +79,7 @@ test.describe('Public site', () => {
 
   test('contact chat asks again when an answer does not fit (nothing is sent)', async ({ page }) => {
     await page.goto(`${base}/contact`)
-    await page.evaluate(() => localStorage.setItem('contact-mode', 'chat'))
+    await page.evaluate(() => localStorage.setItem('contact-mode-v2', 'chat'))
     await page.reload()
     const box = page.locator('.cc-input textarea')
     await expect(page.locator('.cc-me .cc-bubble').nth(1)).toBeVisible({ timeout: 10000 })

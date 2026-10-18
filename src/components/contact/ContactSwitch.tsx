@@ -5,7 +5,8 @@ import type { ContactSettings } from '@/utilities/contactFields'
 import { ContactChat } from './ContactChat'
 import { ContactForm } from './ContactForm'
 
-const KEY = 'contact-mode'
+// v2: the default became the form, so choices remembered before that are not reused.
+const KEY = 'contact-mode-v2'
 
 /** Chat, form, or a switch between them (set in the admin). A visitor's choice is remembered. */
 export function ContactSwitch({ settings, email }: { settings: ContactSettings; email?: string }) {
@@ -39,7 +40,9 @@ export function ContactSwitch({ settings, email }: { settings: ContactSettings; 
           <span className="cs-pill" data-mode={mode} aria-hidden="true" />
         </div>
       ) : null}
-      {mode === 'chat' ? <ContactChat settings={settings} email={email} /> : <ContactForm settings={settings} email={email} />}
+      <section className="contact-card" aria-label="Send a message">
+        {mode === 'chat' ? <ContactChat settings={settings} email={email} /> : <ContactForm settings={settings} email={email} />}
+      </section>
     </div>
   )
 }

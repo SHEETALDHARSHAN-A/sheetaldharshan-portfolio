@@ -25,9 +25,7 @@ export default async function ContactPage() {
           <p>{settings.intro}</p>
         </header>
         <div className="contact-layout">
-          <section className="contact-card" aria-label="Send a message">
-            <ContactSwitch settings={settings} email={site.email} />
-          </section>
+          <ContactSwitch settings={settings} email={site.email} />
           <aside className="contact-side">
             {site.email ? (
               <section>

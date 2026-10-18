@@ -764,7 +764,7 @@ html[data-about-aside='collapsed'] .about-head .resume-btn { grid-column: 2; gri
 }
 @media (max-width: 560px) { .cf > .cf-half { grid-column: 1 / -1; } }
 /* Chat / Form switch */
-.cs { display: grid; gap: 18px; }
+.cs { display: grid; gap: 14px; min-width: 0; }
 .cs-switch { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; justify-self: start; padding: 4px; border-radius: 999px; background: var(--surface); }
 .cs-tab { position: relative; z-index: 1; padding: 7px 22px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 600 14px/1 var(--font-sans); cursor: pointer; transition: color 200ms ease; }
 .cs-tab[aria-selected='true'] { color: var(--text); }
