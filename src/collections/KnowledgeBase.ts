@@ -274,6 +274,12 @@ export const ReaderLinks: CollectionConfig = {
     { name: 'next', type: 'text' },
     { name: 'expiresAt', type: 'date', required: true },
     { name: 'usedAt', type: 'date' },
+    // Cross-device sign-in: the browser that asked for the link keeps a secret (only its hash is
+    // here); opening the link anywhere approves it, and that browser then signs itself in.
+    { name: 'pollHash', type: 'text', index: true },
+    { name: 'confirmedAt', type: 'date' },
+    { name: 'claimedAt', type: 'date' },
+    { name: 'reader', type: 'relationship', relationTo: 'readers' },
     ipHash,
   ],
 }

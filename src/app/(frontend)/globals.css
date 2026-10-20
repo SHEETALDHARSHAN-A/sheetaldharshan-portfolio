@@ -1112,9 +1112,17 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 
 
 /* ./stdout, laid out like Contact: header across, posts left, a column of channels on the right */
-.kb-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.8fr); gap: clamp(24px, 4vw, 56px); align-items: start; max-width: 1100px; }
+.kb-layout { display: grid; grid-template-columns: minmax(0, 1fr) clamp(260px, 22vw, 320px); gap: clamp(24px, 3vw, 48px); align-items: start; transition: grid-template-columns 260ms var(--ease-out); }
+.kb-side-hide { justify-self: end; display: inline-flex; align-items: center; gap: 6px; margin: -4px 0 -10px; padding: 4px 8px; border: 0; border-radius: 8px; background: none; color: var(--faint); font: inherit; font-size: 12.5px; cursor: pointer; }
+.kb-side-hide:hover { color: var(--text); background: var(--surface); }
+.kb-side-show { display: none; }
+@media (min-width: 1201px) {
+  html[data-kb-side='collapsed'] .kb-layout { grid-template-columns: minmax(0, 1fr) 0; gap: 0; }
+  html[data-kb-side='collapsed'] .kb-side { visibility: hidden; opacity: 0; pointer-events: none; }
+  html[data-kb-side='collapsed'] .kb-side-show { display: inline-flex; position: fixed; z-index: 30; right: 0; top: 50%; translate: 0 -50%; align-items: center; gap: 6px; padding: 12px 10px 12px 12px; border: 1px solid var(--line-strong); border-right: 0; border-radius: 12px 0 0 12px; background: var(--bg-elevated, var(--bg)); color: var(--text-soft); font: 500 13px/1 var(--font-sans); writing-mode: vertical-rl; cursor: pointer; animation: el-in 240ms var(--ease-out) both; }
+  html[data-kb-side='collapsed'] .kb-side-show:hover { color: var(--text); }
+}
 .kb-main { min-width: 0; }
-.kb-head { max-width: 1100px; }
 .kb-head-row { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; }
 .kb-head-row .kb-star { margin-top: 8px; }
 .kb-head h1.kb-lower, a[href="/notes"], a[href="/notes"] * { text-transform: none; }
@@ -1131,6 +1139,7 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-card-stats b { color: #f5b301; font-weight: 400; }
 .kb-card-stats i { font-style: normal; color: var(--faint); }
 
+.kb-side-chips { display: grid; gap: 22px; }
 .kb-side { display: grid; gap: 22px; position: sticky; top: 30px; animation: el-in 480ms var(--ease-out) 120ms both; }
 .kb-side-sec h2 { font-family: var(--font-condensed); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin: 0 0 6px; }
 .kb-side-list { list-style: none; margin: 0; padding: 0; }
@@ -1169,11 +1178,13 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 @media (max-width: 1200px) {
   .kb-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; max-width: 900px; }
   .kb-head { max-width: 900px; }
-  .kb-side { order: -1; position: static; display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 6px; animation: none; mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
-  .kb-side::-webkit-scrollbar { display: none; }
+  /* Search on its own row, then the channels as one row of chips that scrolls sideways. */
+  .kb-side { order: -1; position: static; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: none; }
+  .kb-side-chips { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 6px; mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
+  .kb-side-chips::-webkit-scrollbar { display: none; }
   .kb-side-sec h2, .kb-side-you, .kb-privacy, .kb-side-count, .kb-side-star, .kb-side-mine .kb-side-add, .kb-side-mine .kb-side-hint, .kb-side-new, .kb-side-mine .kb-error { display: none; }
-  .kb-side .kb-side-you, .kb-side .kb-privacy { display: none; }
-  .kb-search { flex: 0 0 200px; height: 38px; }
+  .kb-side .kb-side-you, .kb-side .kb-privacy, .kb-side-hide { display: none; }
+  .kb-search { height: 42px; }
   .kb-side-sec, .kb-side-list { display: flex; gap: 6px; flex: none; }
   .kb-side-row { grid-template-columns: auto auto; gap: 6px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; white-space: nowrap; font-size: 14px; }
   .kb-side-row:hover { padding-left: 14px; border-color: var(--line-strong); color: var(--text); }
@@ -1182,7 +1193,7 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
   .kb-side-mine .kb-side-row { border-style: dashed; }
 }
 @media (max-width: 960px) {
-  .kb-search { flex-basis: 160px; height: 36px; }
+
   .kb-card { padding: 18px; }
 }
 
@@ -1232,3 +1243,6 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-modal-card:has(.kb-signin) { width: min(440px, 100%); padding: 22px 24px 24px; gap: 16px; }
 .kb-modal-card .kb-signin { max-width: none; }
 .kb-signin-inline { max-width: 520px; }
+.kb-waiting { display: inline-flex; align-items: center; gap: 10px; margin: 0; color: var(--muted); font-size: 13.5px; }
+.kb-waiting i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--accent); animation: kb-spin 0.9s linear infinite; }
+@keyframes kb-spin { to { transform: rotate(360deg); } }

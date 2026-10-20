@@ -26,6 +26,7 @@ import * as migration_20261020_123627_field_notes_controls from './20261020_1236
 import * as migration_20261020_125259_security_hardening from './20261020_125259_security_hardening';
 import * as migration_20261020_133651_stdout_name from './20261020_133651_stdout_name';
 import * as migration_20261020_134727_reader_channels from './20261020_134727_reader_channels';
+import * as migration_20261020_143627_cross_device_signin from './20261020_143627_cross_device_signin';
 
 export const migrations = [
   {
@@ -166,6 +167,11 @@ export const migrations = [
   {
     up: migration_20261020_134727_reader_channels.up,
     down: migration_20261020_134727_reader_channels.down,
-    name: '20261020_134727_reader_channels'
+    name: '20261020_134727_reader_channels',
+  },
+  {
+    up: migration_20261020_143627_cross_device_signin.up,
+    down: migration_20261020_143627_cross_device_signin.down,
+    name: '20261020_143627_cross_device_signin'
   },
 ];

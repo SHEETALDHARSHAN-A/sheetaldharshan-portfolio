@@ -61,6 +61,8 @@ function reply(ctx: Ctx, body: unknown, status = 200, extraCookie?: string): Res
 }
 
 const SIGN_IN = { error: 'Please sign in first.', signIn: true }
+/** Holds the waiting browser's secret for cross-device email sign-in (15 minutes). */
+export const LINK_COOKIE = 'reader_link'
 /** When a write doesn't come from a page on this site (an old tab, an app's built-in browser, another site). */
 const NOT_SAME_SITE = { error: "This didn't come from an open page on this site, so it was stopped to keep your account safe. Refresh the page and try again; on a phone, open the site in your browser rather than inside another app." }
 
@@ -176,7 +178,9 @@ const emailLink: Endpoint = {
     if (tooMany(`link|${email}`, 3, 15) || tooMany(`link|${ipHash}`, 8, 15) || (await recent(req, 'reader-links', { email: { equals: email } }, 15)) >= 3 || (await recent(req, 'reader-links', { ipHash: { equals: ipHash } }, 15)) >= 8) return reply(ctx, { error: 'A link was just sent. Please check your inbox (and spam), or try again in a few minutes.' }, 429)
     if (!emailAlertsReady()) return reply(ctx, { error: 'Email sign-in is not available right now. Please use GitHub.' }, 503)
     const token = newLinkToken()
-    await req.payload.create({ collection: 'reader-links' as never, data: { tokenHash: hashToken(token), email, ipHash, name: name || undefined, next: safeNext(body.next), expiresAt: new Date(Date.now() + 15 * 60_000).toISOString() } as never, overrideAccess: true })
+    // This browser waits for the link to be opened (here or on a phone) and then signs itself in.
+    const poll = newLinkToken()
+    await req.payload.create({ collection: 'reader-links' as never, data: { tokenHash: hashToken(token), pollHash: hashToken(poll), email, ipHash, name: name || undefined, next: safeNext(body.next), expiresAt: new Date(Date.now() + 15 * 60_000).toISOString() } as never, overrideAccess: true })
     const contact = toContactSettings((await req.payload.findGlobal({ slug: 'contact-page' as never, depth: 0 })) as unknown as Record<string, unknown>)
     const site = await siteInfo(req.payload)
     const origin = new URL(req.url ?? site.url).origin
@@ -188,7 +192,35 @@ const emailLink: Endpoint = {
       { to: email, buttonHref: `${origin}/auth/reader/email?token=${token}`, appearance: site.appearance },
     )
     if (!result.ok) return reply(ctx, { error: 'The email could not be sent. Please try again, or use GitHub.' }, 502)
-    return reply(ctx, { ok: true })
+    return reply(ctx, { ok: true }, 200, `${LINK_COOKIE}=${poll}; Path=/; Max-Age=900; HttpOnly; SameSite=Lax${secure(req) ? '; Secure' : ''}`)
+  },
+}
+
+/**
+ * GET /api/kb/email-link-status: the browser that asked for a sign-in link checks whether the link
+ * was opened and approved (on this device or another). Once it is, this browser is signed in.
+ */
+const emailLinkStatus: Endpoint = {
+  path: '/kb/email-link-status',
+  method: 'get',
+  handler: async (req) => {
+    const ctx = await context(req)
+    if (ctx.reader) return reply(ctx, { signedIn: true, reader: ctx.reader })
+    const poll = (req.headers.get('cookie') ?? '').match(new RegExp(`(?:^|;\\s*)${LINK_COOKIE}=([A-Za-z0-9_-]{40,60})`))?.[1]
+    if (!poll) return reply(ctx, { waiting: false, expired: true })
+    const link = (await req.payload.find({ collection: 'reader-links' as never, where: { pollHash: { equals: hashToken(poll) } }, depth: 0, limit: 1, overrideAccess: true })).docs[0] as unknown as { id: number; expiresAt: string; confirmedAt?: string; claimedAt?: string; reader?: unknown } | undefined
+    const clear = `${LINK_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${secure(req) ? '; Secure' : ''}`
+    if (!link || link.claimedAt || (!link.confirmedAt && new Date(link.expiresAt).getTime() < Date.now())) return reply(ctx, { waiting: false, expired: true }, 200, clear)
+    if (!link.confirmedAt) return reply(ctx, { waiting: true })
+    const readerId = relId(link.reader)
+    const doc = readerId ? ((await req.payload.findByID({ collection: 'readers' as never, id: readerId, depth: 0, overrideAccess: true }).catch(() => null)) as ReaderDoc | null) : null
+    if (!doc || doc.status === 'blocked') return reply(ctx, { waiting: false, expired: true }, 200, clear)
+    // Claim it once: a second request with the same secret gets nothing.
+    await req.payload.update({ collection: 'reader-links' as never, id: link.id, data: { claimedAt: new Date().toISOString() } as never, overrideAccess: true })
+    const headers = new Headers({ 'Cache-Control': 'no-store' })
+    headers.append('Set-Cookie', sessionCookie(signReader(doc), secure(req)))
+    headers.append('Set-Cookie', clear)
+    return Response.json({ signedIn: true, reader: publicReader(doc) }, { headers })
   },
 }
 
@@ -823,4 +855,4 @@ const listSave: Endpoint = {
   },
 }
 
-export const kbEndpoints: Endpoint[] = [lists, listOne, listCreate, listUpdate, listDelete, listSave, myData, deleteAccount, report, my, me, signout, signoutAll, emailLink, profile, thread, stars, comment, commentEdit, commentDelete, like, star, review, reviewDelete, feedback]
+export const kbEndpoints: Endpoint[] = [emailLinkStatus, lists, listOne, listCreate, listUpdate, listDelete, listSave, myData, deleteAccount, report, my, me, signout, signoutAll, emailLink, profile, thread, stars, comment, commentEdit, commentDelete, like, star, review, reviewDelete, feedback]

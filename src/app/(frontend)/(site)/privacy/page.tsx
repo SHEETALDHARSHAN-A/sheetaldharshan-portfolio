@@ -56,6 +56,9 @@ export default async function PrivacyPage() {
             <li>
               <code>reader_session</code>: keeps you signed in to ./stdout for up to 30 days. Set only when you sign in; secure and not readable by scripts.
             </li>
+            <li>
+              <code>reader_link</code>: only while you wait for an email sign-in link (up to 15 minutes), so the device that asked for it signs in once you open the link, even on your phone. Removed straight after.
+            </li>
             <li>Admin cookies: only for me, in the admin.</li>
             <li>Your browser&apos;s local storage remembers small display choices on this device (light or dark theme, panel widths, chat or form). They never leave your browser.</li>
           </ul>

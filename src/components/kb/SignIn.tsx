@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { setReader, type Reader } from './reader'
 
 const PROBLEMS: Record<string, string> = {
   expired: 'That sign-in link has expired or was already used. Send yourself a new one.',
@@ -27,6 +28,32 @@ export function SignInOptions({ why, heading = true }: { why?: string; heading?:
   }, [])
   const next = typeof window === 'undefined' ? pathname : `${pathname}${window.location.hash || ''}`
 
+  // After the link is sent, wait for it to be opened (on a phone or here); then this browser signs in.
+  useEffect(() => {
+    if (!sent) return
+    let stop = false
+    const started = Date.now()
+    const tick = async () => {
+      if (stop) return
+      const r = (await fetch('/api/kb/email-link-status', { credentials: 'include', cache: 'no-store' })
+        .then((x) => x.json())
+        .catch(() => null)) as { signedIn?: boolean; reader?: Reader; expired?: boolean } | null
+      if (stop) return
+      if (r?.signedIn && r.reader) {
+        setReader(r.reader)
+        window.dispatchEvent(new Event('kb-signed-in'))
+        return
+      }
+      if (r?.expired || Date.now() - started > 15 * 60_000) return setState({ error: 'That link expired. Send a new one.' })
+      window.setTimeout(tick, document.hidden ? 6000 : 3000)
+    }
+    const id = window.setTimeout(tick, 3000)
+    return () => {
+      stop = true
+      window.clearTimeout(id)
+    }
+  }, [sent])
+
   if (sent)
     return (
       <div className="kb-signin kb-signin-sent" role="status">
@@ -38,9 +65,23 @@ export function SignInOptions({ why, heading = true }: { why?: string; heading?:
         </span>
         <p className="kb-signin-title">Check your inbox</p>
         <p className="kb-note">
-          A sign-in link is on its way to <strong>{email}</strong>. It works once, for 15 minutes.
+          A sign-in link is on its way to <strong>{email}</strong>. Open it on any device, even your phone: <strong>this page signs in by itself</strong> as soon as you approve.
         </p>
-        <button type="button" className="btn ghost kb-signin-wide" onClick={() => setSent(false)}>
+        {state.error ? (
+          <p className="kb-error">{state.error}</p>
+        ) : (
+          <p className="kb-waiting">
+            <i aria-hidden="true" /> Waiting for you to open the link…
+          </p>
+        )}
+        <button
+          type="button"
+          className="btn ghost kb-signin-wide"
+          onClick={() => {
+            setSent(false)
+            setState({})
+          }}
+        >
           Use a different email
         </button>
       </div>
@@ -117,8 +158,13 @@ export function SignInDialog() {
 
   useEffect(() => {
     const show = (e: Event) => setOpen({ why: (e as CustomEvent<string | undefined>).detail })
+    const done = () => setOpen(null)
     window.addEventListener('kb-signin', show)
-    return () => window.removeEventListener('kb-signin', show)
+    window.addEventListener('kb-signed-in', done)
+    return () => {
+      window.removeEventListener('kb-signin', show)
+      window.removeEventListener('kb-signed-in', done)
+    }
   }, [])
 
   // ?signin=expired etc., set by the sign-in routes: say what happened, then tidy the address bar.

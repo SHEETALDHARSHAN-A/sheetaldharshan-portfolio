@@ -3,8 +3,9 @@ import type { NextRequest } from 'next/server'
 import { getPayload, type Payload } from 'payload'
 import { hashToken, upsertReader } from '@/utilities/readerSession'
 import { finishSignIn } from '@/utilities/readerSignIn'
+import { LINK_COOKIE } from '@/endpoints/kb'
 
-type Link = { id: number; email: string; name?: string | null; next?: string | null; expiresAt: string; usedAt?: string | null }
+type Link = { id: number; email: string; name?: string | null; next?: string | null; expiresAt: string; usedAt?: string | null; pollHash?: string | null }
 
 async function findLink(payload: Payload, token: string): Promise<Link | undefined> {
   if (!/^[A-Za-z0-9_-]{40,60}$/.test(token)) return undefined
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
   if (!usable(link)) return expiredPage()
   return page(
     'Sign in',
-    `<h1>Sign in to ./stdout</h1><p>You're signing in as <strong>${esc(link.email)}</strong>. Tap the button to finish; you'll go straight back to what you were reading.</p>
+    `<h1>Sign in to ./stdout</h1><p>Signing in as <strong>${esc(link.email)}</strong>. Tap the button to approve. If you asked for this link on another device (like your laptop), <strong>that device</strong> signs in by itself.</p>
 <form method="post" class="actions"><input type="hidden" name="token" value="${esc(token)}"><button type="submit">Sign in</button><a class="b g" href="/notes">Not you? Cancel</a></form>`,
     'mail',
   )
@@ -96,9 +97,27 @@ export async function POST(request: NextRequest) {
   const payload = await getPayload({ config: configPromise })
   const link = await findLink(payload, token)
   if (!usable(link)) return finishSignIn(origin, (link as Link | undefined)?.next || '/notes', null, link ? 'expired' : 'invalid', 303)
-  await payload.update({ collection: 'reader-links' as never, id: link.id, data: { usedAt: new Date().toISOString() } as never, overrideAccess: true })
+  const now = new Date().toISOString()
+  // Opened in the same browser that asked for it: sign in right here.
+  const waiting = request.cookies.get(LINK_COOKIE)?.value
+  const sameDevice = !link.pollHash || (waiting ? hashToken(waiting) === link.pollHash : false)
   // Old links are no use to anyone; tidy them while we're here.
   await payload.delete({ collection: 'reader-links' as never, where: { expiresAt: { less_than: new Date(Date.now() - 86400_000).toISOString() } }, overrideAccess: true }).catch(() => undefined)
   const doc = await upsertReader(payload, { provider: 'email', providerId: link.email, email: link.email, name: link.name || link.email.split('@')[0] })
-  return finishSignIn(origin, link.next || '/notes', doc, undefined, 303)
+  if (sameDevice) {
+    await payload.update({ collection: 'reader-links' as never, id: link.id, data: { usedAt: now, confirmedAt: now, claimedAt: now, reader: doc.id } as never, overrideAccess: true })
+    const res = finishSignIn(origin, link.next || '/notes', doc, undefined, 303)
+    res.cookies.set(LINK_COOKIE, '', { path: '/', maxAge: 0 })
+    return res
+  }
+  // Opened on another device (say, a phone): this only approves. The device that asked for the
+  // link notices within a few seconds and signs itself in; nothing is signed in here.
+  await payload.update({ collection: 'reader-links' as never, id: link.id, data: { usedAt: now, confirmedAt: now, reader: doc.id } as never, overrideAccess: true })
+  if (doc.status === 'blocked') return finishSignIn(origin, link.next || '/notes', doc, undefined, 303)
+  return page(
+    'Approved',
+    `<h1>Approved. You're signed in on your other device</h1><p>Go back to the device where you asked for the link (your laptop or computer). It signs in by itself within a few seconds, and the page there updates on its own.</p>
+<p>Nothing was signed in on this device. You can close this tab.</p>`,
+    'shield',
+  )
 }

@@ -12,6 +12,7 @@ How the site protects the admin, readers and their data, and what to keep in min
 - **Sign-in:** GitHub (through Supabase) or a one-time email link. There are no passwords.
   - An email link works once, for 15 minutes, and only a SHA-256 hash of it is stored.
   - Opening the link shows a confirm button. Mail scanners that open links can't use it up.
+  - **Cross-device:** the browser that asks for a link gets a random secret in an httpOnly `reader_link` cookie (only its hash is stored). Opening the link on another device only *approves*. The asking browser polls `/api/kb/email-link-status`, then claims the session once. Opening it in the asking browser signs in directly.
   - Sign-in redirects only go to paths on this site (`safeNext`).
 - **Sessions:** an HS256 token in the httpOnly, Secure, SameSite=Lax `reader_session` cookie (`src/utilities/readerSession.ts`).
   - The key is derived from `PAYLOAD_SECRET` and kept separate from admin tokens.

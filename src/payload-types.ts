@@ -1403,6 +1403,10 @@ export interface ReaderLink {
   next?: string | null;
   expiresAt: string;
   usedAt?: string | null;
+  pollHash?: string | null;
+  confirmedAt?: string | null;
+  claimedAt?: string | null;
+  reader?: (number | null) | Reader;
   ipHash?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -2471,6 +2475,10 @@ export interface ReaderLinksSelect<T extends boolean = true> {
   next?: T;
   expiresAt?: T;
   usedAt?: T;
+  pollHash?: T;
+  confirmedAt?: T;
+  claimedAt?: T;
+  reader?: T;
   ipHash?: T;
   updatedAt?: T;
   createdAt?: T;

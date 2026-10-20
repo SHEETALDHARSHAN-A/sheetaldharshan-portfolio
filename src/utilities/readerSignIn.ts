@@ -2,7 +2,7 @@ import type { User } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import type { Payload } from 'payload'
 import { moderate } from './moderation'
-import { safeNext, sessionCookie, signReader, upsertReader, type ReaderDoc } from './readerSession'
+import { READER_COOKIE, safeNext, SESSION_DAYS, signReader, upsertReader, type ReaderDoc } from './readerSession'
 
 /** Where a reader returns after GitHub, kept in a short-lived cookie during the round trip. */
 export const READER_NEXT_COOKIE = 'reader-next'
@@ -15,7 +15,8 @@ export function finishSignIn(origin: string, next: string, doc: ReaderDoc | null
     return NextResponse.redirect(target, status)
   }
   const res = NextResponse.redirect(target, status)
-  res.headers.append('Set-Cookie', sessionCookie(signReader(doc), origin.startsWith('https')))
+  // Through the cookies API (not a raw header), so later res.cookies changes keep it.
+  res.cookies.set(READER_COOKIE, signReader(doc), { httpOnly: true, secure: origin.startsWith('https'), sameSite: 'lax', path: '/', maxAge: SESSION_DAYS * 86400 })
   return res
 }
 
