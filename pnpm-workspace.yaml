@@ -10,3 +10,6 @@ overrides:
   fflate@>=0.8.0 <0.8.3: ^0.8.3
   esbuild@<=0.24.2: ^0.25.0
   sharp@<0.35.5: ^0.35.5
+  dompurify@<3.4.16: ^3.4.16
+  '@supabase/auth-js@<2.70.0': 2.70.0
+  postcss-selector-parser@<7.1.6: ^7.1.6
