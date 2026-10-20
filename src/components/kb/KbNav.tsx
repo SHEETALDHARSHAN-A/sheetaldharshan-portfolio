@@ -85,6 +85,9 @@ export function KbNav({ channels, active, query, stars = true, signIn = true }: 
           )}
         </div>
       ) : null}
+      <Link href="/privacy" className="kb-privacy">
+        Privacy
+      </Link>
     </nav>
   )
 }

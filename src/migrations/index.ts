@@ -23,6 +23,7 @@ import * as migration_20261018_145409_resume_link from './20261018_145409_resume
 import * as migration_20261020_112623_field_notes from './20261020_112623_field_notes';
 import * as migration_20261020_123230_field_notes_readers from './20261020_123230_field_notes_readers';
 import * as migration_20261020_123627_field_notes_controls from './20261020_123627_field_notes_controls';
+import * as migration_20261020_125259_security_hardening from './20261020_125259_security_hardening';
 
 export const migrations = [
   {
@@ -148,6 +149,11 @@ export const migrations = [
   {
     up: migration_20261020_123627_field_notes_controls.up,
     down: migration_20261020_123627_field_notes_controls.down,
-    name: '20261020_123627_field_notes_controls'
+    name: '20261020_123627_field_notes_controls',
+  },
+  {
+    up: migration_20261020_125259_security_hardening.up,
+    down: migration_20261020_125259_security_hardening.down,
+    name: '20261020_125259_security_hardening'
   },
 ];

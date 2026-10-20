@@ -1,5 +1,6 @@
 import type { CollectionConfig, Field, GlobalConfig } from 'payload'
 import { authenticated } from '../access/authenticated'
+import { privateFields } from '../access/privateFields'
 
 /**
  * The Field Notes's visitor side: comments (threaded, with likes), reviews (1–5 stars), feedback
@@ -24,6 +25,8 @@ const status: Field = {
 }
 const reason: Field = { name: 'reason', type: 'text', label: 'Why held', admin: { position: 'sidebar', readOnly: true, condition: (d) => Boolean(d?.reason) } }
 const reader: Field = { name: 'reader', type: 'relationship', relationTo: 'readers', admin: { position: 'sidebar', readOnly: true } }
+const ipHash: Field = { name: 'ipHash', type: 'text', index: true, admin: { hidden: true } }
+/** Keyed hash of the writer's address, for rate limits only; the address itself is never stored. */
 const blockReader: Field = { name: 'blockReader', type: 'ui', admin: { position: 'sidebar', components: { Field: '@/components/admin/BlockReader#BlockReader' } } }
 const post: Field = { name: 'post', type: 'relationship', relationTo: 'posts', required: true, admin: { position: 'sidebar' } }
 
@@ -57,6 +60,7 @@ export const KbComments: CollectionConfig = {
     post,
     { name: 'parent', type: 'relationship', relationTo: 'kb-comments', label: 'Reply to', admin: { position: 'sidebar' } },
     { name: 'likes', type: 'number', defaultValue: 0, admin: { position: 'sidebar', readOnly: true } },
+    ipHash,
   ],
 }
 
@@ -115,6 +119,7 @@ export const KbFeedback: CollectionConfig = {
     post,
     { name: 'alert', type: 'text', label: 'Email alert', admin: { position: 'sidebar', readOnly: true } },
     reader,
+    ipHash,
   ],
 }
 
@@ -244,10 +249,11 @@ export const ReaderLinks: CollectionConfig = {
     { name: 'next', type: 'text' },
     { name: 'expiresAt', type: 'date', required: true },
     { name: 'usedAt', type: 'date' },
+    ipHash,
   ],
 }
 
-export const KbSettings: GlobalConfig = {
+const KbSettingsConfig: GlobalConfig = {
   slug: 'kb-settings',
   label: 'Field Notes settings',
   admin: { group: GROUP, description: 'The Field Notes page wording, and what readers can do on posts.' },
@@ -300,3 +306,6 @@ export const KbSettings: GlobalConfig = {
     { name: 'blockedWords', type: 'textarea', label: 'Blocked words', admin: { description: 'Extra words to refuse, one per line or comma-separated. Disguises like f*ck or sh1t are caught too.' } },
   ],
 }
+
+/** The switches are public (the pages need them); moderation details and alerts are not. */
+export const KbSettings: GlobalConfig = { ...KbSettingsConfig, fields: privateFields(KbSettingsConfig.fields, ['notify', 'moderation', 'blockedWords']) }

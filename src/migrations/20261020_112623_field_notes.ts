@@ -105,7 +105,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_kb_comments_id_idx" ON "payload_locked_documents_rels" USING btree ("kb_comments_id");
   CREATE INDEX "payload_locked_documents_rels_kb_reviews_id_idx" ON "payload_locked_documents_rels" USING btree ("kb_reviews_id");
   CREATE INDEX "payload_locked_documents_rels_kb_feedback_id_idx" ON "payload_locked_documents_rels" USING btree ("kb_feedback_id");
-  CREATE INDEX "payload_locked_documents_rels_kb_votes_id_idx" ON "payload_locked_documents_rels" USING btree ("kb_votes_id");`)
+  CREATE INDEX "payload_locked_documents_rels_kb_votes_id_idx" ON "payload_locked_documents_rels" USING btree ("kb_votes_id");
+  ALTER TABLE "kb_comments" ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE "kb_reviews" ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE "kb_feedback" ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE "kb_votes" ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE "kb_settings" ENABLE ROW LEVEL SECURITY;`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {

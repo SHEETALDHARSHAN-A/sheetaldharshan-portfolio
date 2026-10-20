@@ -39,7 +39,7 @@ See `docs/architecture.md`. Short version: pages under `src/app/(frontend)` read
 - **[Make it yours](docs/make-it-yours.md)**: use this as your own portfolio, step by step · **[site.json](docs/site-json.md)**: the whole site in one file, AI-ready · **[Contributing](CONTRIBUTING.md)**
 - [Reference analysis](docs/reference-analysis.md) · [Design spec](docs/design-spec.md) · [Animation spec](docs/animation-spec.md)
 - [Architecture](docs/architecture.md) · [CMS schema](docs/cms-schema.md) · [Implementation plan and status](docs/implementation-plan.md)
-- [Admin guide](docs/admin-guide.md) · [Deployment](docs/deployment.md) · [Visual QA report](docs/visual-qa-report.md)
+- [Admin guide](docs/admin-guide.md) · [Deployment](docs/deployment.md) · [Security and privacy](docs/security.md) · [Visual QA report](docs/visual-qa-report.md)
 
 ## Content rules
 Only verified, public information goes into the CMS. Private company work is summarised at a high level with no links. Drafts stay private until published. The seed in `src/seed/data.ts` is the reviewed baseline.

@@ -36,7 +36,7 @@ export function useReader(): State & { signOut: (everywhere?: boolean) => Promis
   }, [])
   /** Signs out here, or (`everywhere`) on every device this reader is signed in on. */
   const signOut = async (everywhere = false) => {
-    await fetch(everywhere ? '/api/kb/signout-all' : '/api/kb/signout', { method: 'POST', credentials: 'include' }).catch(() => null)
+    await fetch(everywhere ? '/api/kb/signout-all' : '/api/kb/signout', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: '{}' }).catch(() => null)
     setReader(null)
     window.dispatchEvent(new Event('kb-signed-out'))
   }

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
+import { headers } from './securityHeaders'
 
 const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
@@ -48,7 +49,9 @@ const nextConfig: NextConfig = {
     return webpackConfig
   },
   reactStrictMode: true,
+  poweredByHeader: false,
   redirects,
+  headers,
   turbopack: {
     root: path.resolve(dirname),
   },

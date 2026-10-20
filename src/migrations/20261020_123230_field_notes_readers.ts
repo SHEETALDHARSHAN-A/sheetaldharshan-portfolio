@@ -92,7 +92,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "kb_comments" DROP COLUMN "visitor";
   ALTER TABLE "kb_reviews" DROP COLUMN "visitor";
   ALTER TABLE "kb_feedback" DROP COLUMN "visitor";
-  ALTER TABLE "kb_votes" DROP COLUMN "visitor";`)
+  ALTER TABLE "kb_votes" DROP COLUMN "visitor";
+  ALTER TABLE "kb_reports" ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE "readers" ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE "reader_links" ENABLE ROW LEVEL SECURITY;`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {

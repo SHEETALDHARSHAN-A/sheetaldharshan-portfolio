@@ -122,6 +122,8 @@ export default buildConfig({
   // Order sets the admin menu: Sidebar, Brand, then Pages.
   globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, AdminLook, AdminSecurity, Homepage, ProjectsPage, About, ContactPage, KbSettings],
   // The admin's search bar (src/components/admin/AdminSearch.tsx).
+  // Only the REST API is used; GraphQL (and its playground) is switched off to keep the surface small.
+  graphQL: { disable: true },
   endpoints: [adminSearch, ...siteJson, contact, contactTest, ...kbEndpoints],
   plugins: [
     ...plugins,

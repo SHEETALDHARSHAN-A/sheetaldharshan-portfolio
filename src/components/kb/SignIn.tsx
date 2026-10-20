@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -10,6 +11,7 @@ const PROBLEMS: Record<string, string> = {
   blocked: 'This account cannot sign in here.',
   failed: 'Signing in did not work. Please try again.',
   unavailable: 'GitHub sign-in is not available right now. Use an email link instead.',
+  deleted: 'Your account and its data were deleted. Thanks for reading.',
 }
 
 /** The sign-in choices: GitHub, or a one-time link by email. Used in the dialog and under posts. */
@@ -39,7 +41,9 @@ export function SignInOptions({ why }: { why?: string }) {
   return (
     <div className="kb-signin">
       <p className="kb-signin-title">Sign in {why ?? 'to comment, like and rate'}</p>
-      <p className="kb-note">No password needed. Your email is never shown.</p>
+      <p className="kb-note">
+        No password needed. Your email is never shown. See the <Link href="/privacy">privacy notice</Link>.
+      </p>
       <div className="kb-signin-buttons">
         <a className="btn kb-gh" href={`/auth/reader/github?next=${encodeURIComponent(next)}`}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -128,7 +132,7 @@ export function SignInDialog() {
             ×
           </button>
         </div>
-        {open.problem ? <p className="kb-error">{open.problem}</p> : null}
+        {open.problem ? <p className={open.problem.startsWith('Your account') ? 'kb-note' : 'kb-error'}>{open.problem}</p> : null}
         <SignInOptions why={open.why} />
       </div>
     </div>,

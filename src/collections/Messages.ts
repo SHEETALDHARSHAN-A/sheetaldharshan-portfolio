@@ -43,6 +43,7 @@ export const Messages: CollectionConfig = {
     },
     { name: 'handled', type: 'checkbox', label: 'Handled', defaultValue: false, admin: { position: 'sidebar' } },
     { name: 'page', type: 'text', admin: { position: 'sidebar', readOnly: true, description: 'Where it was sent from.' } },
+    { name: 'ipHash', type: 'text', index: true, admin: { hidden: true } },
     { name: 'alert', type: 'text', label: 'Email alert', admin: { position: 'sidebar', readOnly: true, description: 'Whether the email alert went out.' } },
   ],
 }

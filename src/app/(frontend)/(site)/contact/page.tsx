@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
 import { BrandIcon } from '@/components/BrandIcon'
 import { ContactSwitch } from '@/components/contact/ContactSwitch'
@@ -64,6 +65,9 @@ export default async function ContactPage() {
                 </a>
               </section>
             ) : null}
+            <p className="contact-privacy">
+              Your details are only used to reply to you. <Link href="/privacy">Privacy</Link>
+            </p>
           </aside>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { moderate, REJECT_MESSAGE, type Verdict } from '@/utilities/moderation'
 import { clearCookie, hashToken, newLinkToken, publicReader, readerFromCookie, safeNext, sessionCookie, signReader, type Reader, type ReaderDoc } from '@/utilities/readerSession'
 import { createHash } from 'node:crypto'
 import { alertRecipient, siteInfo } from './contact'
+import { sameOrigin } from '@/utilities/sameOrigin'
 import { postRules, siteRules, type PostRules, type SiteRules } from '@/utilities/kbRules'
 
 /** Anonymous reporters are told apart by a hash of their address, never the address itself. */
@@ -39,16 +40,10 @@ function tooMany(key: string, max: number, minutes = 10): boolean {
 const secure = (req: PayloadRequest) => (req.headers.get('x-forwarded-proto') ?? new URL(req.url ?? 'http://x').protocol.replace(':', '')) === 'https'
 const ip = (req: PayloadRequest) => req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
 
-/** Writes only from pages on this site. */
-function sameOrigin(req: PayloadRequest): boolean {
-  const origin = req.headers.get('origin')
-  if (!origin) return true // same-origin fetches from older browsers may omit it; SameSite still applies
-  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host')
-  try {
-    return new URL(origin).host === host
-  } catch {
-    return false
-  }
+/** How many of something were created recently, counted in the database so every server instance agrees. */
+async function recent(req: PayloadRequest, collection: string, where: Where, minutes: number): Promise<number> {
+  const since = new Date(Date.now() - minutes * 60_000).toISOString()
+  return (await req.payload.count({ collection: collection as never, where: { and: [where, { createdAt: { greater_than: since } }] }, overrideAccess: true })).totalDocs
 }
 
 async function context(req: PayloadRequest): Promise<Ctx> {
@@ -175,10 +170,11 @@ const emailLink: Endpoint = {
     if (!(await settingsOf(req)).signIn) return reply(ctx, { error: 'Signing in is switched off.' }, 403)
     if (!EMAIL.test(email)) return reply(ctx, { errors: { email: 'Please enter a valid email address.' } }, 400)
     if (name && moderate(name).action !== 'publish') return reply(ctx, { errors: { name: 'Please choose a different name.' } }, 400)
-    if (tooMany(`link|${email}`, 3, 15) || tooMany(`link|${ip(req)}`, 8, 15)) return reply(ctx, { error: 'A link was just sent. Please check your inbox (and spam), or try again in a few minutes.' }, 429)
+    const ipHash = hashKey(ip(req))
+    if (tooMany(`link|${email}`, 3, 15) || tooMany(`link|${ipHash}`, 8, 15) || (await recent(req, 'reader-links', { email: { equals: email } }, 15)) >= 3 || (await recent(req, 'reader-links', { ipHash: { equals: ipHash } }, 15)) >= 8) return reply(ctx, { error: 'A link was just sent. Please check your inbox (and spam), or try again in a few minutes.' }, 429)
     if (!emailAlertsReady()) return reply(ctx, { error: 'Email sign-in is not available right now. Please use GitHub.' }, 503)
     const token = newLinkToken()
-    await req.payload.create({ collection: 'reader-links' as never, data: { tokenHash: hashToken(token), email, name: name || undefined, next: safeNext(body.next), expiresAt: new Date(Date.now() + 15 * 60_000).toISOString() } as never, overrideAccess: true })
+    await req.payload.create({ collection: 'reader-links' as never, data: { tokenHash: hashToken(token), email, ipHash, name: name || undefined, next: safeNext(body.next), expiresAt: new Date(Date.now() + 15 * 60_000).toISOString() } as never, overrideAccess: true })
     const contact = toContactSettings((await req.payload.findGlobal({ slug: 'contact-page' as never, depth: 0 })) as unknown as Record<string, unknown>)
     const site = await siteInfo(req.payload)
     const origin = new URL(req.url ?? site.url).origin
@@ -310,7 +306,11 @@ const comment: Endpoint = {
     // Anonymous comments are welcome but braked harder, and any link waits for approval.
     const reader = ctx.reader
     if (!reader && isBot(body)) return reply(ctx, { ok: true, pending: true, comment: null })
-    if (reader ? tooMany(`c|${reader.id}`, 8) : tooMany(`ca|${ip(req)}`, 4)) return reply(ctx, { error: 'That is a lot of comments in a short time. Please try again in a few minutes.' }, 429)
+    const ipHash = hashKey(ip(req))
+    const busy = reader
+      ? tooMany(`c|${reader.id}`, 8) || (await recent(req, 'kb-comments', { reader: { equals: reader.id } }, 10)) >= 8
+      : tooMany(`ca|${ipHash}`, 4) || (await recent(req, 'kb-comments', { ipHash: { equals: ipHash } }, 10)) >= 4
+    if (busy) return reply(ctx, { error: 'That is a lot of comments in a short time. Please try again in a few minutes.' }, 429)
     const s = await settingsOf(req)
     const post = await postOf(req, body.post, s)
     if (!post) return reply(ctx, { error: 'That post was not found.' }, 404)
@@ -328,7 +328,7 @@ const comment: Endpoint = {
     }
     const doc = (await req.payload.create({
       collection: 'kb-comments' as never,
-      data: { name: reader?.name ?? 'Anonymous', body: words, post: post.id, parent, reader: reader?.id, status: verdict.action === 'hold' ? 'pending' : 'published', reason: verdict.reason } as never,
+      data: { name: reader?.name ?? 'Anonymous', body: words, post: post.id, parent, reader: reader?.id, ipHash: reader ? undefined : ipHash, status: verdict.action === 'hold' ? 'pending' : 'published', reason: verdict.reason } as never,
       overrideAccess: true,
     })) as unknown as { id: number; createdAt: string }
     await tellOwner(req, s, {
@@ -519,8 +519,9 @@ const feedback: Endpoint = {
     if (!quote && !note) return reply(ctx, { errors: { note: 'Tell me a little about it.' } }, 400)
     if (email && !EMAIL.test(email)) return reply(ctx, { errors: { email: 'That email does not look right. It is optional.' } }, 400)
     if (moderate(note, { blocked: s.blocked }).action === 'reject') return reply(ctx, { errors: { note: REJECT_MESSAGE } }, 400)
-    if (tooMany(`f|${ctx.reader?.id ?? ip(req)}`, 10)) return reply(ctx, { error: 'That is a lot of feedback in a short time. Please try again in a few minutes.' }, 429)
-    const doc = (await req.payload.create({ collection: 'kb-feedback' as never, data: { kind, quote, note, email: email || undefined, post: post.id, reader: ctx.reader?.id } as never, overrideAccess: true })) as unknown as { id: number }
+    const ipHash = hashKey(ip(req))
+    if (tooMany(`f|${ctx.reader?.id ?? ipHash}`, 10) || (await recent(req, 'kb-feedback', ctx.reader ? { reader: { equals: ctx.reader.id } } : { ipHash: { equals: ipHash } }, 60)) >= 10) return reply(ctx, { error: 'That is a lot of feedback in a short time. Please try again in a few minutes.' }, 429)
+    const doc = (await req.payload.create({ collection: 'kb-feedback' as never, data: { kind, quote, note, email: email || undefined, post: post.id, reader: ctx.reader?.id, ipHash: ctx.reader ? undefined : ipHash } as never, overrideAccess: true })) as unknown as { id: number }
     const label = { wrong: 'Looks wrong', simpler: 'Could be simpler', other: 'Feedback' }[kind]
     const alert = await tellOwner(req, s, {
       subject: `${label}: “${post.title}”`,
@@ -553,7 +554,7 @@ const report: Endpoint = {
     const c = id ? ((await req.payload.findByID({ collection: 'kb-comments' as never, id, depth: 0, overrideAccess: true }).catch(() => null)) as (CommentDoc & { post: unknown }) | null) : null
     if (!c || c.deleted) return reply(ctx, { error: 'That comment was not found.' }, 404)
     const key = ctx.reader ? `r${ctx.reader.id}` : `ip${hashKey(ip(req))}`
-    if (tooMany(`rep|${key}`, 10)) return reply(ctx, { error: 'That is a lot of reports in a short time. Please try again later.' }, 429)
+    if (tooMany(`rep|${key}`, 10) || (await recent(req, 'kb-reports', { reporterKey: { equals: key } }, 60)) >= 10) return reply(ctx, { error: 'That is a lot of reports in a short time. Please try again later.' }, 429)
     const already = await req.payload.count({ collection: 'kb-reports' as never, where: { and: [{ comment: { equals: c.id } }, { reporterKey: { equals: key } }] }, overrideAccess: true })
     if (already.totalDocs) return reply(ctx, { ok: true, already: true })
     const postId = relId(c.post)
@@ -606,4 +607,82 @@ const my: Endpoint = {
   },
 }
 
-export const kbEndpoints: Endpoint[] = [report, my, me, signout, signoutAll, emailLink, profile, thread, stars, comment, commentEdit, commentDelete, like, star, review, reviewDelete, feedback]
+/** GET /api/kb/my-data: everything stored about the signed-in reader, as a JSON download. */
+const myData: Endpoint = {
+  path: '/kb/my-data',
+  method: 'get',
+  handler: async (req) => {
+    const ctx = await context(req)
+    if (!ctx.reader || !ctx.doc) return reply(ctx, SIGN_IN, 401)
+    const id = ctx.reader.id
+    const all = (collection: string, where: Where) => req.payload.find({ collection: collection as never, where, depth: 0, limit: 5000, pagination: false, overrideAccess: true }).then((r) => r.docs as unknown as Record<string, unknown>[])
+    const [comments, reviews, votes, reports, feedback] = await Promise.all([
+      all('kb-comments', { reader: { equals: id } }),
+      all('kb-reviews', { reader: { equals: id } }),
+      all('kb-votes', { reader: { equals: id } }),
+      all('kb-reports', { reader: { equals: id } }),
+      all('kb-feedback', { reader: { equals: id } }),
+    ])
+    const pick = (o: Record<string, unknown>, keys: string[]) => Object.fromEntries(keys.filter((k) => o[k] !== undefined && o[k] !== null).map((k) => [k, o[k]]))
+    const d = ctx.doc as unknown as Record<string, unknown>
+    const data = {
+      exportedAt: new Date().toISOString(),
+      account: pick(d, ['name', 'email', 'provider', 'githubLogin', 'avatar', 'createdAt', 'lastSeenAt']),
+      comments: comments.map((c) => pick(c, ['id', 'post', 'parent', 'body', 'status', 'likes', 'createdAt', 'editedAt', 'deleted'])),
+      ratings: reviews.map((r) => pick(r, ['post', 'rating', 'review', 'status', 'createdAt', 'editedAt'])),
+      likesAndStars: votes.map((v) => pick(v, ['kind', 'target', 'createdAt'])),
+      reports: reports.map((r) => pick(r, ['comment', 'reason', 'note', 'status', 'createdAt'])),
+      feedback: feedback.map((f) => pick(f, ['post', 'kind', 'quote', 'note', 'email', 'createdAt'])),
+    }
+    const headers = new Headers({ 'Cache-Control': 'no-store', 'Content-Type': 'application/json; charset=utf-8', 'Content-Disposition': 'attachment; filename="field-notes-my-data.json"' })
+    return new Response(JSON.stringify(data, null, 2), { headers })
+  },
+}
+
+/**
+ * POST /api/kb/delete-account {comments: 'delete' | 'anonymous'}: removes the reader and what they
+ * did. Their comments are deleted (kept as "deleted" where others replied) or kept as Anonymous;
+ * likes, stars, ratings and reports go; feedback stays but no longer points to them.
+ */
+const deleteAccount: Endpoint = {
+  path: '/kb/delete-account',
+  method: 'post',
+  handler: async (req) => {
+    const ctx = await context(req)
+    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!ctx.reader) return reply(ctx, SIGN_IN, 401)
+    const id = ctx.reader.id
+    const keepAnonymous = (await readBody(req)).comments === 'anonymous'
+    const payload = req.payload
+    const o = { overrideAccess: true } as const
+    // Likes they gave: remove, then recount those comments.
+    const likes = (await payload.find({ collection: 'kb-votes' as never, where: { and: [{ reader: { equals: id } }, { kind: { equals: 'like' } }] }, depth: 0, limit: 5000, pagination: false, ...o })).docs as unknown as { target: string }[]
+    await payload.delete({ collection: 'kb-votes' as never, where: { reader: { equals: id } }, ...o })
+    for (const t of new Set(likes.map((l) => l.target))) {
+      const count = (await payload.count({ collection: 'kb-votes' as never, where: { and: [{ kind: { equals: 'like' } }, { target: { equals: t } }] }, ...o })).totalDocs
+      await payload.update({ collection: 'kb-comments' as never, id: Number(t), data: { likes: count } as never, ...o }).catch(() => undefined)
+    }
+    await payload.delete({ collection: 'kb-reviews' as never, where: { reader: { equals: id } }, ...o })
+    await payload.delete({ collection: 'kb-reports' as never, where: { reader: { equals: id } }, ...o })
+    await payload.update({ collection: 'kb-feedback' as never, where: { reader: { equals: id } }, data: { reader: null, email: null } as never, ...o })
+    const comments = (await payload.find({ collection: 'kb-comments' as never, where: { reader: { equals: id } }, depth: 0, limit: 5000, pagination: false, ...o })).docs as unknown as { id: number }[]
+    for (const c of comments) {
+      if (keepAnonymous) {
+        await payload.update({ collection: 'kb-comments' as never, id: c.id, data: { reader: null, name: 'Anonymous' } as never, ...o })
+        continue
+      }
+      const replies = (await payload.count({ collection: 'kb-comments' as never, where: { parent: { equals: c.id } }, ...o })).totalDocs
+      if (replies) await payload.update({ collection: 'kb-comments' as never, id: c.id, data: { reader: null, name: 'Deleted', body: '[deleted]', deleted: true } as never, ...o })
+      else {
+        await payload.delete({ collection: 'kb-votes' as never, where: { and: [{ kind: { equals: 'like' } }, { target: { equals: String(c.id) } }] }, ...o })
+        await payload.delete({ collection: 'kb-comments' as never, id: c.id, ...o })
+      }
+    }
+    const email = ctx.doc?.email
+    if (email) await payload.delete({ collection: 'reader-links' as never, where: { email: { equals: email } }, ...o })
+    await payload.delete({ collection: 'readers' as never, id, ...o })
+    return reply({ ...ctx, renew: false }, { ok: true }, 200, clearCookie(secure(req)))
+  },
+}
+
+export const kbEndpoints: Endpoint[] = [myData, deleteAccount, report, my, me, signout, signoutAll, emailLink, profile, thread, stars, comment, commentEdit, commentDelete, like, star, review, reviewDelete, feedback]

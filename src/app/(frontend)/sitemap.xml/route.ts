@@ -17,6 +17,7 @@ export async function GET() {
     { loc: '/projects', priority: '0.9', lastmod: day(latestProject) },
     { loc: '/notes', priority: '0.7', lastmod: day(latestPost) },
     { loc: '/research', priority: '0.6' },
+    { loc: '/privacy', priority: '0.2' },
     { loc: '/contact', priority: '0.6' },
     ...projects.map((project) => ({ loc: `/projects/${project.slug}`, priority: '0.8', lastmod: day(project.updatedAt) })),
     ...posts.map((post) => ({ loc: `/notes/${post.slug}`, priority: '0.7', lastmod: day(post.updatedAt) })),

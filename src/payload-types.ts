@@ -1259,6 +1259,7 @@ export interface KbComment {
   post: number | Post;
   parent?: (number | null) | KbComment;
   likes?: number | null;
+  ipHash?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1336,6 +1337,7 @@ export interface KbFeedback {
   post: number | Post;
   alert?: string | null;
   reader?: (number | null) | Reader;
+  ipHash?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1383,6 +1385,7 @@ export interface ReaderLink {
   next?: string | null;
   expiresAt: string;
   usedAt?: string | null;
+  ipHash?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1420,6 +1423,7 @@ export interface Message {
    * Where it was sent from.
    */
   page?: string | null;
+  ipHash?: string | null;
   /**
    * Whether the email alert went out.
    */
@@ -2338,6 +2342,7 @@ export interface KbCommentsSelect<T extends boolean = true> {
   post?: T;
   parent?: T;
   likes?: T;
+  ipHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2370,6 +2375,7 @@ export interface KbFeedbackSelect<T extends boolean = true> {
   post?: T;
   alert?: T;
   reader?: T;
+  ipHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2430,6 +2436,7 @@ export interface ReaderLinksSelect<T extends boolean = true> {
   next?: T;
   expiresAt?: T;
   usedAt?: T;
+  ipHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2452,6 +2459,7 @@ export interface MessagesSelect<T extends boolean = true> {
       };
   handled?: T;
   page?: T;
+  ipHash?: T;
   alert?: T;
   updatedAt?: T;
   createdAt?: T;

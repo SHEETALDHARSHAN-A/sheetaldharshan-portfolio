@@ -5,6 +5,9 @@ import { toMediaRef } from '@/data/media'
 import { audioSource } from '@/utilities/audioSource'
 import { videoSource } from '@/utilities/videoSource'
 
+/** Only https links are rendered, whatever was saved. */
+const httpsOnly = (u?: string | null) => (u && /^https:\/\//i.test(u) ? u : undefined)
+
 /** A video in a post: YouTube/Vimeo in their player, a direct link or uploaded file in a native one. */
 export function PostVideo({ url, file, caption }: PostVideoBlock) {
   const upload = toMediaRef(file)
@@ -39,8 +42,10 @@ export function PostAudio({ title, url, file, caption }: PostAudioBlock) {
 }
 
 /** A photo in a post, uploaded or linked, optionally clickable. */
-export function PostPhoto({ image, imageUrl, alt, href, caption, size }: PostPhotoBlock) {
+export function PostPhoto({ image, imageUrl: rawImage, alt, href: rawHref, caption, size }: PostPhotoBlock) {
   const upload = toMediaRef(image)
+  const imageUrl = httpsOnly(rawImage)
+  const href = httpsOnly(rawHref)
   const img = upload ? (
     <Picture media={alt ? { ...upload, alt } : upload} sizes={size === 'wide' ? '(max-width: 960px) 100vw, 1000px' : '(max-width: 960px) 100vw, 720px'} />
   ) : imageUrl ? (

@@ -19,7 +19,15 @@ export const Users: CollectionConfig = {
       'People who can sign in to this admin. To add someone: Create new, enter their name, email, a password to share with them, and their GitHub username; they sign in with the password, then confirm with that GitHub account.',
   },
   // Email and password; src/proxy.ts then asks for a GitHub check before the session counts.
-  auth: true,
+  auth: {
+    // Five wrong passwords lock the account for 15 minutes (GitHub is the second step on top).
+    maxLoginAttempts: 5,
+    lockTime: 15 * 60 * 1000,
+    // An admin session lasts 8 hours of inactivity at most.
+    tokenExpiration: 8 * 60 * 60,
+    useSessions: true,
+    cookies: { secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' },
+  },
   fields: [
     {
       name: 'name',

@@ -157,6 +157,67 @@ export function MyNotes() {
       ) : (
         empty('Comments you report, and what happened to them, show up here.')
       )}
+      <YourData />
     </div>
+  )
+}
+
+/** Download everything stored about you, or delete your account. */
+function YourData() {
+  const [confirming, setConfirming] = useState(false)
+  const [comments, setComments] = useState<'delete' | 'anonymous'>('delete')
+  const [state, setState] = useState<{ busy?: boolean; error?: string }>({})
+  return (
+    <section className="kb-data" aria-label="Your data">
+      <p className="kb-sec-title">Your data</p>
+      <p className="kb-note">
+        See what is stored and why in the <Link href="/privacy">privacy notice</Link>.
+      </p>
+      <div className="kb-inline-actions">
+        <a className="btn ghost" href="/api/kb/my-data" download>
+          Download my data
+        </a>
+        {!confirming ? (
+          <button type="button" className="btn ghost kb-danger" onClick={() => setConfirming(true)}>
+            Delete my account
+          </button>
+        ) : null}
+      </div>
+      {confirming ? (
+        <div className="kb-delete">
+          <p>
+            <strong>Delete your account?</strong> Your likes, stars, ratings and reports are removed and you are signed out everywhere. This cannot be undone.
+          </p>
+          <label className="kb-reason" data-on={comments === 'delete' || undefined}>
+            <input type="radio" name="kb-del" checked={comments === 'delete'} onChange={() => setComments('delete')} />
+            Delete my comments too (ones with replies show as &quot;deleted&quot;)
+          </label>
+          <label className="kb-reason" data-on={comments === 'anonymous' || undefined}>
+            <input type="radio" name="kb-del" checked={comments === 'anonymous'} onChange={() => setComments('anonymous')} />
+            Keep my comments, shown as Anonymous
+          </label>
+          {state.error ? <p className="kb-error">{state.error}</p> : null}
+          <div className="kb-inline-actions">
+            <button type="button" className="btn ghost" onClick={() => setConfirming(false)}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn kb-danger-solid"
+              disabled={state.busy}
+              onClick={async () => {
+                setState({ busy: true })
+                const res = await fetch('/api/kb/delete-account', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ comments }) }).catch(() => null)
+                const body = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string } | null
+                if (!body?.ok) return setState({ error: body?.error ?? 'It could not be deleted. Please try again.' })
+                window.location.assign('/notes?signin=deleted')
+              }}
+            >
+              {state.busy ? 'Deleting…' : 'Delete my account'}
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </section>
   )
 }

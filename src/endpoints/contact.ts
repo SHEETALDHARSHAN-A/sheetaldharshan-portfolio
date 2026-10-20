@@ -1,5 +1,7 @@
+import { createHash } from 'node:crypto'
 import type { Endpoint } from 'payload'
 import { checkAnswer, toContactSettings, type ContactSettings } from '@/utilities/contactFields'
+import { sameOrigin } from '@/utilities/sameOrigin'
 import { emailAlertsReady, sendTemplate } from '@/utilities/emailAlert'
 import { SAMPLE, type EmailVars } from '@/utilities/emailTemplate'
 
@@ -24,6 +26,7 @@ export const contact: Endpoint = {
   path: '/contact',
   method: 'post',
   handler: async (req) => {
+    if (!sameOrigin(req)) return Response.json({ error: 'Please send your message from the Contact page.' }, { status: 403 })
     let body: Record<string, unknown>
     try {
       body = (await req.json?.()) as Record<string, unknown>
@@ -49,7 +52,10 @@ export const contact: Endpoint = {
     const name = clean[first('name') ?? ''] ?? ''
     const email = clean[first('email') ?? ''] ?? ''
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-    if (limited(`${ip}|${email.toLowerCase()}`)) return Response.json({ error: 'That is a lot of messages in a short time. Please try again in a few minutes.' }, { status: 429 })
+    // A keyed hash of the address (never the address) counts messages across every server instance.
+    const ipHash = createHash('sha256').update(`${process.env.PAYLOAD_SECRET ?? ''}|${ip}`).digest('hex').slice(0, 24)
+    const lastTen = (await req.payload.count({ collection: 'messages' as never, where: { and: [{ ipHash: { equals: ipHash } }, { createdAt: { greater_than: new Date(Date.now() - 10 * 60_000).toISOString() } }] }, overrideAccess: true })).totalDocs
+    if (limited(`${ip}|${email.toLowerCase()}`) || lastTen >= 5) return Response.json({ error: 'That is a lot of messages in a short time. Please try again in a few minutes.' }, { status: 429 })
 
     let id: number | string
     try {
@@ -63,6 +69,7 @@ export const contact: Endpoint = {
           message: clean[first('textarea') ?? ''] ?? '',
           answers: settings.fields.filter((f) => clean[f.key]).map((f) => ({ question: f.label, answer: clean[f.key] })),
           page: typeof body.page === 'string' ? body.page.slice(0, 300) : '/contact',
+          ipHash,
         } as never,
         overrideAccess: true,
       })

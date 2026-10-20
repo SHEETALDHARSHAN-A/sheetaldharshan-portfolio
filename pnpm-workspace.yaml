@@ -3,3 +3,10 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   workerd: true
+
+# Patched versions of vulnerable sub-dependencies (pnpm audit). Remove once the parents ship them.
+overrides:
+  undici@>=7.0.0 <7.29.1: ^7.29.1
+  fflate@>=0.8.0 <0.8.3: ^0.8.3
+  esbuild@<=0.24.2: ^0.25.0
+  sharp@<0.35.5: ^0.35.5

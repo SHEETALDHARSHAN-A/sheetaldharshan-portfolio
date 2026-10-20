@@ -71,6 +71,7 @@ Scripts read `.env`, and `DATABASE_URL` there may be the **live** database. Trea
 
 - **Facts only.** Content about the owner must be verified and public. Never invent jobs, numbers, dates, achievements or links.
 - **Never commit secrets** (`.env`, keys, tokens). Configuration goes in Vercel's environment variables.
+- **Security and privacy:** follow the checklist in [docs/security.md](docs/security.md) for new collections, endpoints, outside services and personal data.
 - **Commits:** a plain summary line that says what changed for a reader, a body when the reason isn't obvious, and **no AI or tool attribution footers**. Push only when typecheck, lint and the e2e tests pass.
 - **Public pages stay static**: `revalidate = 300`. Don't read cookies or headers in them. Saving in the admin refreshes affected paths through `src/hooks/revalidate.ts`.
 - **Anything from the admin is validated before it reaches CSS or HTML** (see `src/styles/theme.ts`, `hex()` in `src/data/content.ts`).

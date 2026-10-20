@@ -1141,3 +1141,16 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-menu a, .kb-menu button { display: block; width: 100%; text-align: left; padding: 9px 10px; border: 0; border-radius: 8px; background: none; color: var(--text); font: inherit; font-size: 14px; cursor: pointer; }
 .kb-menu a:hover, .kb-menu button:hover { background: var(--surface); }
 .kb-menu-danger { color: #ff6b6b !important; }
+.kb-data { display: grid; gap: 10px; margin-top: 12px; padding-top: 22px; border-top: 1px solid var(--line); }
+.kb-data a:not(.btn) { color: var(--accent); }
+.kb-delete { display: grid; gap: 10px; padding: 16px; border-radius: 12px; border: 1px solid color-mix(in srgb, #ff6b6b 45%, transparent); background: color-mix(in srgb, #ff6b6b 6%, transparent); }
+.kb-delete p { margin: 0; color: var(--text-soft); font-size: 14px; }
+.kb-danger { color: #ff6b6b; border-color: color-mix(in srgb, #ff6b6b 45%, transparent); }
+.kb-danger-solid { background: #e5484d; color: #fff; }
+.kb-note a { color: var(--accent); }
+.kb-privacy { margin: 10px 0 0 10px; font-size: 12px; color: var(--faint); }
+.kb-privacy:hover { color: var(--text-soft); }
+.privacy .prose h2 { margin-top: 2em; }
+@media (max-width: 960px) { .kb-privacy { display: none; } }
+.contact-privacy { margin: 18px 0 0; color: var(--faint); font-size: 12.5px; }
+.contact-privacy a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }

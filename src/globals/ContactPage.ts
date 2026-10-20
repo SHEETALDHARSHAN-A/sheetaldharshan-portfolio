@@ -1,3 +1,4 @@
+import { privateFields } from '@/access/privateFields'
 import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { revalidateGlobalPaths } from '@/hooks/revalidate'
@@ -24,7 +25,7 @@ const templateFields = (d: EmailTemplate, kind: 'alert' | 'confirm', buttonNote:
 ]
 
 /** The Contact page: its wording, whether visitors get a chat, a form or both, and the questions asked. */
-export const ContactPage: GlobalConfig = {
+const ContactPageConfig: GlobalConfig = {
   slug: 'contact-page',
   label: 'Contact page',
   admin: {
@@ -180,3 +181,5 @@ export const ContactPage: GlobalConfig = {
     },
   ],
 }
+
+export const ContactPage: GlobalConfig = { ...ContactPageConfig, fields: privateFields(ContactPageConfig.fields, ['notify', 'notifyEmail', 'fromName', 'fromEmail', 'emailAccent', 'alertEmail', 'confirm', 'confirmEmail']) }
