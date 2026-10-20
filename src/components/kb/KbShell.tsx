@@ -3,6 +3,7 @@ import { PageFrame } from '@/components/shell/PageFrame'
 import { getChannels, getKbSettings } from '@/data/content'
 import { KbNav } from './KbNav'
 import { ReaderFab } from './ReaderFab'
+import { KbSideTab } from './KbSideControls'
 import { SignInDialog } from './SignIn'
 
 /**
@@ -23,6 +24,7 @@ export async function KbShell({ head, active, query, children }: { head?: React.
           <SignInDialog />
         </Suspense>
         <ReaderFab />
+        <KbSideTab />
       </div>
     </PageFrame>
   )

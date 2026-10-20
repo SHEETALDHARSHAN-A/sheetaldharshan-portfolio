@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import type { Channel } from '@/data/types'
 import { Avatar } from './Avatar'
+import { KbSideResizer } from './KbSideControls'
 import { VerifiedTick } from './Author'
 import { askToSignIn, useReader } from './reader'
 import { StarIcon } from './StarButton'
@@ -80,34 +81,10 @@ export function KbNav({
     </li>
   )
 
-  /** Hide or show the column (wide screens); remembered on this device. */
-  const setSide = (collapsed: boolean) => {
-    document.documentElement.dataset.kbSide = collapsed ? 'collapsed' : 'open'
-    try {
-      localStorage.setItem('kb-side', collapsed ? 'collapsed' : 'open')
-    } catch {}
-  }
-
   return (
     <>
-      <button
-        type="button"
-        className="kb-side-show"
-        onClick={() => setSide(false)}
-        aria-label="Show channels and search"
-      >
-        ‹ Channels
-      </button>
       <aside className="kb-side" aria-label="./stdout channels">
-        <button
-          type="button"
-          className="kb-side-hide"
-          onClick={() => setSide(true)}
-          aria-label="Hide channels and search"
-          title="Hide"
-        >
-          Hide ›
-        </button>
+        <KbSideResizer />
         <form action="/notes" method="get" role="search" className="kb-search">
           <svg
             width="15"
