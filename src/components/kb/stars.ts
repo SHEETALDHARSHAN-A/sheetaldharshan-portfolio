@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { askToSignIn, currentReader } from './reader'
 
 /**
  * Channel stars, shared by the sidebar and the channel header so both update together.
@@ -11,6 +12,12 @@ let state: State = { counts: {}, mine: [] }
 let loading: Promise<void> | null = null
 const listeners = new Set<(s: State) => void>()
 const emit = () => listeners.forEach((l) => l(state))
+
+/** After signing in or out, "your stars" change. */
+export function reloadStars() {
+  loading = null
+  return load()
+}
 
 function load() {
   loading ??= fetch('/api/kb/stars', { credentials: 'include' })
@@ -31,6 +38,10 @@ export function useStars(): State & { toggle: (id: string) => Promise<void> } {
     return () => void listeners.delete(setS)
   }, [])
   const toggle = async (id: string) => {
+    if (!currentReader()) {
+      askToSignIn('to star channels')
+      return
+    }
     const on = state.mine.includes(id)
     // Show it at once; the server's answer corrects the count.
     state = { counts: { ...state.counts, [id]: Math.max(0, (state.counts[id] ?? 0) + (on ? -1 : 1)) }, mine: on ? state.mine.filter((m) => m !== id) : [...state.mine, id] }

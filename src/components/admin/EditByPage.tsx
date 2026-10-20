@@ -34,9 +34,11 @@ export async function EditByPage({ payload }: { payload: Payload }) {
         { label: 'Posts', href: c('posts') },
         { label: 'Channels', href: c('categories') },
         { label: 'Comments', href: c('kb-comments') },
+        { label: 'Reported comments', href: c('kb-reports') },
         { label: 'Reviews', href: c('kb-reviews') },
         { label: 'Feedback on posts', href: c('kb-feedback') },
-        { label: 'Settings: wording & moderation', href: g('kb-settings') },
+        { label: 'Readers (block, sign out)', href: c('readers') },
+        { label: 'Settings: switches & moderation', href: g('kb-settings') },
       ],
     },
     {

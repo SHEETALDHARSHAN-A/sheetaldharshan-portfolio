@@ -3,7 +3,10 @@
 import Link from 'next/link'
 import type { Channel } from '@/data/types'
 import { StarIcon } from './StarButton'
-import { useStars } from './stars'
+import { useEffect } from 'react'
+import { askToSignIn, useReader } from './reader'
+import { reloadStars, useStars } from './stars'
+import { Avatar } from './Avatar'
 
 const mark = (c: Pick<Channel, 'emoji'>) => (c.emoji ? <span className="kb-emoji">{c.emoji}</span> : <span className="kb-hash">#</span>)
 
@@ -11,8 +14,13 @@ const mark = (c: Pick<Channel, 'emoji'>) => (c.emoji ? <span className="kb-emoji
  * The Field Notes sidebar, like Slack's: search, all posts, the channels you starred, then every
  * channel with its post count. On phones it becomes a row of channel chips above the posts.
  */
-export function KbNav({ channels, active, query }: { channels: Channel[]; active?: string; query?: string }) {
+export function KbNav({ channels, active, query, stars = true, signIn = true }: { channels: Channel[]; active?: string; query?: string; stars?: boolean; signIn?: boolean }) {
   const { counts, mine, toggle } = useStars()
+  const { reader, ready, signOut } = useReader()
+  // Stars are per reader: refresh them when someone signs in or out.
+  useEffect(() => {
+    if (ready) void reloadStars()
+  }, [ready, reader?.id])
   const starred = channels.filter((c) => mine.includes(c.id))
   const row = (c: Channel, inStarred = false) => (
     <li key={`${inStarred ? 's' : 'c'}-${c.id}`}>
@@ -21,9 +29,9 @@ export function KbNav({ channels, active, query }: { channels: Channel[]; active
         <span className="kb-nav-name">{c.title}</span>
         <span className="kb-nav-count">{c.posts}</span>
       </Link>
-      <button type="button" className="kb-nav-star" aria-pressed={mine.includes(c.id)} aria-label={`${mine.includes(c.id) ? 'Unstar' : 'Star'} #${c.title}`} onClick={() => void toggle(c.id)} title={counts[c.id] ? `${counts[c.id]} star${counts[c.id] === 1 ? '' : 's'}` : 'Star'}>
+      {stars ? <button type="button" className="kb-nav-star" aria-pressed={mine.includes(c.id)} aria-label={`${mine.includes(c.id) ? 'Unstar' : 'Star'} #${c.title}`} onClick={() => void toggle(c.id)} title={counts[c.id] ? `${counts[c.id]} star${counts[c.id] === 1 ? '' : 's'}` : 'Star'}>
         <StarIcon on={mine.includes(c.id)} size={13} />
-      </button>
+      </button> : null}
     </li>
   )
   return (
@@ -46,7 +54,7 @@ export function KbNav({ channels, active, query }: { channels: Channel[]; active
           </Link>
         </li>
       </ul>
-      {starred.length > 0 && (
+      {stars && starred.length > 0 && (
         <>
           <p className="kb-nav-head">Starred</p>
           <ul className="kb-nav-list">{starred.map((c) => row(c, true))}</ul>
@@ -58,6 +66,25 @@ export function KbNav({ channels, active, query }: { channels: Channel[]; active
           <ul className="kb-nav-list">{channels.map((c) => row(c))}</ul>
         </>
       )}
+      {ready && signIn ? (
+        <div className="kb-account">
+          {reader ? (
+            <>
+              <Avatar name={reader.name} src={reader.avatar} />
+              <span className="kb-account-name" title={`Signed in with ${reader.provider === 'email' ? 'email' : 'GitHub'}`}>
+                {reader.name}
+              </span>
+              <button type="button" className="kb-link" onClick={() => void signOut()}>
+                Sign out
+              </button>
+            </>
+          ) : (
+            <button type="button" className="kb-link" onClick={() => askToSignIn()}>
+              Sign in to comment, like and star
+            </button>
+          )}
+        </div>
+      ) : null}
     </nav>
   )
 }

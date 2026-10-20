@@ -6,6 +6,7 @@ import { ADMIN_EMAILS } from '@/config/admin'
 import { PURPOSE_COOKIE, SECOND_FACTOR_COOKIE, SECOND_FACTOR_SECONDS, signSecondFactor } from '@/utilities/secondFactor'
 import { githubLogin, isAllowedAdmin } from '@/utilities/supabaseAuth'
 import { supabaseForRoute } from '@/utilities/supabaseRoute'
+import { finishSignIn, READER_NEXT_COOKIE, readerFromGitHub } from '@/utilities/readerSignIn'
 
 /**
  * GitHub sends people back here. An allowlisted account either completes the second step of a
@@ -15,8 +16,10 @@ import { supabaseForRoute } from '@/utilities/supabaseRoute'
 export async function GET(request: NextRequest) {
   const url = new URL(request.url)
   const store = await cookies()
-  const purpose = store.get(PURPOSE_COOKIE)?.value === 'reset' ? 'reset' : '2fa'
+  const raw = store.get(PURPOSE_COOKIE)?.value
   store.delete({ name: PURPOSE_COOKIE, path: '/auth' })
+  if (raw === 'reader') return readerCallback(url, store.get(READER_NEXT_COOKIE)?.value ?? '/notes')
+  const purpose = raw === 'reset' ? 'reset' : '2fa'
   const back = (status: string) => NextResponse.redirect(`${url.origin}/auth/verify?${purpose === 'reset' ? 'reset=1&' : ''}auth=${status}`)
 
   const code = url.searchParams.get('code')
@@ -58,5 +61,22 @@ export async function GET(request: NextRequest) {
     path: '/',
     maxAge: SECOND_FACTOR_SECONDS,
   })
+  return res
+}
+
+/** A Field Notes reader coming back from GitHub: signed in to comment, never to the admin. */
+async function readerCallback(url: URL, next: string) {
+  const supabase = await supabaseForRoute()
+  const code = url.searchParams.get('code')
+  if (!supabase || !code) return finishSignIn(url.origin, next, null)
+  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  if (error) return finishSignIn(url.origin, next, null)
+  const { data } = await supabase.auth.getUser()
+  // The Supabase session is only used to learn who they are on GitHub.
+  await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined)
+  if (!data.user) return finishSignIn(url.origin, next, null)
+  const payload = await getPayload({ config: configPromise })
+  const res = finishSignIn(url.origin, next, await readerFromGitHub(payload, data.user))
+  res.cookies.delete({ name: READER_NEXT_COOKIE, path: '/auth' })
   return res
 }

@@ -3,6 +3,7 @@ import { draftMode } from 'next/headers'
 import configPromise from '@payload-config'
 import { getPayload, type Payload, type Where } from 'payload'
 
+import { siteRules, type SiteRules } from '@/utilities/kbRules'
 import type { About as AboutDoc, Category, Post as PostDoc, Project as ProjectDoc } from '@/payload-types'
 import { toMediaRef } from '@/data/media'
 import {
@@ -289,6 +290,7 @@ export const getPost = cache(async (slug: string): Promise<Post | null> => {
     ...toPostSummary(doc),
     content: doc.content,
     related: (doc.relatedPosts ?? []).filter((post): post is PostDoc => typeof post === 'object' && post._status === 'published').map(toPostSummary),
+    interaction: (doc.interaction ?? {}) as Post['interaction'],
     prerequisites: (doc.prerequisites ?? []).filter((post): post is PostDoc => typeof post === 'object' && post._status === 'published').map(toPostSummary),
     tags: [],
     meta: { title: doc.meta?.title ?? undefined, description: doc.meta?.description ?? undefined, image: toMediaRef(doc.meta?.image) },
@@ -315,11 +317,12 @@ export const getChannels = cache(async (): Promise<Channel[]> => {
     .map((c) => ({ id: String(c.id), slug: c.slug ?? '', title: c.title, emoji: c.emoji || undefined, description: c.description || undefined, posts: counts.get(String(c.id)) ?? 0 }))
 })
 
-export type KbSettings = { heading: string; intro: string }
+export type KbSettings = { heading: string; intro: string; rules: SiteRules }
 export const getKbSettings = cache(async (): Promise<KbSettings> => {
   const payload = await getClient()
-  const g = (await payload.findGlobal({ slug: 'kb-settings', depth: 0 }).catch(dbFailed)) as { heading?: string; intro?: string } | undefined
+  const g = (await payload.findGlobal({ slug: 'kb-settings', depth: 0 }).catch(dbFailed)) as unknown as ({ heading?: string; intro?: string } & Record<string, unknown>) | undefined
   return {
+    rules: siteRules(g),
     heading: g?.heading || 'Field Notes',
     intro: g?.intro || 'Notes on what I build and learn: backend systems, AI agents, developer tools and databases.',
   }

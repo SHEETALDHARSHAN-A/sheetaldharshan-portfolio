@@ -124,6 +124,8 @@ export type Post = PostSummary & {
   related: PostSummary[]
   /** "Read first" posts, shown as "Before you read" at the top. */
   prerequisites: PostSummary[]
+  /** The post's own "Reader interaction" overrides. */
+  interaction: Record<string, 'default' | 'on' | 'off' | 'locked' | null | undefined>
   tags: string[]
   meta: { title?: string; description?: string; image?: MediaRef }
 }

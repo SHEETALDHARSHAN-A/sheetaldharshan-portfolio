@@ -180,6 +180,39 @@ export const Posts: CollectionConfig<'posts'> = {
       ],
     },
     {
+      name: 'interaction',
+      type: 'group',
+      label: 'Reader interaction',
+      admin: {
+        position: 'sidebar',
+        description: 'For this post only. "Site default" follows Field Notes → Settings.',
+      },
+      fields: [
+        {
+          name: 'comments',
+          type: 'select',
+          defaultValue: 'default',
+          options: [
+            { label: 'Site default', value: 'default' },
+            { label: 'On', value: 'on' },
+            { label: 'Locked (shown, no new ones)', value: 'locked' },
+            { label: 'Off (hidden)', value: 'off' },
+          ],
+        },
+        ...(['ratings', 'likes', 'feedback'] as const).map((name) => ({
+          name,
+          type: 'select' as const,
+          defaultValue: 'default',
+          label: { ratings: 'Ratings & reviews', likes: 'Likes on comments', feedback: 'Feedback on selected text' }[name],
+          options: [
+            { label: 'Site default', value: 'default' },
+            { label: 'On', value: 'on' },
+            { label: 'Off', value: 'off' },
+          ],
+        })),
+      ],
+    },
+    {
       name: 'publishedAt',
       type: 'date',
       admin: {

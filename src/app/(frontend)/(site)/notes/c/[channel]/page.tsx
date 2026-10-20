@@ -35,7 +35,7 @@ export default async function ChannelPage({ params }: Props) {
           </h1>
           {c.description ? <p>{c.description}</p> : null}
         </div>
-        <StarButton id={c.id} title={c.title} />
+        {kb.rules.stars ? <StarButton id={c.id} title={c.title} /> : null}
       </header>
       {posts.length === 0 ? (
         <div className="empty">Nothing in #{c.title} yet.</div>

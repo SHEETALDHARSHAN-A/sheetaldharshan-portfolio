@@ -105,25 +105,52 @@ In the sidebar:
 
 The **SEO** tab's description is also the summary shown in the lists. **Save draft** stays private, **Preview** shows it, and **Publish** lists it on `/notes`, in its channel and in `/rss.xml`.
 
-### What readers can do, and what you get
-- **Rate** a post 1–5 stars, with an optional short review. One rating per browser; rating again updates it.
-- **Comment**, reply to comments (threads nest four levels deep) and **like** comments. No sign-in: a name, plus an optional email that's never shown.
-- **Select any text** in a post to tell you it *looks wrong*, *could be simpler*, or anything else. There's also a **Send feedback** button under each post.
+### Readers: signing in, anonymous comments, reports
+- **Sign in** with GitHub or a one-time **email link** (sent through Resend, valid 15 minutes). There are no passwords.
+  - GitHub readers show their GitHub picture and a **blue verified tick**, and their name links to their GitHub profile.
+  - GitHub sign-in reuses the GitHub app already set up in Supabase for the admin, so it needs no extra setup.
+- **Sessions:** a signed token in a secure, httpOnly cookie, valid for 30 days and renewed while the reader keeps visiting. Readers can sign out, or **sign out on all devices**, from their floating avatar (bottom right) or the Field Notes sidebar.
+- **Signed-in readers** can comment and **edit** or **delete** their own comments. An edited comment shows "· edited", with the time on hover; a deleted comment with replies shows "deleted" so the thread stays readable. They can also **like** comments, **star** channels and **rate** posts, each once per person. Their own page, **`/notes/me`**, lists what they starred, wrote, rated and liked, plus the reports they sent and what happened to each.
+- **Anonymous comments** (no sign-in) show as "Anonymous" and can't be edited or deleted by their writer. Any link in one waits for approval.
+- **Anyone can report** a comment, with a reason and a note. You get an email; reports are under **Field Notes → Reported comments**. Hide or delete the comment, then set the report to *Actioned* or *Dismissed*; signed-in reporters see that status on their page.
+- **Feedback on selected text** needs no sign-in.
+- **Times** are relative ("just now", "5 min ago", "yesterday"), stay up to date while the page is open, and show the exact date and time on hover.
 
-Each comment, written review and piece of feedback is emailed to you, using the sender and address set under **Contact page → Email alerts**. The email has a button that opens the item in the admin.
+You get an email for each comment, written review, report and piece of feedback. It uses the sender and address under **Contact page → Email alerts**, with a button that opens the item in the admin.
 
-### Moderation
+### Switches: site-wide and per post
+**Field Notes → Settings → What readers can do** turns each part on or off for the whole site:
+
+| Switch | What it controls |
+|---|---|
+| **Comments** | Comments on posts. |
+| **Anonymous comments** | Off means readers must sign in to comment. |
+| **Likes on comments** | Liking comments. |
+| **Star ratings & reviews** | Rating posts, with an optional review. |
+| **Starring channels** | Starring channels in the sidebar. |
+| **Reporting comments** | The Report button on comments. |
+| **Feedback on selected text** | The select-to-feedback bar and Send feedback button. |
+| **Reader sign-in** | Off means nobody can sign in, and likes, stars and ratings stop. |
+| **Email me each one** | An email for each comment, review, report and piece of feedback. |
+
+Each **post** can override comments, ratings, likes and feedback in its sidebar under **Reader interaction**:
+- **Site default** follows the Settings page.
+- **On** and **Off** override it for that post.
+- For comments, **Locked** keeps existing comments visible but closes the post to new ones.
+
+### Moderation and blocking
 Comments and reviews are checked before they show:
-- **Refused outright:** slurs, threats and severe abuse, in English or in Hindi/Tamil written in English letters. Disguised spellings (`f*ck`, `sh1t`, `b.i.t.c.h`) are caught too, and the visitor is asked to rephrase.
-- **Held for your approval:** swearing, several links, all capitals and spam patterns. The writer sees their comment marked "Waiting for approval"; nobody else sees it.
+- **Refused outright:** slurs, threats and severe abuse, in English or in Hindi/Tamil written in English letters. Disguised spellings (`f*ck`, `sh1t`, `b.i.t.c.h`) are caught too, and the writer is asked to rephrase.
+- **Held for your approval:** swearing, several links, all capitals and spam patterns. The writer sees their comment marked "Waiting for approval"; nobody else does.
 - **Shown straight away:** everything else.
 
-To handle them:
-- **Field Notes → Comments** (or **Reviews**): set **Status** to *Shown*, *Hidden* or *Waiting for approval*, or delete. **Why held** says what the checks found.
-- **Field Notes → Feedback**: the selected text and the reader's note. Fix the post, then tick **Handled**.
-- **Field Notes → Settings**: switch comments, ratings or feedback on and off, choose **Hold everything until I approve it**, add your own **Blocked words**, and edit the page heading and intro.
+**Settings → Moderation** can instead hold every anonymous comment, or hold everything. Add your own refused words under **Blocked words**.
 
-Markdown import: paste the text into the editor; the Lexical editor converts common Markdown shortcuts (`#`, `-`, `>`, triple backticks) as you type. There is no bulk importer.
+To handle comments, reviews and readers:
+- **Field Notes → Comments** (or **Reviews**): set **Status** to *Shown*, *Hidden* or *Waiting for approval*, or delete. **Why held** says what the checks found.
+- **Block this reader:** a button in each comment's or review's sidebar. A blocked reader is signed out at once, can't post, and everything they wrote is hidden. You can also add a private reason.
+- **Field Notes → Readers:** everyone who signed in, and the same **Block** status. Raise **Session version** by 1 to sign someone out on every device without blocking them.
+- **Field Notes → Feedback:** fix the post, then tick **Handled**.
 
 ## Manage media
 **Media** holds images, MP4/WebM videos and PDFs. Give every image an **Alt** text. Images get responsive sizes automatically. Replace a file from its edit page; references update. Folders are available for organisation.

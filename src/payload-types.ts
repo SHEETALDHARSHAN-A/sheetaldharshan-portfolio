@@ -79,7 +79,10 @@ export interface Config {
     'kb-comments': KbComment;
     'kb-reviews': KbReview;
     'kb-feedback': KbFeedback;
+    'kb-reports': KbReport;
     'kb-votes': KbVote;
+    readers: Reader;
+    'reader-links': ReaderLink;
     messages: Message;
     users: User;
     redirects: Redirect;
@@ -111,7 +114,10 @@ export interface Config {
     'kb-comments': KbCommentsSelect<false> | KbCommentsSelect<true>;
     'kb-reviews': KbReviewsSelect<false> | KbReviewsSelect<true>;
     'kb-feedback': KbFeedbackSelect<false> | KbFeedbackSelect<true>;
+    'kb-reports': KbReportsSelect<false> | KbReportsSelect<true>;
     'kb-votes': KbVotesSelect<false> | KbVotesSelect<true>;
+    readers: ReadersSelect<false> | ReadersSelect<true>;
+    'reader-links': ReaderLinksSelect<false> | ReaderLinksSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -646,6 +652,15 @@ export interface Post {
      */
     image?: (number | null) | Media;
     description?: string | null;
+  };
+  /**
+   * For this post only. "Site default" follows Field Notes → Settings.
+   */
+  interaction?: {
+    comments?: ('default' | 'on' | 'locked' | 'off') | null;
+    ratings?: ('default' | 'on' | 'off') | null;
+    likes?: ('default' | 'on' | 'off') | null;
+    feedback?: ('default' | 'on' | 'off') | null;
   };
   publishedAt?: string | null;
   authors?: (number | User)[] | null;
@@ -1218,33 +1233,70 @@ export interface Certification {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Comments on posts. Clean ones show straight away; anything the checks flag waits here for you. Set Status to Shown, Hidden, or delete.
+ * Comments on posts, from signed-in readers (with their account) or anonymous. Clean ones show straight away; anything the checks flag waits here. Set Status to Shown or Hidden, or delete.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "kb-comments".
  */
 export interface KbComment {
   id: number;
-  name: string;
   /**
-   * Optional, never shown.
+   * The reader's name when they wrote it.
    */
-  email?: string | null;
+  name: string;
+  editedAt?: string | null;
   body: string;
+  /**
+   * Deleted by its writer; kept as "deleted" because it has replies.
+   */
+  deleted?: boolean | null;
   /**
    * Waiting: held by the checks (see Why held). Shown: visible to everyone. Hidden: only here.
    */
   status?: ('published' | 'pending' | 'hidden') | null;
   reason?: string | null;
+  reader?: (number | null) | Reader;
   post: number | Post;
   parent?: (number | null) | KbComment;
   likes?: number | null;
-  visitor?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Star ratings on posts, with an optional short review. One per visitor per post; rating again updates it.
+ * Everyone who signed in to Field Notes. Block someone to stop them posting and hide what they wrote.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "readers".
+ */
+export interface Reader {
+  id: number;
+  name: string;
+  /**
+   * Never shown publicly.
+   */
+  email?: string | null;
+  /**
+   * Blocked: signed out, cannot post, and their comments and reviews are hidden.
+   */
+  status?: ('active' | 'blocked') | null;
+  /**
+   * Only for you.
+   */
+  blockedReason?: string | null;
+  /**
+   * Raise by 1 to sign them out on every device.
+   */
+  sessionVersion?: number | null;
+  lastSeenAt?: string | null;
+  provider?: ('github' | 'google' | 'email') | null;
+  githubLogin?: string | null;
+  providerId?: string | null;
+  avatar?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Star ratings on posts, with an optional short review. One per reader per post; rating again updates it.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "kb-reviews".
@@ -1254,13 +1306,14 @@ export interface KbReview {
   rating: number;
   review?: string | null;
   name?: string | null;
+  editedAt?: string | null;
   /**
    * Waiting: held by the checks (see Why held). Shown: visible to everyone. Hidden: only here.
    */
   status?: ('published' | 'pending' | 'hidden') | null;
   reason?: string | null;
+  reader?: (number | null) | Reader;
   post: number | Post;
-  visitor?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1282,7 +1335,27 @@ export interface KbFeedback {
   handled?: boolean | null;
   post: number | Post;
   alert?: string | null;
-  visitor?: string | null;
+  reader?: (number | null) | Reader;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Comments readers reported. Open the comment to hide or delete it, then set this report to Actioned or Dismissed. Signed-in reporters see the status on their page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-reports".
+ */
+export interface KbReport {
+  id: number;
+  reason: 'spam' | 'abuse' | 'hate' | 'misleading' | 'off-topic' | 'other';
+  note?: string | null;
+  quote?: string | null;
+  status?: ('open' | 'actioned' | 'dismissed') | null;
+  comment?: (number | null) | KbComment;
+  post?: (number | null) | Post;
+  reader?: (number | null) | Reader;
+  reporterKey?: string | null;
+  alert?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1294,7 +1367,22 @@ export interface KbVote {
   id: number;
   kind: 'like' | 'star';
   target: string;
-  visitor: string;
+  reader: number | Reader;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reader-links".
+ */
+export interface ReaderLink {
+  id: number;
+  tokenHash: string;
+  email: string;
+  name?: string | null;
+  next?: string | null;
+  expiresAt: string;
+  usedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1578,8 +1666,20 @@ export interface PayloadLockedDocument {
         value: number | KbFeedback;
       } | null)
     | ({
+        relationTo: 'kb-reports';
+        value: number | KbReport;
+      } | null)
+    | ({
         relationTo: 'kb-votes';
         value: number | KbVote;
+      } | null)
+    | ({
+        relationTo: 'readers';
+        value: number | Reader;
+      } | null)
+    | ({
+        relationTo: 'reader-links';
+        value: number | ReaderLink;
       } | null)
     | ({
         relationTo: 'messages';
@@ -1874,6 +1974,14 @@ export interface PostsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+      };
+  interaction?:
+    | T
+    | {
+        comments?: T;
+        ratings?: T;
+        likes?: T;
+        feedback?: T;
       };
   publishedAt?: T;
   authors?: T;
@@ -2221,14 +2329,15 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface KbCommentsSelect<T extends boolean = true> {
   name?: T;
-  email?: T;
+  editedAt?: T;
   body?: T;
+  deleted?: T;
   status?: T;
   reason?: T;
+  reader?: T;
   post?: T;
   parent?: T;
   likes?: T;
-  visitor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2240,10 +2349,11 @@ export interface KbReviewsSelect<T extends boolean = true> {
   rating?: T;
   review?: T;
   name?: T;
+  editedAt?: T;
   status?: T;
   reason?: T;
+  reader?: T;
   post?: T;
-  visitor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2259,7 +2369,24 @@ export interface KbFeedbackSelect<T extends boolean = true> {
   handled?: T;
   post?: T;
   alert?: T;
-  visitor?: T;
+  reader?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-reports_select".
+ */
+export interface KbReportsSelect<T extends boolean = true> {
+  reason?: T;
+  note?: T;
+  quote?: T;
+  status?: T;
+  comment?: T;
+  post?: T;
+  reader?: T;
+  reporterKey?: T;
+  alert?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2270,7 +2397,39 @@ export interface KbFeedbackSelect<T extends boolean = true> {
 export interface KbVotesSelect<T extends boolean = true> {
   kind?: T;
   target?: T;
-  visitor?: T;
+  reader?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "readers_select".
+ */
+export interface ReadersSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  status?: T;
+  blockedReason?: T;
+  sessionVersion?: T;
+  lastSeenAt?: T;
+  provider?: T;
+  githubLogin?: T;
+  providerId?: T;
+  avatar?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reader-links_select".
+ */
+export interface ReaderLinksSelect<T extends boolean = true> {
+  tokenHash?: T;
+  email?: T;
+  name?: T;
+  next?: T;
+  expiresAt?: T;
+  usedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3188,8 +3347,19 @@ export interface KbSetting {
   heading?: string | null;
   intro?: string | null;
   comments?: boolean | null;
+  /**
+   * Off: readers must sign in to comment.
+   */
+  anonymous?: boolean | null;
+  likes?: boolean | null;
   reviews?: boolean | null;
+  stars?: boolean | null;
+  reports?: boolean | null;
   feedback?: boolean | null;
+  /**
+   * Off: nobody can sign in; likes, stars and ratings stop.
+   */
+  signIn?: boolean | null;
   /**
    * Sent like Contact alerts (Contact page → Email alerts).
    */
@@ -3197,7 +3367,7 @@ export interface KbSetting {
   /**
    * Slurs, threats and abuse are always refused. Swearing, several links, all capitals and spam patterns are held for you.
    */
-  moderation?: ('auto' | 'all') | null;
+  moderation?: ('auto' | 'anonymous' | 'all') | null;
   /**
    * Extra words to refuse, one per line or comma-separated. Disguises like f*ck or sh1t are caught too.
    */
@@ -3559,8 +3729,13 @@ export interface KbSettingsSelect<T extends boolean = true> {
   heading?: T;
   intro?: T;
   comments?: T;
+  anonymous?: T;
+  likes?: T;
   reviews?: T;
+  stars?: T;
+  reports?: T;
   feedback?: T;
+  signIn?: T;
   notify?: T;
   moderation?: T;
   blockedWords?: T;

@@ -17,7 +17,7 @@ import { Certifications } from './collections/Certifications'
 import { Publications } from './collections/Publications'
 import { Users } from './collections/Users'
 import { Messages } from './collections/Messages'
-import { KbComments, KbFeedback, KbReviews, KbSettings, KbVotes } from './collections/KnowledgeBase'
+import { KbComments, KbFeedback, KbReports, KbReviews, KbSettings, KbVotes, ReaderLinks, Readers } from './collections/KnowledgeBase'
 import { contact, contactTest } from './endpoints/contact'
 import { kbEndpoints } from './endpoints/kb'
 import { plugins } from './plugins'
@@ -117,7 +117,7 @@ export default buildConfig({
     // Dev push only against a local database; shared databases (Supabase) change through migrations.
     push: process.env.NODE_ENV !== 'production' && !/supabase\.(co|com)/.test(process.env.DATABASE_URL || ''),
   }),
-  collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, KbComments, KbReviews, KbFeedback, KbVotes, Messages, Users],
+  collections: [Projects, Posts, Pages, Publications, Experience, Education, Certifications, Media, Categories, KbComments, KbReviews, KbFeedback, KbReports, KbVotes, Readers, ReaderLinks, Messages, Users],
   cors: [getServerSideURL()].filter(Boolean),
   // Order sets the admin menu: Sidebar, Brand, then Pages.
   globals: [SiteSettings, Navigation, Pet, CodingActivity, Brand, Appearance, AdminLook, AdminSecurity, Homepage, ProjectsPage, About, ContactPage, KbSettings],

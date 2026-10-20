@@ -15,12 +15,13 @@ const KINDS: { kind: Kind; label: string; hint: string }[] = [
  * The note (with the selected text) is saved in the admin and emailed to the author. A button under
  * the post sends feedback without a selection.
  */
-export function SelectionFeedback({ postId, children }: { postId: string; children: React.ReactNode }) {
+export function SelectionFeedback({ postId, enabled = true, children }: { postId: string; enabled?: boolean; children: React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null)
   const [bar, setBar] = useState<{ x: number; y: number; below: boolean; quote: string } | null>(null)
   const [form, setForm] = useState<{ kind: Kind; quote: string; startedAt: number } | null>(null)
 
   useEffect(() => {
+    if (!enabled) return
     let timer = 0
     const touch = window.matchMedia('(pointer: coarse)').matches
     const check = () => {
@@ -48,7 +49,7 @@ export function SelectionFeedback({ postId, children }: { postId: string; childr
       window.removeEventListener('scroll', hide, true)
       window.removeEventListener('resize', hide)
     }
-  }, [])
+  }, [enabled])
 
   const open = (kind: Kind, quote: string) => {
     setForm({ kind, quote, startedAt: Date.now() })
@@ -59,13 +60,13 @@ export function SelectionFeedback({ postId, children }: { postId: string; childr
   return (
     <div ref={box} className="kb-selectable">
       {children}
-      <div className="kb-feedback-cta">
+      {enabled ? <div className="kb-feedback-cta">
         <span>Spotted something wrong, or could it be clearer?</span>
         <span className="kb-feedback-tip">Select any text to point at it, or</span>
         <button type="button" className="btn ghost" onClick={() => open('other', '')}>
           Send feedback
         </button>
-      </div>
+      </div> : null}
       {bar
         ? createPortal(
             <div className="kb-selbar" data-below={bar.below || undefined} style={{ left: bar.x, top: bar.y }} role="toolbar" aria-label="Feedback on the selected text" onMouseDown={(e) => e.preventDefault()}>

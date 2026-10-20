@@ -13,6 +13,7 @@ import { Discussion } from '@/components/kb/Discussion'
 import { SelectionFeedback } from '@/components/kb/SelectionFeedback'
 import { breadcrumbSchema } from '@/data/seo'
 import { formatDate, getKbSettings, getPost, getSite } from '@/data/content'
+import { postRules } from '@/utilities/kbRules'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -35,6 +36,7 @@ export default async function KbPostPage({ params }: Props) {
   const { slug } = await params
   const [post, site, kb, { isEnabled: draft }] = await Promise.all([getPost(slug), getSite(), getKbSettings(), draftMode()])
   if (!post) notFound()
+  const rules = postRules(kb.rules, post.interaction)
 
   return (
     <KbShell active={post.channel?.slug}>
@@ -78,7 +80,7 @@ export default async function KbPostPage({ params }: Props) {
           </div>
         )}
         <Prereq posts={post.prerequisites} />
-        <SelectionFeedback postId={post.id}>
+        <SelectionFeedback postId={post.id} enabled={rules.feedback}>
           <RichText className="prose" data={post.content as DefaultTypedEditorState} enableGutter={false} enableProse={false} />
         </SelectionFeedback>
         {post.related.length > 0 && (
@@ -94,7 +96,7 @@ export default async function KbPostPage({ params }: Props) {
             </ul>
           </aside>
         )}
-        <Discussion postId={post.id} />
+        {rules.comments !== 'off' || rules.ratings ? <Discussion postId={post.id} /> : null}
       </article>
     </KbShell>
   )
