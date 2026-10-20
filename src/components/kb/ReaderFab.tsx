@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmAction } from './Confirm'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Avatar } from './Avatar'
@@ -30,7 +31,8 @@ export function ReaderFab() {
 
   if (!reader) return null
   const out = async (everywhere: boolean) => {
-    if (everywhere && !window.confirm('Sign out on every device where you are signed in?')) return
+    setOpen(false)
+    if (everywhere && !(await confirmAction({ title: 'Sign out on all devices?', body: "You'll be signed out here and on every phone, tablet or computer where you're signed in to ./stdout. You can sign in again any time.", confirm: 'Sign out everywhere', danger: true, icon: 'logout' }))) return
     setBusy(true)
     await signOut(everywhere)
     setBusy(false)

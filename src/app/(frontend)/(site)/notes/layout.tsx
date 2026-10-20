@@ -3,6 +3,7 @@ import { KbNav } from '@/components/kb/KbNav'
 import { KbSideTab } from '@/components/kb/KbSideControls'
 import { ReaderFab } from '@/components/kb/ReaderFab'
 import { SignInDialog } from '@/components/kb/SignIn'
+import { ConfirmHost } from '@/components/kb/Confirm'
 import { getChannels, getKbSettings } from '@/data/content'
 
 /**
@@ -24,6 +25,7 @@ export default async function StdoutLayout({ children }: { children: React.React
       </Suspense>
       <ReaderFab />
       <KbSideTab />
+      <ConfirmHost />
     </div>
   )
 }

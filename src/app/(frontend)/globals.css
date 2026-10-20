@@ -1289,3 +1289,13 @@ button.kb-twisty:hover { color: var(--text); background: var(--surface); }
 :root[data-motion='reduced'] .kb-enter, :root[data-motion='reduced'] .kb-enter * { animation: none !important; }
 @media (prefers-reduced-motion: reduce) { .kb-enter, .kb-enter * { animation: none !important; } }
 @media (max-width: 1200px) { .kb-enter { display: contents; } .kb-enter .kb-page-body { animation: kb-enter calc(420ms * var(--speed, 1)) var(--ease-out) both; } }
+
+/* The site's own confirm dialog (Confirm.tsx) */
+.kb-confirm { width: min(400px, 100%); justify-items: center; text-align: center; gap: 12px; padding: 26px 24px 22px; }
+.kb-confirm-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
+.kb-confirm-icon[data-danger] { background: color-mix(in srgb, #e5484d 16%, transparent); color: #ff6b6b; }
+.kb-confirm-title { margin: 0; font-size: 17px; font-weight: 600; color: var(--text); }
+.kb-confirm .kb-note { margin: 0; line-height: 1.5; }
+.kb-confirm .kb-actions { width: 100%; justify-content: stretch; margin-top: 6px; }
+.kb-confirm .kb-actions .btn { flex: 1; justify-content: center; }
+@media (max-width: 480px) { .kb-confirm .kb-actions { flex-direction: column-reverse; } .kb-confirm .kb-actions .btn { width: 100%; } }

@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmAction } from './Confirm'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AuthorLine, VerifiedTick, type Author } from './Author'
 import { Avatar } from './Avatar'
@@ -331,7 +332,7 @@ function Comments({ postId, thread, setThread, reload }: { postId: string; threa
     if (typeof body.likes === 'number') patch(c.id, { liked: Boolean(body.liked), likes: body.likes })
   }
   const remove = async (c: Comment) => {
-    if (!window.confirm('Delete your comment? This cannot be undone.')) return
+    if (!(await confirmAction({ title: 'Delete your comment?', body: 'It is removed for everyone. If others replied, it shows as "deleted" so the conversation still makes sense. This cannot be undone.', confirm: 'Delete comment', danger: true, icon: 'trash' }))) return
     const body = await api('comment-delete', { id: c.id })
     if (!body.ok) return setNote(firstError(body))
     await reload()

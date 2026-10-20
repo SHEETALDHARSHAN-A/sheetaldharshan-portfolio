@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmAction } from './Confirm'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -96,7 +97,7 @@ export function YourChannel({ id }: { id: string }) {
                 type="button"
                 className="kb-link kb-link-muted"
                 onClick={async () => {
-                  if (!window.confirm(`Delete “${list.name}”? The posts themselves stay; only this channel goes.`)) return
+                  if (!(await confirmAction({ title: `Delete “${list.name}”?`, body: 'Only this channel of yours goes; the posts in it stay on ./stdout, and other channels are not touched.', confirm: 'Delete channel', danger: true, icon: 'trash' }))) return
                   const r = await listActions.remove(list.id)
                   if (!r.ok) return setError(listError(r))
                   router.push('/notes/me')
