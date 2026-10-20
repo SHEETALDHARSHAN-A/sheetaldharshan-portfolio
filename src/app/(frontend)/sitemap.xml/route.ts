@@ -15,11 +15,11 @@ export async function GET() {
     { loc: '', priority: '1.0', lastmod: day(latest) },
     { loc: '/about', priority: '0.9', lastmod: day(latest) },
     { loc: '/projects', priority: '0.9', lastmod: day(latestProject) },
-    { loc: '/blog', priority: '0.7', lastmod: day(latestPost) },
+    { loc: '/notes', priority: '0.7', lastmod: day(latestPost) },
     { loc: '/research', priority: '0.6' },
     { loc: '/contact', priority: '0.6' },
     ...projects.map((project) => ({ loc: `/projects/${project.slug}`, priority: '0.8', lastmod: day(project.updatedAt) })),
-    ...posts.map((post) => ({ loc: `/blog/${post.slug}`, priority: '0.7', lastmod: day(post.updatedAt) })),
+    ...posts.map((post) => ({ loc: `/notes/${post.slug}`, priority: '0.7', lastmod: day(post.updatedAt) })),
     ...pages.map((slug) => ({ loc: `/${slug}`, priority: '0.5' })),
   ]
   const urls = entries

@@ -12,7 +12,7 @@ export const Brand: GlobalConfig = {
     description: 'The icon in browser tabs, Google results and phone home screens. Leave a field empty to keep the current SD logo. Your About photo is under Pages → About; the link-preview image is under Sidebar → Name & profiles.',
   },
   access: { read: () => true, update: authenticated },
-  hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/blog', '/about', '/contact', '/research'])] },
+  hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/notes', '/about', '/contact', '/research'])] },
   fields: [
     {
       type: 'row',

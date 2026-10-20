@@ -8,7 +8,7 @@ export const SiteSettings: GlobalConfig = {
   label: 'Name & profiles',
   admin: { group: 'Site-wide', description: 'The name in the sidebar and page titles, your role, contact email, profile links (sidebar footer and Contact) and the link-preview image.' },
   access: { read: () => true, update: authenticated },
-  hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/blog', '/about', '/contact', '/research'])] },
+  hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/notes', '/about', '/contact', '/research'])] },
   fields: [
     {
       type: 'row',

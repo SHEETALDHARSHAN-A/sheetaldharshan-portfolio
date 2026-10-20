@@ -76,6 +76,10 @@ export interface Config {
     certifications: Certification;
     media: Media;
     categories: Category;
+    'kb-comments': KbComment;
+    'kb-reviews': KbReview;
+    'kb-feedback': KbFeedback;
+    'kb-votes': KbVote;
     messages: Message;
     users: User;
     redirects: Redirect;
@@ -104,6 +108,10 @@ export interface Config {
     certifications: CertificationsSelect<false> | CertificationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    'kb-comments': KbCommentsSelect<false> | KbCommentsSelect<true>;
+    'kb-reviews': KbReviewsSelect<false> | KbReviewsSelect<true>;
+    'kb-feedback': KbFeedbackSelect<false> | KbFeedbackSelect<true>;
+    'kb-votes': KbVotesSelect<false> | KbVotesSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -134,6 +142,7 @@ export interface Config {
     'projects-page': ProjectsPage;
     about: About;
     'contact-page': ContactPage;
+    'kb-settings': KbSetting;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -148,6 +157,7 @@ export interface Config {
     'projects-page': ProjectsPageSelect<false> | ProjectsPageSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
     'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
+    'kb-settings': KbSettingsSelect<false> | KbSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -621,7 +631,14 @@ export interface Post {
     [k: string]: unknown;
   };
   relatedPosts?: (number | Post)[] | null;
+  /**
+   * The first one is the post's home channel in Field Notes.
+   */
   categories?: (number | Category)[] | null;
+  /**
+   * Shown as "Before you read" at the top. For one in the middle, add a Prerequisite block in the text.
+   */
+  prerequisites?: (number | Post)[] | null;
   meta?: {
     title?: string | null;
     /**
@@ -648,12 +665,26 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Field Notes channels, like Slack channels. Readers can star them; posts pick theirs under Channels.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
   id: number;
   title: string;
+  /**
+   * Optional, shown instead of #.
+   */
+  emoji?: string | null;
+  /**
+   * Lower comes first.
+   */
+  order?: number | null;
+  /**
+   * One or two lines at the top of the channel.
+   */
+  description?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -1187,6 +1218,87 @@ export interface Certification {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Comments on posts. Clean ones show straight away; anything the checks flag waits here for you. Set Status to Shown, Hidden, or delete.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-comments".
+ */
+export interface KbComment {
+  id: number;
+  name: string;
+  /**
+   * Optional, never shown.
+   */
+  email?: string | null;
+  body: string;
+  /**
+   * Waiting: held by the checks (see Why held). Shown: visible to everyone. Hidden: only here.
+   */
+  status?: ('published' | 'pending' | 'hidden') | null;
+  reason?: string | null;
+  post: number | Post;
+  parent?: (number | null) | KbComment;
+  likes?: number | null;
+  visitor?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Star ratings on posts, with an optional short review. One per visitor per post; rating again updates it.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-reviews".
+ */
+export interface KbReview {
+  id: number;
+  rating: number;
+  review?: string | null;
+  name?: string | null;
+  /**
+   * Waiting: held by the checks (see Why held). Shown: visible to everyone. Hidden: only here.
+   */
+  status?: ('published' | 'pending' | 'hidden') | null;
+  reason?: string | null;
+  post: number | Post;
+  visitor?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Readers select text in a post and tell you it looks wrong, could be simpler, or anything else. Fix it, then tick Handled.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-feedback".
+ */
+export interface KbFeedback {
+  id: number;
+  kind: 'wrong' | 'simpler' | 'other';
+  quote?: string | null;
+  note?: string | null;
+  /**
+   * Optional: to thank them or ask more.
+   */
+  email?: string | null;
+  handled?: boolean | null;
+  post: number | Post;
+  alert?: string | null;
+  visitor?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-votes".
+ */
+export interface KbVote {
+  id: number;
+  kind: 'like' | 'star';
+  target: string;
+  visitor: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Messages from the Contact page form. Reply by email, then tick "Handled".
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1452,6 +1564,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categories';
         value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'kb-comments';
+        value: number | KbComment;
+      } | null)
+    | ({
+        relationTo: 'kb-reviews';
+        value: number | KbReview;
+      } | null)
+    | ({
+        relationTo: 'kb-feedback';
+        value: number | KbFeedback;
+      } | null)
+    | ({
+        relationTo: 'kb-votes';
+        value: number | KbVote;
       } | null)
     | ({
         relationTo: 'messages';
@@ -1739,6 +1867,7 @@ export interface PostsSelect<T extends boolean = true> {
   content?: T;
   relatedPosts?: T;
   categories?: T;
+  prerequisites?: T;
   meta?:
     | T
     | {
@@ -2069,6 +2198,9 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
+  emoji?: T;
+  order?: T;
+  description?: T;
   generateSlug?: T;
   slug?: T;
   parent?: T;
@@ -2080,6 +2212,65 @@ export interface CategoriesSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-comments_select".
+ */
+export interface KbCommentsSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  body?: T;
+  status?: T;
+  reason?: T;
+  post?: T;
+  parent?: T;
+  likes?: T;
+  visitor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-reviews_select".
+ */
+export interface KbReviewsSelect<T extends boolean = true> {
+  rating?: T;
+  review?: T;
+  name?: T;
+  status?: T;
+  reason?: T;
+  post?: T;
+  visitor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-feedback_select".
+ */
+export interface KbFeedbackSelect<T extends boolean = true> {
+  kind?: T;
+  quote?: T;
+  note?: T;
+  email?: T;
+  handled?: T;
+  post?: T;
+  alert?: T;
+  visitor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-votes_select".
+ */
+export interface KbVotesSelect<T extends boolean = true> {
+  kind?: T;
+  target?: T;
+  visitor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2724,7 +2915,7 @@ export interface Homepage {
           | {
               label: string;
               /**
-               * /projects, /blog, /about, /contact or a full URL
+               * /projects, /notes, /about, /contact or a full URL
                */
               href: string;
               newTab?: boolean | null;
@@ -2983,6 +3174,34 @@ export interface ContactPage {
         id?: string | null;
       }[]
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The Field Notes page wording, and what readers can do on posts.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-settings".
+ */
+export interface KbSetting {
+  id: number;
+  heading?: string | null;
+  intro?: string | null;
+  comments?: boolean | null;
+  reviews?: boolean | null;
+  feedback?: boolean | null;
+  /**
+   * Sent like Contact alerts (Contact page → Email alerts).
+   */
+  notify?: boolean | null;
+  /**
+   * Slurs, threats and abuse are always refused. Swearing, several links, all capitals and spam patterns are held for you.
+   */
+  moderation?: ('auto' | 'all') | null;
+  /**
+   * Extra words to refuse, one per line or comma-separated. Disguises like f*ck or sh1t are caught too.
+   */
+  blockedWords?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3334,6 +3553,23 @@ export interface ContactPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-settings_select".
+ */
+export interface KbSettingsSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  comments?: T;
+  reviews?: T;
+  feedback?: T;
+  notify?: T;
+  moderation?: T;
+  blockedWords?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -3370,6 +3606,86 @@ export interface TaskSchedulePublish {
     } | null;
   };
   output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PrereqBlock".
+ */
+export interface PrereqBlock {
+  /**
+   * Shown above the links, e.g. "Read these first".
+   */
+  title?: string | null;
+  posts?: (number | Post)[] | null;
+  /**
+   * Optional: a whole channel to read first.
+   */
+  channel?: (number | null) | Category;
+  /**
+   * Optional, e.g. "You need to know what MCP is".
+   */
+  note?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'prereq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostPhotoBlock".
+ */
+export interface PostPhotoBlock {
+  image?: (number | null) | Media;
+  /**
+   * A direct https link to an image, used when nothing is uploaded.
+   */
+  imageUrl?: string | null;
+  /**
+   * For screen readers and search. Uploaded images use their own alt text when empty.
+   */
+  alt?: string | null;
+  /**
+   * Optional, e.g. the source or a larger version.
+   */
+  href?: string | null;
+  caption?: string | null;
+  size?: ('normal' | 'small' | 'wide') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'photo';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostVideoBlock".
+ */
+export interface PostVideoBlock {
+  /**
+   * A YouTube or Vimeo link, or a direct https link to an .mp4/.webm file. Or upload a file below instead.
+   */
+  url?: string | null;
+  file?: (number | null) | Media;
+  caption?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'video';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostAudioBlock".
+ */
+export interface PostAudioBlock {
+  /**
+   * Optional, e.g. "Listen: the 5-minute version".
+   */
+  title?: string | null;
+  /**
+   * A Spotify or SoundCloud link, or a direct https link to an .mp3/.m4a/.ogg/.wav file. Or upload a file below instead.
+   */
+  url?: string | null;
+  file?: (number | null) | Media;
+  caption?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'audio';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

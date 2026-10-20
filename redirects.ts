@@ -19,9 +19,11 @@ export const redirects: NextConfig['redirects'] = async () => {
   const moved = [
     { source: '/work', destination: '/projects' },
     { source: '/work/:slug*', destination: '/projects' },
-    { source: '/notes', destination: '/blog' },
-    { source: '/notes/:slug*', destination: '/blog/:slug*' },
-    { source: '/writing', destination: '/blog' },
+    { source: '/blog', destination: '/notes' },
+    { source: '/blog/:slug*', destination: '/notes/:slug*' },
+    { source: '/kb', destination: '/notes' },
+    { source: '/kb/:slug*', destination: '/notes/:slug*' },
+    { source: '/writing', destination: '/notes' },
     { source: '/publications', destination: '/research' },
   ].map((r) => ({ ...r, permanent: true }))
 

@@ -21,10 +21,14 @@ import type {
 import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { cn } from '@/utilities/ui'
+import { Prereq } from '@/components/kb/Prereq'
+import type { GalleryBlock, PostAudioBlock, PostPhotoBlock, PostVideoBlock, PrereqBlock } from '@/payload-types'
+import { PostAudio, PostPhoto, PostVideo } from '@/components/kb/PostMedia'
+import { RenderProjectBlocks } from '@/components/blocks/RenderProjectBlocks'
 
 type NodeTypes =
   | DefaultNodeTypes
-  | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps>
+  | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps | PrereqBlock | PostVideoBlock | PostAudioBlock | PostPhotoBlock | GalleryBlock>
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   const { value, relationTo } = linkNode.fields.doc!
@@ -32,7 +36,7 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
     throw new Error('Expected value to be an object')
   }
   const slug = value.slug
-  if (relationTo === 'posts') return `/blog/${slug}`
+  if (relationTo === 'posts') return `/notes/${slug}`
   if (relationTo === 'projects') return `/projects/${slug}`
   return `/${slug}`
 }
@@ -54,6 +58,11 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
     ),
     code: ({ node }) => <CodeBlock className="col-start-2" {...node.fields} />,
     cta: ({ node }) => <CallToActionBlock {...node.fields} />,
+    prereq: ({ node }) => <Prereq {...(node.fields as PrereqBlock)} />,
+    video: ({ node }) => <PostVideo {...(node.fields as PostVideoBlock)} />,
+    audio: ({ node }) => <PostAudio {...(node.fields as PostAudioBlock)} />,
+    photo: ({ node }) => <PostPhoto {...(node.fields as PostPhotoBlock)} />,
+    gallery: ({ node }) => <RenderProjectBlocks blocks={[{ ...(node.fields as GalleryBlock), blockType: 'gallery' }]} />,
   },
 })
 

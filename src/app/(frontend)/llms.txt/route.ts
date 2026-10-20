@@ -20,13 +20,13 @@ export async function GET() {
     '## Pages',
     `- [About](${base}/about): background, experience, education and skills`,
     `- [Projects](${base}/projects): things I have built and contributed to`,
-    `- [Writing](${base}/blog): technical posts`,
+    `- [Field Notes](${base}/notes): technical posts by channel`,
     `- [Research](${base}/research): publications`,
     `- [Contact](${base}/contact): email and profiles`,
     '',
     '## Projects',
     ...projects.map((p) => `- [${p.title}](${base}/projects/${p.slug}): ${p.summary}`),
-    ...(posts.length ? ['', '## Writing', ...posts.map((p) => `- [${p.title}](${base}/blog/${p.slug})${p.excerpt ? `: ${p.excerpt}` : ''}`)] : []),
+    ...(posts.length ? ['', '## Field Notes', ...posts.map((p) => `- [${p.title}](${base}/notes/${p.slug})${p.excerpt ? `: ${p.excerpt}` : ''}`)] : []),
     ...(publications.length
       ? ['', '## Research', ...publications.map((p) => `- ${p.title} (${[p.publisher, p.venue, p.year].filter(Boolean).join(', ')})${p.doi ? `: https://doi.org/${p.doi}` : ''}`)]
       : []),

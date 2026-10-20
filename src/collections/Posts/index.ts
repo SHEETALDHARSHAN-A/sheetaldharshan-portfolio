@@ -14,6 +14,9 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { Prereq } from '../../blocks/Prereq/config'
+import { Gallery } from '../../blocks/Gallery/config'
+import { PostAudio, PostPhoto, PostVideo } from '../../blocks/PostMedia/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
@@ -48,7 +51,7 @@ export const Posts: CollectionConfig<'posts'> = {
     },
   },
   admin: {
-    group: 'Writing page',
+    group: 'Field Notes',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
@@ -90,7 +93,7 @@ export const Posts: CollectionConfig<'posts'> = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    BlocksFeature({ blocks: [Prereq, PostPhoto, PostVideo, PostAudio, Gallery, Code, Banner, MediaBlock] }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),
@@ -124,11 +127,25 @@ export const Posts: CollectionConfig<'posts'> = {
             {
               name: 'categories',
               type: 'relationship',
+              label: 'Channels',
               admin: {
                 position: 'sidebar',
+                description: 'The first one is the post\'s home channel in Field Notes.',
               },
               hasMany: true,
               relationTo: 'categories',
+            },
+            {
+              name: 'prerequisites',
+              type: 'relationship',
+              label: 'Read first',
+              admin: {
+                position: 'sidebar',
+                description: 'Shown as "Before you read" at the top. For one in the middle, add a Prerequisite block in the text.',
+              },
+              filterOptions: ({ id }) => (id ? { id: { not_in: [id] } } : true),
+              hasMany: true,
+              relationTo: 'posts',
             },
           ],
           label: 'Meta',

@@ -8,7 +8,7 @@ export const Navigation: GlobalConfig = {
   label: 'Menu links',
   admin: { group: 'Sidebar', description: 'The numbered menu in the sidebar (and the phone tab bar), plus the small footer links.' },
   access: { read: () => true, update: authenticated },
-  hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/blog', '/about', '/contact', '/research'])] },
+  hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/notes', '/about', '/contact', '/research'])] },
   fields: [
     {
       name: 'items',

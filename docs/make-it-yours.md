@@ -133,7 +133,7 @@ Do it in this order; later items reuse earlier ones. The admin's **Edit by page*
 5. **About**: intro (the first sentence is your pitch; keep it to what a recruiter should know in ten seconds), photo, technologies.
 6. **Homepage conversation**: the chat bubbles on `/`, in your own voice.
 7. **Navigation** (including its **Sidebar look**), **Pet**, and **Site-wide → Favicon & icons**.
-8. **Posts**: optional articles at `/blog`.
+8. **Field Notes** (optional, at `/notes`): create a few **Channels**, then **Posts**. Use the Prerequisite, Photo, Video and Audio blocks in the editor. Comments, ratings and feedback come by email; see the [admin guide](admin-guide.md#field-notes-posts-channels-comments).
 
 Everything has **Save draft** and **Preview**; nothing goes public until you publish it.
 

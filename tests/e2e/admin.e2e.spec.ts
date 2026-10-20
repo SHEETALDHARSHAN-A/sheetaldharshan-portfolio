@@ -88,19 +88,19 @@ test.describe.serial('Admin workflows', () => {
     await check.close()
   })
 
-  test('scenario C: a draft post is private, a published post appears on /blog', async () => {
+  test('scenario C: a draft post is private, a published post appears on /notes', async () => {
     const payload = await payloadClient()
     const content = {
       root: { type: 'root', format: '', indent: 0, version: 1, direction: 'ltr', children: [{ type: 'paragraph', format: '', indent: 0, version: 1, direction: 'ltr', textFormat: 0, children: [{ type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text: 'Written by the e2e suite.', version: 1 }] }] },
     }
     const post = await payload.create({ collection: 'posts', draft: true, data: { title: 'E2E Building Reliable AI Agents', slug: 'e2e-building-reliable-ai-agents', content, _status: 'draft' } as never, context: { disableRevalidate: true } })
     const check = await page.context().newPage()
-    const draft = await check.goto(`${base}/blog/e2e-building-reliable-ai-agents`)
+    const draft = await check.goto(`${base}/notes/e2e-building-reliable-ai-agents`)
     expect(draft?.status()).toBe(404)
     await payload.update({ collection: 'posts', id: post.id, data: { _status: 'published', publishedAt: new Date().toISOString() } as never, context: { disableRevalidate: true } })
-    await check.goto(`${base}/blog`)
+    await check.goto(`${base}/notes`)
     await expect(check.locator('.post-item h2', { hasText: 'E2E Building Reliable AI Agents' })).toBeVisible()
-    await check.goto(`${base}/blog/e2e-building-reliable-ai-agents`)
+    await check.goto(`${base}/notes/e2e-building-reliable-ai-agents`)
     await expect(check.locator('article h1')).toContainText('Building Reliable AI Agents')
     await check.close()
   })

@@ -6,7 +6,7 @@ import { SAMPLE, type EmailVars } from '@/utilities/emailTemplate'
 const recent = new Map<string, number[]>()
 
 /** At most 5 messages per visitor per 10 minutes (per server instance; a light brake, not a wall). */
-function limited(key: string): boolean {
+export function limited(key: string): boolean {
   const now = Date.now()
   const times = (recent.get(key) ?? []).filter((t) => now - t < 10 * 60 * 1000)
   times.push(now)
@@ -82,16 +82,16 @@ export const contact: Endpoint = {
 }
 
 type PayloadLike = Parameters<Endpoint['handler']>[0]['payload']
-type Site = { name: string; url: string; email?: string }
+export type Site = { name: string; url: string; email?: string }
 
 /** Your name, site address and email from Site-wide → Name & profiles, for the emails. */
-async function siteInfo(payload: PayloadLike): Promise<Site> {
+export async function siteInfo(payload: PayloadLike): Promise<Site> {
   const s = (await payload.findGlobal({ slug: 'site-settings' as never, depth: 0 }).catch(() => null)) as { displayName?: string; fullName?: string; canonicalUrl?: string; email?: string } | null
   return { name: s?.fullName || s?.displayName || 'My website', url: (s?.canonicalUrl || process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/$/, ''), email: s?.email || undefined }
 }
 
 /** Who gets alerts: the address set on the Contact page, or the site's email. */
-const alertRecipient = (settings: ContactSettings, site: Site) => settings.notifyEmail || site.email
+export const alertRecipient = (settings: ContactSettings, site: Site) => settings.notifyEmail || site.email
 
 async function alertOwner(settings: ContactSettings, site: Site, vars: EmailVars, answers: { label: string; value: string }[]): Promise<string> {
   if (!settings.notify) return 'Off (Contact page → Email alerts)'

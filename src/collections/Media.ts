@@ -41,7 +41,7 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    mimeTypes: ['image/*', 'video/mp4', 'video/webm', 'application/pdf'],
+    mimeTypes: ['image/*', 'video/mp4', 'video/webm', 'audio/*', 'application/pdf'],
     // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
     staticDir: path.resolve(dirname, '../../public/media'),
     adminThumbnail: 'thumbnail',

@@ -20,7 +20,7 @@ const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
 const generateURL: GenerateURL<Post | Page> = ({ doc, ...rest }) => {
   const url = getServerSideURL()
   const collection = (rest as { collectionSlug?: string }).collectionSlug
-  const prefix = collection === 'posts' ? '/blog' : collection === 'projects' ? '/projects' : ''
+  const prefix = collection === 'posts' ? '/notes' : collection === 'projects' ? '/projects' : ''
   return doc?.slug ? `${url}${prefix}/${doc.slug}` : url
 }
 

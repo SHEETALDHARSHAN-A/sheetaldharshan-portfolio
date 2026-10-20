@@ -79,8 +79,49 @@ Image settings (favicons, pet, About photo, link preview, admin logos) show an *
 ## Publish a project
 **Projects → Create new**. Fill the **Overview** tab (title, summary, kind, category, year, role, technologies). Add media in **Media** (thumbnail for the list, hero image, and a short silent MP4/WebM loop for the stage; the two seeded projects already have an illustrative artwork and loop, replace them with real captures when you have them). Build the page in **Page** by adding blocks: Text, Media, Gallery, Code, Feature list, Timeline, Link list, Facts, Embed (YouTube/Vimeo). Add links in **Links** and metadata in **SEO**. In the sidebar set **Featured** (shown on About), **Display order** (lower first), **Accent** (stage tint when there is no media), or **Archived** to hide it. Autosave keeps a draft; **Publish** makes it appear on `/projects` and at `/projects/<slug>`. The slug is generated from the title and can be edited.
 
-## Write and publish an article
-**Posts → Create new**. Title, optional hero image, then write in the editor: headings, lists, quotes, links, tables, images (Media block), code (Code block), banners. Pick **Categories** in the sidebar and set **Published at**. The **SEO** tab's description is also the excerpt shown in the list. **Save draft** stays private; **Preview** shows it; **Publish** lists it on `/blog` and in `/rss.xml`. Related posts appear at the end of the article.
+## Field Notes (posts, channels, comments)
+Field Notes lives at `/notes`. It works like Slack: a sidebar of **channels**, each listing its posts. Readers can star channels, rate posts, comment in threads, and send feedback on any sentence. Everything is under **Edit by page → Field Notes**.
+
+### Channels
+**Field Notes → Channels**: a title, an optional emoji (shown instead of #), a one-line description and an **Order** (lower comes first). Each channel has its own page at `/notes/c/<slug>`. Readers star channels to pin them under **Starred** in their sidebar, and the star count shows on the channel page.
+
+### Write a post
+**Posts → Create new**. Add a title and an optional hero image, then write in the editor: headings, lists, quotes, links and tables. Type `/` or use **+** to add a block:
+
+| Block | What it does |
+|---|---|
+| **Prerequisite** | A "Before you go on" card anywhere in the text, linking to other posts and/or a whole channel, with an optional note. |
+| **Photo** | An uploaded image or an image link, with alt text, a caption, an optional click-through link, and a size (text width, small, wide). |
+| **Video** | A YouTube or Vimeo link, a direct `.mp4`/`.webm` link, or an uploaded video, with a caption. |
+| **Audio** | A Spotify or SoundCloud link, a direct audio link (`.mp3`, `.m4a`…), or an uploaded audio file, with a title and caption. |
+| **Gallery** | Several images in one, two or three columns. |
+| **Code**, **Banner**, **Media** | Code with highlighting, a coloured note, a plain uploaded file. |
+
+In the sidebar:
+- **Channels**: the first one is the post's home channel.
+- **Read first**: shows as "Before you read" at the top of the post.
+- **Related posts**: listed at the end of the post.
+- **Published at**: the post's date.
+
+The **SEO** tab's description is also the summary shown in the lists. **Save draft** stays private, **Preview** shows it, and **Publish** lists it on `/notes`, in its channel and in `/rss.xml`.
+
+### What readers can do, and what you get
+- **Rate** a post 1–5 stars, with an optional short review. One rating per browser; rating again updates it.
+- **Comment**, reply to comments (threads nest four levels deep) and **like** comments. No sign-in: a name, plus an optional email that's never shown.
+- **Select any text** in a post to tell you it *looks wrong*, *could be simpler*, or anything else. There's also a **Send feedback** button under each post.
+
+Each comment, written review and piece of feedback is emailed to you, using the sender and address set under **Contact page → Email alerts**. The email has a button that opens the item in the admin.
+
+### Moderation
+Comments and reviews are checked before they show:
+- **Refused outright:** slurs, threats and severe abuse, in English or in Hindi/Tamil written in English letters. Disguised spellings (`f*ck`, `sh1t`, `b.i.t.c.h`) are caught too, and the visitor is asked to rephrase.
+- **Held for your approval:** swearing, several links, all capitals and spam patterns. The writer sees their comment marked "Waiting for approval"; nobody else sees it.
+- **Shown straight away:** everything else.
+
+To handle them:
+- **Field Notes → Comments** (or **Reviews**): set **Status** to *Shown*, *Hidden* or *Waiting for approval*, or delete. **Why held** says what the checks found.
+- **Field Notes → Feedback**: the selected text and the reader's note. Fix the post, then tick **Handled**.
+- **Field Notes → Settings**: switch comments, ratings or feedback on and off, choose **Hold everything until I approve it**, add your own **Blocked words**, and edit the page heading and intro.
 
 Markdown import: paste the text into the editor; the Lexical editor converts common Markdown shortcuts (`#`, `-`, `>`, triple backticks) as you type. There is no bulk importer.
 

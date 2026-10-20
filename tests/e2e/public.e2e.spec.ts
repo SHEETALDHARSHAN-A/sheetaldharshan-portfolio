@@ -58,13 +58,23 @@ test.describe('Public site', () => {
     expect(missing?.status()).toBe(404)
   })
 
-  test('blog listing, search and draft privacy', async ({ page }) => {
+  test('Field Notes: channels, search, old links and draft privacy', async ({ page }) => {
     await page.goto(`${base}/blog`)
-    await expect(page.locator('h1')).toContainText('Writing')
-    await page.fill('input[name="q"]', 'zzz-no-such-note')
-    await page.click('.search-form button')
+    await expect(page).toHaveURL(/\/notes$/)
+    await expect(page.locator('h1')).toContainText('Field Notes')
+    await expect(page.locator('.kb-nav a[aria-current="page"]')).toContainText('All posts')
+    const channel = page.locator('.kb-nav-list a[href^="/notes/c/"]').first()
+    if (await channel.count()) {
+      const name = (await channel.locator('.kb-nav-name').innerText()).trim()
+      await channel.click()
+      await expect(page.locator('.kb-channel-head h1')).toContainText(name)
+      await expect(page.locator('.kb-star')).toBeVisible()
+    }
+    await page.goto(`${base}/notes`)
+    await page.fill('#kb-q', 'zzz-no-such-note')
+    await page.press('#kb-q', 'Enter')
     await expect(page.locator('.empty')).toContainText('Nothing matched')
-    const missing = await page.goto(`${base}/blog/e2e-this-note-does-not-exist`)
+    const missing = await page.goto(`${base}/notes/e2e-this-note-does-not-exist`)
     expect(missing?.status()).toBe(404)
   })
 

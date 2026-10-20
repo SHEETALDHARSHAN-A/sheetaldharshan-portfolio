@@ -9,7 +9,9 @@
 
 ## Collections
 - **Projects** (drafts, autosave, schedule publish, versions): title, slug, summary, description, kind, category, year, role, client, technologies[], tags[], startDate, completionDate; media tab (thumbnail, heroImage, heroVideo, screenshots[], demoVideoUrl); page tab (`layout` blocks: prose, mediaBlock, gallery, code, features, timeline, links, stats, embed; `layoutPreset` case-study/article); links tab (githubUrl, liveDemoUrl, documentationUrl, releasesUrl); SEO tab; sidebar: featured, archived, displayOrder, accent.
-- **Posts** (template, drafts): title, heroImage, content (Lexical with headings, code, media, banner blocks), relatedPosts, categories, publishedAt, authors, SEO. Routes at `/blog/[slug]`.
+- **Posts** (template, drafts): title, heroImage, content (Lexical with headings and the prereq, photo, video, audio, gallery, code, banner and media blocks), relatedPosts, categories (channels), prerequisites, publishedAt, authors, SEO. Routes at `/notes/[slug]`; channels at `/notes/c/[slug]`.
+- **Categories** (Field Notes channels): title, emoji, order, description, slug.
+- **kb-comments**, **kb-reviews**, **kb-feedback**, **kb-votes** (likes and channel stars), global **kb-settings**: the Field Notes visitor side. Written only through `/api/kb/*` (`src/endpoints/kb.ts`), which checks text with `src/utilities/moderation.ts`.
 - **Pages** (drafts): title, hero, `layout` blocks (prose, mediaBlock, gallery, code, features, links, timeline, embed, content, cta, formBlock), showInNavigation, SEO, slug. Reserved slugs rejected.
 - **Publications**: title, authors, year, publisher, kind, venue, doi, externalUrl, abstract, personalContribution, tags[], featured, order.
 - **Experience**: role, company, companyUrl, location, startDate, endDate, current, summary, highlights[], technologies[], order.

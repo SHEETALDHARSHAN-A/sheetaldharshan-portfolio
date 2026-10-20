@@ -67,7 +67,7 @@ export const Homepage: GlobalConfig = {
               type: 'row',
               fields: [
                 { name: 'label', type: 'text', required: true, admin: { width: '50%' } },
-                { name: 'href', type: 'text', required: true, admin: { width: '50%', description: '/projects, /blog, /about, /contact or a full URL' } },
+                { name: 'href', type: 'text', required: true, admin: { width: '50%', description: '/projects, /notes, /about, /contact or a full URL' } },
               ],
             },
             { name: 'newTab', type: 'checkbox', defaultValue: false },

@@ -12,7 +12,7 @@ export const Appearance: GlobalConfig = {
   slug: 'appearance',
   label: 'Theme',
   access: { read: () => true, update: authenticated },
-  hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/blog', '/about', '/contact', '/research'])] },
+  hooks: { afterChange: [revalidateGlobalPaths(['/', '/projects', '/notes', '/about', '/contact', '/research'])] },
   admin: {
     group: 'Site-wide', livePreview: { url: () => previewUrl('/projects') } },
   fields: [

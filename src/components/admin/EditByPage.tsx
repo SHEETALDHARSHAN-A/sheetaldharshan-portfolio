@@ -27,7 +27,18 @@ export async function EditByPage({ payload }: { payload: Payload }) {
         { label: '+ New project', href: `${c('projects')}/create` },
       ],
     },
-    { label: 'Writing page', view: '/blog', items: [{ label: 'Posts', href: c('posts') }, { label: 'Categories', href: c('categories') }] },
+    {
+      label: 'Field Notes',
+      view: '/notes',
+      items: [
+        { label: 'Posts', href: c('posts') },
+        { label: 'Channels', href: c('categories') },
+        { label: 'Comments', href: c('kb-comments') },
+        { label: 'Reviews', href: c('kb-reviews') },
+        { label: 'Feedback on posts', href: c('kb-feedback') },
+        { label: 'Settings: wording & moderation', href: g('kb-settings') },
+      ],
+    },
     {
       label: 'About page',
       view: '/about',

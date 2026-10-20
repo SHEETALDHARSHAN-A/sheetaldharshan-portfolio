@@ -67,7 +67,7 @@ export const InteractiveAvatar = forwardRef<AvatarHandle, { size?: number; class
     if (pathname === '/projects') apply('excited')
     else if (pathname.startsWith('/projects/')) apply('curious', { duration: 1600 })
     else if (pathname === '/contact') apply('wave')
-    else if (pathname.startsWith('/blog')) apply('thinking', { duration: 1600 })
+    else if (pathname.startsWith('/notes')) apply('thinking', { duration: 1600 })
     else if (pathname === '/about') apply('happy')
   }, [pathname, apply])
 

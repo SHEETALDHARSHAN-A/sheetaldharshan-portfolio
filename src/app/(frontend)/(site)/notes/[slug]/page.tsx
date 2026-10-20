@@ -7,9 +7,12 @@ import RichText from '@/components/RichText'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Picture } from '@/components/Media/Picture'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { KbShell } from '@/components/kb/KbShell'
+import { Prereq } from '@/components/kb/Prereq'
+import { Discussion } from '@/components/kb/Discussion'
+import { SelectionFeedback } from '@/components/kb/SelectionFeedback'
 import { breadcrumbSchema } from '@/data/seo'
-import { PageFrame } from '@/components/shell/PageFrame'
-import { formatDate, getPost, getSite } from '@/data/content'
+import { formatDate, getKbSettings, getPost, getSite } from '@/data/content'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -18,24 +21,23 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = await getPost(slug)
-  if (!post) return { title: 'Note not found' }
+  if (!post) return { title: 'Post not found' }
   const image = post.meta.image ?? post.cover
   return {
     title: post.meta.title || post.title,
     description: post.meta.description || post.excerpt,
-    alternates: { canonical: `/blog/${post.slug}` },
+    alternates: { canonical: `/notes/${post.slug}` },
     openGraph: { type: 'article', title: post.title, description: post.excerpt, publishedTime: post.publishedAt, images: image ? [{ url: image.sizes?.og?.url ?? image.url }] : undefined },
   }
 }
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function KbPostPage({ params }: Props) {
   const { slug } = await params
-  const [post, site, { isEnabled: draft }] = await Promise.all([getPost(slug), getSite(), draftMode()])
+  const [post, site, kb, { isEnabled: draft }] = await Promise.all([getPost(slug), getSite(), getKbSettings(), draftMode()])
   if (!post) notFound()
 
   return (
-    <PageFrame>
-    <div className="page">
+    <KbShell active={post.channel?.slug}>
       {draft && <LivePreviewListener />}
       <JsonLd
         data={{
@@ -45,14 +47,24 @@ export default async function BlogPostPage({ params }: Props) {
           description: post.excerpt,
           datePublished: post.publishedAt,
           author: { '@type': 'Person', name: site.fullName, url: site.canonicalUrl },
-          mainEntityOfPage: `${site.canonicalUrl}/blog/${post.slug}`,
+          mainEntityOfPage: `${site.canonicalUrl}/notes/${post.slug}`,
           ...(post.cover ? { image: post.cover.url } : {}),
         }}
       />
-      <JsonLd data={breadcrumbSchema(site, [{ name: 'Writing', path: '/blog' }, { name: post.title, path: `/blog/${post.slug}` }])} />
-      <article>
+      <JsonLd
+        data={breadcrumbSchema(site, [
+          { name: kb.heading, path: '/notes' },
+          ...(post.channel ? [{ name: `#${post.channel.title}`, path: `/notes/c/${post.channel.slug}` }] : []),
+          { name: post.title, path: `/notes/${post.slug}` },
+        ])}
+      />
+      <article className="kb-article">
         <header className="article-head">
-          <span className="eyebrow">{post.categories[0] ?? 'Note'}</span>
+          {post.channel ? (
+            <Link className="kb-chip" href={`/notes/c/${post.channel.slug}`}>
+              {post.channel.emoji ?? '#'} {post.channel.title}
+            </Link>
+          ) : null}
           <h1>{post.title}</h1>
           <div className="meta">
             <span>{formatDate(post.publishedAt)}</span>
@@ -65,26 +77,25 @@ export default async function BlogPostPage({ params }: Props) {
             <Picture media={post.cover} priority size="large" sizes="(max-width: 960px) 100vw, 820px" />
           </div>
         )}
-        <RichText className="prose" data={post.content as DefaultTypedEditorState} enableGutter={false} enableProse={false} />
+        <Prereq posts={post.prerequisites} />
+        <SelectionFeedback postId={post.id}>
+          <RichText className="prose" data={post.content as DefaultTypedEditorState} enableGutter={false} enableProse={false} />
+        </SelectionFeedback>
         {post.related.length > 0 && (
           <aside className="article-related">
             <span className="eyebrow">Related</span>
-            <div className="post-list">
+            <ul className="kb-related">
               {post.related.map((item) => (
-                <article className="post-item" key={item.id}>
-                  <div className="meta">
-                    <span>{formatDate(item.publishedAt)}</span>
-                  </div>
-                  <h2>
-                    <Link href={`/blog/${item.slug}`}>{item.title}</Link>
-                  </h2>
-                </article>
+                <li key={item.id}>
+                  <Link href={`/notes/${item.slug}`}>{item.title}</Link>
+                  <span>{formatDate(item.publishedAt)}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </aside>
         )}
+        <Discussion postId={post.id} />
       </article>
-    </div>
-    </PageFrame>
+    </KbShell>
   )
 }

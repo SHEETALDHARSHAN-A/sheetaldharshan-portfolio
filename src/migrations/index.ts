@@ -20,6 +20,7 @@ import * as migration_20261018_063000_contact_form_first from './20261018_063000
 import * as migration_20261018_064000_email_alerts from './20261018_064000_email_alerts';
 import * as migration_20261018_141416_email_templates from './20261018_141416_email_templates';
 import * as migration_20261018_145409_resume_link from './20261018_145409_resume_link';
+import * as migration_20261020_112623_field_notes from './20261020_112623_field_notes';
 
 export const migrations = [
   {
@@ -130,6 +131,11 @@ export const migrations = [
   {
     up: migration_20261018_145409_resume_link.up,
     down: migration_20261018_145409_resume_link.down,
-    name: '20261018_145409_resume_link'
+    name: '20261018_145409_resume_link',
+  },
+  {
+    up: migration_20261020_112623_field_notes.up,
+    down: migration_20261020_112623_field_notes.down,
+    name: '20261020_112623_field_notes'
   },
 ];

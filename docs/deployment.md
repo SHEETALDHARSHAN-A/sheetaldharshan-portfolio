@@ -74,7 +74,7 @@ Use the records Vercel shows for the domain at the time of setup; do not copy va
 Vercel issues and renews certificates automatically once DNS resolves. Verify `https://sheetaldharshan.me` and that `http://` and `www` redirect.
 
 ## Verification checklist
-- `/` loads with the conversation; `/projects`, `/blog`, `/about`, `/research`, `/contact` render.
+- `/` loads with the conversation; `/projects`, `/notes`, `/about`, `/research`, `/contact` render.
 - `/admin` requires login; anonymous `POST /api/projects` returns 401/403.
 - Upload an image in Media and open its URL after a redeploy (persistence).
 - `/sitemap.xml`, `/rss.xml`, `/robots.txt` use the production domain.

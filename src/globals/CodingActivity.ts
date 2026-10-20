@@ -26,7 +26,7 @@ export const CodingActivity: GlobalConfig = {
   slug: 'coding-activity',
   label: 'Coding activity',
   access: { read: () => true, update: authenticated },
-  hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/blog', '/about', '/contact', '/research'])] },
+  hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/notes', '/about', '/contact', '/research'])] },
   admin: { group: 'Sidebar', description: 'Choose where each card appears and whether it starts open. Cards show above round logos (a pop-up in the sidebar, in the page on About); with two or more open by default they take turns as a carousel. Untick both places to hide a card.' },
   fields: [
     {

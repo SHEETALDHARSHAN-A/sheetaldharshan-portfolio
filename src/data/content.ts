@@ -10,6 +10,7 @@ import {
   type AboutContent,
   type AboutSection,
   type CertificationEntry,
+  type Channel,
   type Conversation,
   type EducationEntry,
   type ExperienceEntry,
@@ -37,7 +38,7 @@ async function isDraft(): Promise<boolean> {
 
 const defaultNav: NavItem[] = [
   { label: 'Projects', href: '/projects' },
-  { label: 'Writing', href: '/blog' },
+  { label: 'Field Notes', href: '/notes' },
   { label: 'About', href: '/about' },
   { label: 'Research', href: '/research' },
   { label: 'Contact', href: '/contact' },
@@ -244,6 +245,11 @@ function categoryTitles(categories: PostDoc['categories']): string[] {
   return (categories ?? []).map((category) => (typeof category === 'object' ? (category as Category).title : '')).filter(Boolean)
 }
 
+function channelOf(categories: PostDoc['categories']): PostSummary['channel'] {
+  const first = (categories ?? []).find((c): c is Category => typeof c === 'object' && Boolean(c?.slug))
+  return first ? { slug: first.slug ?? '', title: first.title, emoji: first.emoji || undefined } : undefined
+}
+
 function toPostSummary(doc: PostDoc): PostSummary {
   return {
     id: String(doc.id),
@@ -253,6 +259,7 @@ function toPostSummary(doc: PostDoc): PostSummary {
     publishedAt: doc.publishedAt ?? undefined,
     updatedAt: doc.updatedAt,
     categories: categoryTitles(doc.categories),
+    channel: channelOf(doc.categories),
     readingMinutes: readingMinutes(doc.content),
     cover: toMediaRef(doc.heroImage) ?? toMediaRef(doc.meta?.image),
   }
@@ -282,6 +289,7 @@ export const getPost = cache(async (slug: string): Promise<Post | null> => {
     ...toPostSummary(doc),
     content: doc.content,
     related: (doc.relatedPosts ?? []).filter((post): post is PostDoc => typeof post === 'object' && post._status === 'published').map(toPostSummary),
+    prerequisites: (doc.prerequisites ?? []).filter((post): post is PostDoc => typeof post === 'object' && post._status === 'published').map(toPostSummary),
     tags: [],
     meta: { title: doc.meta?.title ?? undefined, description: doc.meta?.description ?? undefined, image: toMediaRef(doc.meta?.image) },
   }
@@ -291,6 +299,48 @@ export const getCategories = cache(async (): Promise<{ title: string; slug: stri
   const payload = await getClient()
   const result = await payload.find({ collection: 'categories', depth: 0, limit: 50, sort: 'title' }).catch(dbFailed)
   return (result?.docs ?? []).map((category) => ({ title: category.title, slug: category.slug ?? '' })).filter((category) => category.slug)
+})
+
+/** Field Notes channels in their set order, each with its number of published posts. */
+export const getChannels = cache(async (): Promise<Channel[]> => {
+  const payload = await getClient()
+  const [channels, posts] = await Promise.all([
+    payload.find({ collection: 'categories', depth: 0, limit: 100, sort: ['order', 'title'] }).catch(dbFailed),
+    payload.find({ collection: 'posts', depth: 0, limit: 1000, pagination: false, where: { _status: { equals: 'published' } }, select: { categories: true } }).catch(dbFailed),
+  ])
+  const counts = new Map<string, number>()
+  for (const post of posts?.docs ?? []) for (const c of post.categories ?? []) counts.set(String(typeof c === 'object' ? c.id : c), (counts.get(String(typeof c === 'object' ? c.id : c)) ?? 0) + 1)
+  return (channels?.docs ?? [])
+    .filter((c) => c.slug)
+    .map((c) => ({ id: String(c.id), slug: c.slug ?? '', title: c.title, emoji: c.emoji || undefined, description: c.description || undefined, posts: counts.get(String(c.id)) ?? 0 }))
+})
+
+export type KbSettings = { heading: string; intro: string }
+export const getKbSettings = cache(async (): Promise<KbSettings> => {
+  const payload = await getClient()
+  const g = (await payload.findGlobal({ slug: 'kb-settings', depth: 0 }).catch(dbFailed)) as { heading?: string; intro?: string } | undefined
+  return {
+    heading: g?.heading || 'Field Notes',
+    intro: g?.intro || 'Notes on what I build and learn: backend systems, AI agents, developer tools and databases.',
+  }
+})
+
+/** Shown comments and average rating per post, for the post lists. */
+export const getPostStats = cache(async (): Promise<Record<string, { comments: number; rating: number; ratings: number }>> => {
+  const payload = await getClient()
+  const [comments, reviews] = await Promise.all([
+    payload.find({ collection: 'kb-comments', depth: 0, limit: 10000, pagination: false, where: { status: { equals: 'published' } }, select: { post: true } }).catch(() => null),
+    payload.find({ collection: 'kb-reviews', depth: 0, limit: 10000, pagination: false, where: { status: { equals: 'published' } }, select: { post: true, rating: true } }).catch(() => null),
+  ])
+  const out: Record<string, { comments: number; rating: number; ratings: number }> = {}
+  const entry = (id: unknown) => (out[String(typeof id === 'object' && id ? (id as { id: unknown }).id : id)] ??= { comments: 0, rating: 0, ratings: 0 })
+  for (const c of comments?.docs ?? []) entry(c.post).comments++
+  for (const r of reviews?.docs ?? []) {
+    const e = entry(r.post)
+    e.rating = (e.rating * e.ratings + r.rating) / (e.ratings + 1)
+    e.ratings++
+  }
+  return out
 })
 
 /* ------------------------------------------------------------------ profile collections */

@@ -25,7 +25,7 @@ export const Pet: GlobalConfig = {
     description: 'The animated character in the sidebar (bottom-right on phones). Clicking it opens site search.',
   },
   access: { read: () => true, update: authenticated },
-  hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/blog', '/about', '/contact', '/research'])] },
+  hooks: { afterChange: [revalidateGlobalPaths(['/projects', '/notes', '/about', '/contact', '/research'])] },
   fields: [
     {
       type: 'row',

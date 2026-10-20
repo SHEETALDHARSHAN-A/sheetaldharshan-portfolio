@@ -10,14 +10,14 @@ export const homepageMessages: { content: string; style: string; choices?: { lab
   { content: 'I build developer tools and AI agents that work over real databases.', style: 'default' },
   { content: "I'm currently a software engineer at [Exasol](https://www.exasol.com).", style: 'default' },
   { content: 'Outside work, I build things that make working with data a little easier.', style: 'default' },
-  { content: 'Most of my work lives in [my projects](/projects). I also [write about what I learn](/blog) and [publish research](/research).', style: 'default' },
+  { content: 'Most of my work lives in [my projects](/projects). I also [write about what I learn](/notes) and [publish research](/research).', style: 'default' },
   { content: 'Want to chat? [Say hi](/contact), or [get to know me](/about) first.', style: 'default' },
 ]
 
 export const navigation = {
   items: [
     { label: 'Projects', href: '/projects', visible: true },
-    { label: 'Writing', href: '/blog', visible: true },
+    { label: 'Field Notes', href: '/notes', visible: true },
     { label: 'About', href: '/about', visible: true },
     { label: 'Research', href: '/research', visible: true },
     { label: 'Contact', href: '/contact', visible: true },

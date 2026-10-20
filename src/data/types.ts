@@ -103,6 +103,8 @@ export const kindLabels: Record<ProjectKind, string> = {
   experiment: 'Experiment',
 }
 
+export type Channel = { id: string; slug: string; title: string; emoji?: string; description?: string; posts: number }
+
 export type PostSummary = {
   id: string
   slug: string
@@ -110,6 +112,8 @@ export type PostSummary = {
   excerpt?: string
   publishedAt?: string
   categories: string[]
+  /** The post's home channel: its first category. */
+  channel?: { slug: string; title: string; emoji?: string }
   readingMinutes: number
   cover?: MediaRef
   updatedAt?: string
@@ -118,6 +122,8 @@ export type PostSummary = {
 export type Post = PostSummary & {
   content: unknown
   related: PostSummary[]
+  /** "Read first" posts, shown as "Before you read" at the top. */
+  prerequisites: PostSummary[]
   tags: string[]
   meta: { title?: string; description?: string; image?: MediaRef }
 }
