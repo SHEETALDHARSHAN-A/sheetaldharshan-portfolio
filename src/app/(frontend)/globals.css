@@ -1231,8 +1231,9 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-signin-title { margin: 0; font-weight: 600; font-size: 17px; color: var(--text); }
 .kb-signin .kb-note { margin-top: 4px; }
 .kb-signin-wide { width: 100%; justify-content: center; padding: 12px 18px; font-size: 14.5px; }
-.kb-gh { position: relative; gap: 10px; }
-.kb-gh-note { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; padding: 3px 9px 3px 4px; border-radius: 999px; background: color-mix(in srgb, #1d9bf0 14%, transparent); color: #1a73d9; font-size: 12px; font-weight: 600; }
+.kb-gh { position: relative; gap: 6px 10px; flex-wrap: wrap; }
+.kb-gh-label, .kb-gh-note { white-space: nowrap; }
+.kb-gh-note { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, #1d9bf0 14%, transparent); color: #1a73d9; font-size: 12px; font-weight: 600; }
 .kb-gh-note .kb-tick { vertical-align: 0; }
 .kb-or { display: flex; align-items: center; gap: 12px; color: var(--faint); font-size: 12.5px; }
 .kb-or::before, .kb-or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
