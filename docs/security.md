@@ -41,8 +41,16 @@ Admin, API, sign-in and reader pages are `noindex`, and sign-in responses are ne
 - **Row-level security** is on for every table in Supabase, with no policies, so the public (anon) key can't read anything through Supabase's API. Turn it on for each new table too. The migration steps in [CONTRIBUTING](../CONTRIBUTING.md) do this.
 - **Secrets** live only in Vercel environment variables and your local `.env`, which is git-ignored. Never commit them.
 
+## HTTPS everywhere (HSTS preload)
+`src/proxy.ts` redirects the bare domain to `www` (taken from `NEXT_PUBLIC_SERVER_URL`) and sets the full HSTS header on that redirect. This is because hstspreload.org checks the bare domain, and Vercel's own domain redirect only sends a short header.
+
+For this to work, in Vercel the bare domain must point at the project (**Connect to an environment: Production**), not at "Redirect to www…".
+
+Once it is on the preload list, every subdomain must serve HTTPS for good. Removal takes months, so check before adding web subdomains. Mail-only DNS records such as Resend's are unaffected.
+
 ## Dependencies
-- Run `pnpm audit --prod` regularly and upgrade what it flags.
+- Run `pnpm audit --prod` regularly and upgrade what it flags. Dependabot alerts on GitHub do this automatically (repository → Settings → Code security).
+- **Waiting on a fix:** `braces` (high, build-time file watcher only; no patched release yet). When `pnpm view braces version` shows 3.0.4 or later, add `braces@<3.0.4: ^3.0.4` under `overrides` in `pnpm-workspace.yaml`, then run `pnpm install` and `pnpm audit --prod`.
 - `pnpm-workspace.yaml` → `overrides` pins patched versions of vulnerable sub-dependencies until their parents ship them. Remove a pin once the parent package includes the fix.
 
 ## Checklist for changes

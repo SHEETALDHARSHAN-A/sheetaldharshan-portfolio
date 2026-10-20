@@ -31,8 +31,11 @@ const csp = [
   ...(dev ? [] : ['upgrade-insecure-requests']),
 ].join('; ')
 
+/** Two years, all subdomains, and eligible for the browsers' preload list (hstspreload.org). */
+export const HSTS = 'max-age=63072000; includeSubDomains; preload'
+
 const baseline = [
-  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+  { key: 'Strict-Transport-Security', value: HSTS },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },

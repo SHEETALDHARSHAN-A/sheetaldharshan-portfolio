@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { HSTS } from '../securityHeaders'
 import { SECOND_FACTOR_COOKIE, secondFactorRequired, tokenClaims, verifySecondFactor } from '@/utilities/secondFactor'
 
 // Admin pages that work before (or without) the GitHub step.
@@ -9,7 +10,28 @@ const OPEN_ADMIN = /^\/admin\/(login|logout|reset|create-first-user|unauthorized
  * Payload (the admin, its API and previews), and admin pages send the person to the GitHub step.
  * Forgotten passwords are reset through GitHub too.
  */
+/**
+ * The bare domain → www. Done here rather than in Vercel's domain settings so the redirect carries
+ * the full HSTS header (with includeSubDomains and preload), which hstspreload.org checks on the
+ * bare domain. Set in NEXT_PUBLIC_SERVER_URL; nothing happens unless that address starts with www.
+ */
+const CANONICAL = (() => {
+  try {
+    const u = new URL(process.env.NEXT_PUBLIC_SERVER_URL || '')
+    return u.hostname.startsWith('www.') ? u : null
+  } catch {
+    return null
+  }
+})()
+
 export async function proxy(request: NextRequest) {
+  const host = (request.headers.get('host') ?? '').split(':')[0]
+  if (CANONICAL && host === CANONICAL.hostname.slice(4)) {
+    const to = new URL(request.nextUrl.pathname + request.nextUrl.search, CANONICAL.origin)
+    const res = NextResponse.redirect(to, 308)
+    res.headers.set('Strict-Transport-Security', HSTS)
+    return res
+  }
   const { pathname } = request.nextUrl
   if (pathname === '/admin/forgot' || pathname.startsWith('/admin/forgot/')) {
     return NextResponse.redirect(new URL('/auth/verify?reset=1', request.url))
