@@ -24,6 +24,7 @@ import * as migration_20261020_112623_field_notes from './20261020_112623_field_
 import * as migration_20261020_123230_field_notes_readers from './20261020_123230_field_notes_readers';
 import * as migration_20261020_123627_field_notes_controls from './20261020_123627_field_notes_controls';
 import * as migration_20261020_125259_security_hardening from './20261020_125259_security_hardening';
+import * as migration_20261020_133651_stdout_name from './20261020_133651_stdout_name';
 
 export const migrations = [
   {
@@ -154,6 +155,11 @@ export const migrations = [
   {
     up: migration_20261020_125259_security_hardening.up,
     down: migration_20261020_125259_security_hardening.down,
-    name: '20261020_125259_security_hardening'
+    name: '20261020_125259_security_hardening',
+  },
+  {
+    up: migration_20261020_133651_stdout_name.up,
+    down: migration_20261020_133651_stdout_name.down,
+    name: '20261020_133651_stdout_name'
   },
 ];

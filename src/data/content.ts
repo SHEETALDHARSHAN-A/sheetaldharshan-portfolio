@@ -39,9 +39,9 @@ async function isDraft(): Promise<boolean> {
 
 const defaultNav: NavItem[] = [
   { label: 'Projects', href: '/projects' },
-  { label: 'Field Notes', href: '/notes' },
-  { label: 'About', href: '/about' },
+  { label: './stdout', href: '/notes' },
   { label: 'Research', href: '/research' },
+  { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ]
 
@@ -303,7 +303,7 @@ export const getCategories = cache(async (): Promise<{ title: string; slug: stri
   return (result?.docs ?? []).map((category) => ({ title: category.title, slug: category.slug ?? '' })).filter((category) => category.slug)
 })
 
-/** Field Notes channels in their set order, each with its number of published posts. */
+/** ./stdout channels in their set order, each with its number of published posts. */
 export const getChannels = cache(async (): Promise<Channel[]> => {
   const payload = await getClient()
   const [channels, posts] = await Promise.all([
@@ -323,8 +323,8 @@ export const getKbSettings = cache(async (): Promise<KbSettings> => {
   const g = (await payload.findGlobal({ slug: 'kb-settings', depth: 0 }).catch(dbFailed)) as unknown as ({ heading?: string; intro?: string } & Record<string, unknown>) | undefined
   return {
     rules: siteRules(g),
-    heading: g?.heading || 'Field Notes',
-    intro: g?.intro || 'Notes on what I build and learn: backend systems, AI agents, developer tools and databases.',
+    heading: g?.heading || './stdout',
+    intro: g?.intro || "What's on my screen right now: notes on what I'm reading, building and learning, written up so you can read along. Pick a channel, star the ones you like, and tell me if anything could be clearer.",
   }
 })
 

@@ -2,7 +2,7 @@ import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypt
 import type { Payload } from 'payload'
 
 /**
- * Field Notes reader sessions. A reader signs in with GitHub or an emailed link; the server then
+ * ./stdout reader sessions. A reader signs in with GitHub or an emailed link; the server then
  * sets a signed token (a JWT, HS256) in an httpOnly cookie. The token names the reader and their
  * session version, so raising `sessionVersion` in the admin (or blocking them) signs them out
  * everywhere at once. Tokens last 30 days and are renewed while the reader keeps visiting.

@@ -127,7 +127,7 @@ export function SignInDialog() {
     <div className="kb-modal" role="dialog" aria-modal="true" aria-label="Sign in" onMouseDown={(e) => e.target === e.currentTarget && setOpen(null)}>
       <div className="kb-modal-card">
         <div className="kb-modal-head">
-          <strong>Sign in to Field Notes</strong>
+          <strong>Sign in to ./stdout</strong>
           <button type="button" className="kb-x" onClick={() => setOpen(null)} aria-label="Close">
             ×
           </button>

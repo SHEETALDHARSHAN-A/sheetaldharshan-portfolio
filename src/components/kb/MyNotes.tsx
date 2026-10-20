@@ -50,7 +50,7 @@ export function MyNotes() {
     return (
       <div className="kb-me">
         <header className="page-head kb-head">
-          <h1 className="h1-accent">Your Field Notes</h1>
+          <h1 className="h1-accent">Your ./stdout</h1>
           <p>Sign in to see the channels you starred and everything you wrote, liked and reported.</p>
         </header>
         <SignInOptions why="to see your page" />

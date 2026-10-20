@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { postRules, siteRules } from '@/utilities/kbRules'
 import { safeNext } from '@/utilities/readerSession'
 
-describe('Field Notes rules', () => {
+describe('./stdout rules', () => {
   it('uses the site switches unless a post overrides them', () => {
     const site = siteRules({ comments: true, likes: false, reviews: true })
     expect(postRules(site, {})).toMatchObject({ comments: 'on', likes: false, ratings: true })

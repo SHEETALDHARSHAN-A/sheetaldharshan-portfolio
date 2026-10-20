@@ -12,7 +12,7 @@ import { postRules, siteRules, type PostRules, type SiteRules } from '@/utilitie
 const hashKey = (v: string) => createHash('sha256').update(`${process.env.PAYLOAD_SECRET ?? ''}|${v}`).digest('hex').slice(0, 24)
 
 /**
- * The Field Notes API (/api/kb/…). Reading is open to everyone. Commenting, liking, starring and
+ * The ./stdout API (/api/kb/…). Reading is open to everyone. Commenting, liking, starring and
  * rating need a signed-in reader (GitHub or an emailed link; see src/utilities/readerSession.ts),
  * so each counts once per person. Feedback on selected text stays open without signing in.
  * Everything written is checked (src/utilities/moderation.ts): abuse is refused, anything
@@ -97,7 +97,7 @@ const isBot = (body: Body) => (typeof body.website === 'string' && body.website.
 
 /** Emails you about new comments, reviews and feedback, from the sender set on the Contact page. */
 async function tellOwner(req: PayloadRequest, s: Settings, m: { subject: string; heading: string; intro: string; rows: { label: string; value: string }[]; adminPath: string; replyTo?: string }): Promise<string> {
-  if (!s.notify) return 'Off (Field Notes → Settings)'
+  if (!s.notify) return 'Off (./stdout → Settings)'
   if (!emailAlertsReady()) return 'Not sent: RESEND_API_KEY is not set'
   const contact = toContactSettings((await req.payload.findGlobal({ slug: 'contact-page' as never, depth: 0 })) as unknown as Record<string, unknown>)
   const site = await siteInfo(req.payload)
@@ -105,7 +105,7 @@ async function tellOwner(req: PayloadRequest, s: Settings, m: { subject: string;
   if (!to) return 'Not sent: no address to send to'
   const result = await sendTemplate(
     contact,
-    { subject: m.subject, heading: m.heading, intro: m.intro, showAnswers: true, button: 'Open in the admin', footer: 'Sent by Field Notes on {url}.' },
+    { subject: m.subject, heading: m.heading, intro: m.intro, showAnswers: true, button: 'Open in the admin', footer: 'Sent by ./stdout on {url}.' },
     { name: '', email: '', site: site.name, url: site.url },
     m.rows,
     { to, replyTo: m.replyTo, buttonHref: `${site.url}/admin/${m.adminPath}` },
@@ -180,7 +180,7 @@ const emailLink: Endpoint = {
     const origin = new URL(req.url ?? site.url).origin
     const result = await sendTemplate(
       contact,
-      { subject: 'Your sign-in link for {site} · Field Notes', heading: 'Sign in to Field Notes', intro: 'Click the button to sign in as {email}. The link works once, for the next 15 minutes.', showAnswers: false, button: 'Sign in', footer: "If you didn't ask for this, you can ignore this email; nobody can sign in without it." },
+      { subject: 'Your sign-in link for {site} · ./stdout', heading: 'Sign in to ./stdout', intro: 'Click the button to sign in as {email}. The link works once, for the next 15 minutes.', showAnswers: false, button: 'Sign in', footer: "If you didn't ask for this, you can ignore this email; nobody can sign in without it." },
       { name: name || email, email, site: site.name, url: site.url },
       [],
       { to: email, buttonHref: `${origin}/auth/reader/email?token=${token}` },

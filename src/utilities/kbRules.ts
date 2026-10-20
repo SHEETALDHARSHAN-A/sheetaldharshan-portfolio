@@ -1,5 +1,5 @@
 /**
- * What readers may do on Field Notes: the site-wide switches (Field Notes → Settings) combined with
+ * What readers may do on ./stdout: the site-wide switches (./stdout → Settings) combined with
  * a post's own overrides (its "Reader interaction" sidebar). The server enforces these; the pages
  * use the same answer to show or hide buttons.
  */

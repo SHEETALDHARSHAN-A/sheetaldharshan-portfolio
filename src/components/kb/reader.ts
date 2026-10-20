@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 /**
- * The signed-in Field Notes reader, shared by every component on the page (sidebar stars,
+ * The signed-in ./stdout reader, shared by every component on the page (sidebar stars,
  * ratings, comments). Loaded once from /api/kb/me; `askToSignIn()` opens the sign-in dialog.
  */
 export type Reader = { id: number; name: string; avatar?: string; provider: string; verified: boolean; github?: string }

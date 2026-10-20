@@ -5,10 +5,10 @@ How the site protects the admin, readers and their data, and what to keep in min
 ## Admin
 - **Two steps:** a password, then GitHub (`src/proxy.ts`, `src/utilities/secondFactor.ts`). Without the GitHub step the Payload session is hidden from the admin and its API.
 - **Lockout:** five wrong passwords lock the account for 15 minutes. Sessions expire after 8 hours of inactivity, with secure, SameSite cookies (`src/collections/Users`).
-- **Every Payload collection and global** has explicit access rules. Public globals hide private fields with `privateFields()` (`src/access/privateFields.ts`), for example the Contact page alert addresses and templates, and Field Notes moderation.
+- **Every Payload collection and global** has explicit access rules. Public globals hide private fields with `privateFields()` (`src/access/privateFields.ts`), for example the Contact page alert addresses and templates, and ./stdout moderation.
 - **GraphQL is switched off;** only the REST API exists.
 
-## Readers (Field Notes)
+## Readers (./stdout)
 - **Sign-in:** GitHub (through Supabase) or a one-time email link. There are no passwords.
   - An email link works once, for 15 minutes, and only a SHA-256 hash of it is stored.
   - Opening the link shows a confirm button. Mail scanners that open links can't use it up.

@@ -7,7 +7,7 @@ export type Segment = { text: string; hit: boolean }
 export const typeLabels: Record<SearchDocType, string> = {
   page: 'Page',
   project: 'Project',
-  post: 'Field Notes',
+  post: './stdout',
   publication: 'Research',
   experience: 'Experience',
   education: 'Education',

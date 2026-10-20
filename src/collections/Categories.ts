@@ -14,10 +14,10 @@ export const Categories: CollectionConfig = {
   },
   labels: { singular: 'Channel', plural: 'Channels' },
   admin: {
-    group: 'Field Notes',
+    group: './stdout',
     useAsTitle: 'title',
     defaultColumns: ['title', 'emoji', 'order', 'slug'],
-    description: 'Field Notes channels, like Slack channels. Readers can star them; posts pick theirs under Channels.',
+    description: './stdout channels, like Slack channels. Readers can star them; posts pick theirs under Channels.',
   },
   defaultSort: 'order',
   fields: [

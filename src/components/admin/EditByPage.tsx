@@ -28,7 +28,7 @@ export async function EditByPage({ payload }: { payload: Payload }) {
       ],
     },
     {
-      label: 'Field Notes',
+      label: './stdout',
       view: '/notes',
       items: [
         { label: 'Posts', href: c('posts') },

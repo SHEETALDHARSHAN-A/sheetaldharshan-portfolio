@@ -79,11 +79,11 @@ Image settings (favicons, pet, About photo, link preview, admin logos) show an *
 ## Publish a project
 **Projects → Create new**. Fill the **Overview** tab (title, summary, kind, category, year, role, technologies). Add media in **Media** (thumbnail for the list, hero image, and a short silent MP4/WebM loop for the stage; the two seeded projects already have an illustrative artwork and loop, replace them with real captures when you have them). Build the page in **Page** by adding blocks: Text, Media, Gallery, Code, Feature list, Timeline, Link list, Facts, Embed (YouTube/Vimeo). Add links in **Links** and metadata in **SEO**. In the sidebar set **Featured** (shown on About), **Display order** (lower first), **Accent** (stage tint when there is no media), or **Archived** to hide it. Autosave keeps a draft; **Publish** makes it appear on `/projects` and at `/projects/<slug>`. The slug is generated from the title and can be edited.
 
-## Field Notes (posts, channels, comments)
-Field Notes lives at `/notes`. It works like Slack: a sidebar of **channels**, each listing its posts. Readers can star channels, rate posts, comment in threads, and send feedback on any sentence. Everything is under **Edit by page → Field Notes**.
+## ./stdout (posts, channels, comments)
+./stdout lives at `/notes`. It works like Slack: a sidebar of **channels**, each listing its posts. Readers can star channels, rate posts, comment in threads, and send feedback on any sentence. Everything is under **Edit by page → ./stdout**.
 
 ### Channels
-**Field Notes → Channels**: a title, an optional emoji (shown instead of #), a one-line description and an **Order** (lower comes first). Each channel has its own page at `/notes/c/<slug>`. Readers star channels to pin them under **Starred** in their sidebar, and the star count shows on the channel page.
+**./stdout → Channels**: a title, an optional emoji (shown instead of #), a one-line description and an **Order** (lower comes first). Each channel has its own page at `/notes/c/<slug>`. Readers star channels to pin them under **Starred** in their sidebar, and the star count shows on the channel page.
 
 ### Write a post
 **Posts → Create new**. Add a title and an optional hero image, then write in the editor: headings, lists, quotes, links and tables. Type `/` or use **+** to add a block:
@@ -109,17 +109,17 @@ The **SEO** tab's description is also the summary shown in the lists. **Save dra
 - **Sign in** with GitHub or a one-time **email link** (sent through Resend, valid 15 minutes). There are no passwords.
   - GitHub readers show their GitHub picture and a **blue verified tick**, and their name links to their GitHub profile.
   - GitHub sign-in reuses the GitHub app already set up in Supabase for the admin, so it needs no extra setup.
-- **Sessions:** a signed token in a secure, httpOnly cookie, valid for 30 days and renewed while the reader keeps visiting. Readers can sign out, or **sign out on all devices**, from their floating avatar (bottom right) or the Field Notes sidebar.
+- **Sessions:** a signed token in a secure, httpOnly cookie, valid for 30 days and renewed while the reader keeps visiting. Readers can sign out, or **sign out on all devices**, from their floating avatar (bottom right) or the ./stdout sidebar.
 - **Signed-in readers** can comment and **edit** or **delete** their own comments. An edited comment shows "· edited", with the time on hover; a deleted comment with replies shows "deleted" so the thread stays readable. They can also **like** comments, **star** channels and **rate** posts, each once per person. Their own page, **`/notes/me`**, lists what they starred, wrote, rated and liked, plus the reports they sent and what happened to each.
 - **Anonymous comments** (no sign-in) show as "Anonymous" and can't be edited or deleted by their writer. Any link in one waits for approval.
-- **Anyone can report** a comment, with a reason and a note. You get an email; reports are under **Field Notes → Reported comments**. Hide or delete the comment, then set the report to *Actioned* or *Dismissed*; signed-in reporters see that status on their page.
+- **Anyone can report** a comment, with a reason and a note. You get an email; reports are under **./stdout → Reported comments**. Hide or delete the comment, then set the report to *Actioned* or *Dismissed*; signed-in reporters see that status on their page.
 - **Feedback on selected text** needs no sign-in.
 - **Times** are relative ("just now", "5 min ago", "yesterday"), stay up to date while the page is open, and show the exact date and time on hover.
 
 You get an email for each comment, written review, report and piece of feedback. It uses the sender and address under **Contact page → Email alerts**, with a button that opens the item in the admin.
 
 ### Switches: site-wide and per post
-**Field Notes → Settings → What readers can do** turns each part on or off for the whole site:
+**./stdout → Settings → What readers can do** turns each part on or off for the whole site:
 
 | Switch | What it controls |
 |---|---|
@@ -147,10 +147,10 @@ Comments and reviews are checked before they show:
 **Settings → Moderation** can instead hold every anonymous comment, or hold everything. Add your own refused words under **Blocked words**.
 
 To handle comments, reviews and readers:
-- **Field Notes → Comments** (or **Reviews**): set **Status** to *Shown*, *Hidden* or *Waiting for approval*, or delete. **Why held** says what the checks found.
+- **./stdout → Comments** (or **Reviews**): set **Status** to *Shown*, *Hidden* or *Waiting for approval*, or delete. **Why held** says what the checks found.
 - **Block this reader:** a button in each comment's or review's sidebar. A blocked reader is signed out at once, can't post, and everything they wrote is hidden. You can also add a private reason.
-- **Field Notes → Readers:** everyone who signed in, and the same **Block** status. Raise **Session version** by 1 to sign someone out on every device without blocking them.
-- **Field Notes → Feedback:** fix the post, then tick **Handled**.
+- **./stdout → Readers:** everyone who signed in, and the same **Block** status. Raise **Session version** by 1 to sign someone out on every device without blocking them.
+- **./stdout → Feedback:** fix the post, then tick **Handled**.
 
 ## Manage media
 **Media** holds images, MP4/WebM videos and PDFs. Give every image an **Alt** text. Images get responsive sizes automatically. Replace a file from its edit page; references update. Folders are available for organisation.

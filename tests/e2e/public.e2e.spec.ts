@@ -58,10 +58,10 @@ test.describe('Public site', () => {
     expect(missing?.status()).toBe(404)
   })
 
-  test('Field Notes: channels, search, old links and draft privacy', async ({ page }) => {
+  test('./stdout: channels, search, old links and draft privacy', async ({ page }) => {
     await page.goto(`${base}/blog`)
     await expect(page).toHaveURL(/\/notes$/)
-    await expect(page.locator('h1')).toContainText('Field Notes')
+    await expect(page.locator('h1')).toContainText('./stdout')
     await expect(page.locator('.kb-nav a[aria-current="page"]')).toContainText('All posts')
     const channel = page.locator('.kb-nav-list a[href^="/notes/c/"]').first()
     if (await channel.count()) {

@@ -43,7 +43,7 @@ export async function GET() {
   const docs: SearchDoc[] = [
     { id: 'page:home', type: 'page', title: 'Home', subtitle: site.tagline, href: '/', keywords: 'home start hello intro welcome conversation' },
     { id: 'page:projects', type: 'page', title: 'Projects', subtitle: 'Things I have built and contributed to', href: '/projects', keywords: 'projects work portfolio case studies builds apps code' },
-    { id: 'page:kb', type: 'page', title: 'Field Notes', subtitle: 'Posts by channel', href: '/notes', keywords: 'Field Notes kb writing blog posts articles notes essays channels' },
+    { id: 'page:kb', type: 'page', title: './stdout', subtitle: 'Posts by channel', href: '/notes', keywords: './stdout kb writing blog posts articles notes essays channels' },
     { id: 'page:about', type: 'page', title: 'About', subtitle: join(site.currentRole, site.location), href: '/about', keywords: 'about me bio background resume cv who', body: clip(about.intro.join(' ')) },
     { id: 'page:research', type: 'page', title: 'Research', subtitle: 'Publications', href: '/research', keywords: 'research publications papers ieee conference journal' },
     { id: 'page:contact', type: 'page', title: 'Contact', subtitle: site.email, href: '/contact', keywords: 'contact email mail hire reach message touch talk' },

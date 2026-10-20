@@ -3,7 +3,7 @@ import { videoSource } from '@/utilities/videoSource'
 import { audioSource } from '@/utilities/audioSource'
 
 /**
- * Media for Field Notes posts, placed anywhere in the text: a video (YouTube, Vimeo, a direct .mp4
+ * Media for ./stdout posts, placed anywhere in the text: a video (YouTube, Vimeo, a direct .mp4
  * link or an uploaded file), audio (an uploaded file, a direct link, Spotify or SoundCloud) and a
  * photo (uploaded or linked, optionally clickable). Stored inside the post's text, so adding one
  * needs no database change.

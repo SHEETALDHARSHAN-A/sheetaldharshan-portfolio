@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { moderate } from '@/utilities/moderation'
 
-describe('Field Notes moderation', () => {
+describe('./stdout moderation', () => {
   it('publishes ordinary comments, including words that only look rude', () => {
     for (const t of ['Great explanation, thanks!', 'The cockpit analogy works.', 'I live in Essex and use Sussex data.', 'Therapist-style prompts', 'Shiitake and grapes', 'The Sunni and Shia sections', 'Is this Pakistan-specific?', 'The pundit was wrong']) {
       expect(moderate(t).action, t).toBe('publish')

@@ -3,13 +3,13 @@ import { authenticated } from '../access/authenticated'
 import { privateFields } from '../access/privateFields'
 
 /**
- * The Field Notes's visitor side: comments (threaded, with likes), reviews (1–5 stars), feedback
+ * The ./stdout's visitor side: comments (threaded, with likes), reviews (1–5 stars), feedback
  * on selected text, and the likes and channel stars themselves. Everything is created only by the
  * endpoints in src/endpoints/kb.ts, which check and moderate it first; the admin approves, hides or
  * deletes.
  */
 
-const GROUP = 'Field Notes'
+const GROUP = './stdout'
 const adminOnly = { create: () => false, read: authenticated, update: authenticated, delete: authenticated }
 
 const status: Field = {
@@ -197,7 +197,7 @@ export const Readers: CollectionConfig = {
     group: GROUP,
     useAsTitle: 'name',
     defaultColumns: ['name', 'provider', 'email', 'status', 'lastSeenAt', 'createdAt'],
-    description: 'Everyone who signed in to Field Notes. Block someone to stop them posting and hide what they wrote.',
+    description: 'Everyone who signed in to ./stdout. Block someone to stop them posting and hide what they wrote.',
     listSearchableFields: ['name', 'email', 'githubLogin'],
   },
   access: adminOnly,
@@ -255,12 +255,12 @@ export const ReaderLinks: CollectionConfig = {
 
 const KbSettingsConfig: GlobalConfig = {
   slug: 'kb-settings',
-  label: 'Field Notes settings',
-  admin: { group: GROUP, description: 'The Field Notes page wording, and what readers can do on posts.' },
+  label: './stdout settings',
+  admin: { group: GROUP, description: 'The ./stdout page wording, and what readers can do on posts.' },
   access: { read: () => true, update: authenticated },
   fields: [
-    { name: 'heading', type: 'text', defaultValue: 'Field Notes' },
-    { name: 'intro', type: 'textarea', defaultValue: 'Notes on what I build and learn: backend systems, AI agents, developer tools and databases. Pick a channel, star the ones you like, and tell me if something could be clearer.' },
+    { name: 'heading', type: 'text', defaultValue: './stdout', admin: { description: 'The page heading and the browser tab title.' } },
+    { name: 'intro', type: 'textarea', defaultValue: "What's on my screen right now: notes on what I'm reading, building and learning, written up so you can read along. Pick a channel, star the ones you like, and tell me if anything could be clearer.", admin: { description: 'The line under the heading: what this page is for.' } },
     {
       type: 'collapsible',
       label: 'What readers can do (every post)',

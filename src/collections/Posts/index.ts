@@ -51,7 +51,7 @@ export const Posts: CollectionConfig<'posts'> = {
     },
   },
   admin: {
-    group: 'Field Notes',
+    group: './stdout',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
@@ -130,7 +130,7 @@ export const Posts: CollectionConfig<'posts'> = {
               label: 'Channels',
               admin: {
                 position: 'sidebar',
-                description: 'The first one is the post\'s home channel in Field Notes.',
+                description: 'The first one is the post\'s home channel in ./stdout.',
               },
               hasMany: true,
               relationTo: 'categories',
@@ -185,7 +185,7 @@ export const Posts: CollectionConfig<'posts'> = {
       label: 'Reader interaction',
       admin: {
         position: 'sidebar',
-        description: 'For this post only. "Site default" follows Field Notes → Settings.',
+        description: 'For this post only. "Site default" follows ./stdout → Settings.',
       },
       fields: [
         {

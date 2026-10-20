@@ -11,7 +11,7 @@ import { Avatar } from './Avatar'
 const mark = (c: Pick<Channel, 'emoji'>) => (c.emoji ? <span className="kb-emoji">{c.emoji}</span> : <span className="kb-hash">#</span>)
 
 /**
- * The Field Notes sidebar, like Slack's: search, all posts, the channels you starred, then every
+ * The ./stdout sidebar, like Slack's: search, all posts, the channels you starred, then every
  * channel with its post count. On phones it becomes a row of channel chips above the posts.
  */
 export function KbNav({ channels, active, query, stars = true, signIn = true }: { channels: Channel[]; active?: string; query?: string; stars?: boolean; signIn?: boolean }) {
@@ -35,14 +35,14 @@ export function KbNav({ channels, active, query, stars = true, signIn = true }: 
     </li>
   )
   return (
-    <nav className="kb-nav" aria-label="Field Notes channels">
+    <nav className="kb-nav" aria-label="./stdout channels">
       <form action="/notes" method="get" role="search" className="kb-search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" />
         </svg>
         <label className="sr-only" htmlFor="kb-q">
-          Search the Field Notes
+          Search the ./stdout
         </label>
         <input id="kb-q" name="q" type="search" placeholder="Search" defaultValue={query ?? ''} />
       </form>

@@ -1,5 +1,5 @@
 /**
- * Checks what visitors write in the Field Notes (comments, reviews, feedback, names) before it is
+ * Checks what visitors write in the ./stdout (comments, reviews, feedback, names) before it is
  * shown. Three outcomes:
  *   - reject: slurs, threats and severe abuse. Never stored; the visitor is asked to rephrase.
  *   - hold:   general swearing, several links, shouting or spam patterns. Stored, but hidden until
@@ -7,7 +7,7 @@
  *   - publish: everything else.
  * Words are matched after undoing common disguises (f*ck, sh1t, b.i.t.c.h, fuuuck). Hindi and Tamil
  * abuse written in English letters is included. More words can be added in the admin
- * (Field Notes → Settings → Blocked words); those are rejected.
+ * (./stdout → Settings → Blocked words); those are rejected.
  */
 export type Verdict = { action: 'publish' | 'hold' | 'reject'; reason?: string }
 

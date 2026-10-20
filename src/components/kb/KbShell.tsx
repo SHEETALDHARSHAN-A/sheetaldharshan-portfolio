@@ -5,7 +5,7 @@ import { KbNav } from './KbNav'
 import { SignInDialog } from './SignIn'
 import { ReaderFab } from './ReaderFab'
 
-/** Every Field Notes page: the channel sidebar on the left, the page on the right. */
+/** Every ./stdout page: the channel sidebar on the left, the page on the right. */
 export async function KbShell({ active, query, children }: { active?: string; query?: string; children: React.ReactNode }) {
   const [channels, kb] = await Promise.all([getChannels(), getKbSettings()])
   return (

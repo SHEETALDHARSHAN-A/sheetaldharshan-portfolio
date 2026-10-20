@@ -7,7 +7,7 @@ import { safeNext } from '@/utilities/readerSession'
 import { READER_NEXT_COOKIE } from '@/utilities/readerSignIn'
 
 /**
- * Field Notes sign-in with GitHub. Uses the same Supabase GitHub app and /auth/callback as the
+ * ./stdout sign-in with GitHub. Uses the same Supabase GitHub app and /auth/callback as the
  * admin's GitHub step, so no extra setup is needed; the purpose cookie tells the callback it is a
  * reader signing in, and `next` brings them back to the post they were reading.
  */

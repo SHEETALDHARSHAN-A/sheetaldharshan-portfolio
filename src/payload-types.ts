@@ -638,7 +638,7 @@ export interface Post {
   };
   relatedPosts?: (number | Post)[] | null;
   /**
-   * The first one is the post's home channel in Field Notes.
+   * The first one is the post's home channel in ./stdout.
    */
   categories?: (number | Category)[] | null;
   /**
@@ -654,7 +654,7 @@ export interface Post {
     description?: string | null;
   };
   /**
-   * For this post only. "Site default" follows Field Notes → Settings.
+   * For this post only. "Site default" follows ./stdout → Settings.
    */
   interaction?: {
     comments?: ('default' | 'on' | 'locked' | 'off') | null;
@@ -680,7 +680,7 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Field Notes channels, like Slack channels. Readers can star them; posts pick theirs under Channels.
+ * ./stdout channels, like Slack channels. Readers can star them; posts pick theirs under Channels.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
@@ -1264,7 +1264,7 @@ export interface KbComment {
   createdAt: string;
 }
 /**
- * Everyone who signed in to Field Notes. Block someone to stop them posting and hide what they wrote.
+ * Everyone who signed in to ./stdout. Block someone to stop them posting and hide what they wrote.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "readers".
@@ -3345,14 +3345,20 @@ export interface ContactPage {
   createdAt?: string | null;
 }
 /**
- * The Field Notes page wording, and what readers can do on posts.
+ * The ./stdout page wording, and what readers can do on posts.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "kb-settings".
  */
 export interface KbSetting {
   id: number;
+  /**
+   * The page heading and the browser tab title.
+   */
   heading?: string | null;
+  /**
+   * The line under the heading: what this page is for.
+   */
   intro?: string | null;
   comments?: boolean | null;
   /**

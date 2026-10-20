@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
   return res
 }
 
-/** A Field Notes reader coming back from GitHub: signed in to comment, never to the admin. */
+/** A ./stdout reader coming back from GitHub: signed in to comment, never to the admin. */
 async function readerCallback(url: URL, next: string) {
   const supabase = await supabaseForRoute()
   const code = url.searchParams.get('code')

@@ -28,8 +28,8 @@ function page(title: string, body: string, status = 200) {
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token') ?? ''
   const link = await findLink(await getPayload({ config: configPromise }), token)
-  if (!usable(link)) return page('Link expired', `<h1>This link has expired</h1><p>Sign-in links work once, for 15 minutes. Ask for a new one on the page you were reading.</p><a class="b" href="/notes">Back to Field Notes</a>`, 410)
-  return page('Sign in', `<h1>Sign in to Field Notes</h1><p>as <strong>${esc(link.email)}</strong></p><form method="post"><input type="hidden" name="token" value="${esc(token)}"><button type="submit">Sign in</button></form>`)
+  if (!usable(link)) return page('Link expired', `<h1>This link has expired</h1><p>Sign-in links work once, for 15 minutes. Ask for a new one on the page you were reading.</p><a class="b" href="/notes">Back to ./stdout</a>`, 410)
+  return page('Sign in', `<h1>Sign in to ./stdout</h1><p>as <strong>${esc(link.email)}</strong></p><form method="post"><input type="hidden" name="token" value="${esc(token)}"><button type="submit">Sign in</button></form>`)
 }
 
 export async function POST(request: NextRequest) {

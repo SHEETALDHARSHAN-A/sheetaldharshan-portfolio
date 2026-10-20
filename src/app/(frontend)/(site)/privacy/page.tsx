@@ -21,7 +21,7 @@ export default async function PrivacyPage() {
           <h2>The short version</h2>
           <ul>
             <li>You can read everything here without an account, and nothing tracks you: there are no analytics, ads or tracking cookies.</li>
-            <li>I only keep what you choose to send: a message on the Contact page, or a comment, rating or feedback in Field Notes.</li>
+            <li>I only keep what you choose to send: a message on the Contact page, or a comment, rating or feedback in ./stdout.</li>
             <li>Your email address is never shown publicly or shared, and is never used for newsletters or marketing.</li>
             <li>Signed-in readers can download or delete their data any time from <Link href="/notes/me">their page</Link>.</li>
           </ul>
@@ -31,14 +31,14 @@ export default async function PrivacyPage() {
           <p>
             The name, email, optional phone number, topic and message you send. They are stored so I can read and answer your message, and emailed to me as an alert. I keep them only as long as I need them to reply.
           </p>
-          <h3>Field Notes accounts</h3>
+          <h3>./stdout accounts</h3>
           <p>
             If you sign in with <strong>GitHub</strong>, I receive your GitHub name, username, profile picture and the email GitHub shares. If you sign in with an <strong>email link</strong>, I keep your email address and the name you choose. Your name and picture are shown next to what you write; GitHub
             accounts show a verified tick and link to your GitHub profile. Your email is never shown.
           </p>
           <h3>Comments, ratings, likes, stars, reports and feedback</h3>
           <p>
-            What you write and do in Field Notes is stored with the post it belongs to and shown as described on the page. Anonymous comments carry no name. Feedback on selected text and reports are private: only I see them.
+            What you write and do in ./stdout is stored with the post it belongs to and shown as described on the page. Anonymous comments carry no name. Feedback on selected text and reports are private: only I see them.
           </p>
           <h3>Abuse prevention</h3>
           <p>
@@ -49,7 +49,7 @@ export default async function PrivacyPage() {
           <h2>Cookies and local storage</h2>
           <ul>
             <li>
-              <code>reader_session</code>: keeps you signed in to Field Notes for up to 30 days. Set only when you sign in; secure and not readable by scripts.
+              <code>reader_session</code>: keeps you signed in to ./stdout for up to 30 days. Set only when you sign in; secure and not readable by scripts.
             </li>
             <li>Admin cookies: only for me, in the admin.</li>
             <li>Your browser&apos;s local storage remembers small display choices on this device (light or dark theme, panel widths, chat or form). They never leave your browser.</li>
