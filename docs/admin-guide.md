@@ -139,6 +139,19 @@ Each **post** can override comments, ratings, likes and feedback in its sidebar 
 - **On** and **Off** override it for that post.
 - For comments, **Locked** keeps existing comments visible but closes the post to new ones.
 
+### The side column and empty pages
+**./stdout → Settings → Side column** sets every label in the right-hand column:
+- The search placeholder, and the Browse, All posts, Channels, readers' own channels and account headings.
+- The New channel button and its placeholder, the hint for readers without channels, the sign-in link text, and the Privacy link.
+
+It also sets how the tree behaves:
+- **Sections open at first:** which sections start open. Readers can still fold any of them, and their choice is remembered.
+- **Open the current channel by itself.**
+- **Show post counts.**
+- **Posts listed under each channel:** 0 turns the fold-out lists off.
+
+**Empty pages and labels** sets the terminal-style lines shown when there is nothing to list (no posts, a search with no results, an empty channel), plus the small labels above the headings. Empty fields use the defaults, which are shown greyed out in each field.
+
 ### Moderation and blocking
 Comments and reviews are checked before they show:
 - **Refused outright:** slurs, threats and severe abuse, in English or in Hindi/Tamil written in English letters. Disguised spellings (`f*ck`, `sh1t`, `b.i.t.c.h`) are caught too, and the writer is asked to rephrase.

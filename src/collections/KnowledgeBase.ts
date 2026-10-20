@@ -1,6 +1,7 @@
 import type { CollectionConfig, Field, GlobalConfig } from 'payload'
 import { authenticated } from '../access/authenticated'
 import { privateFields } from '../access/privateFields'
+import { EMPTY_DEFAULTS, SIDE_DEFAULTS } from '../utilities/kbText'
 
 /**
  * The ./stdout's visitor side: comments (threaded, with likes), reviews (1–5 stars), feedback
@@ -333,6 +334,97 @@ const KbSettingsConfig: GlobalConfig = {
         { label: 'Hold everything until I approve it', value: 'all' },
       ],
       admin: { description: 'Slurs, threats and abuse are always refused. Swearing, several links, all capitals and spam patterns are held for you.' },
+    },
+    {
+      name: 'side',
+      type: 'group',
+      label: 'Side column',
+      admin: { description: 'The column on the right of ./stdout pages (search, sections and channels that fold open). Empty fields use the default shown.' },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'searchPlaceholder', type: 'text', label: 'Search placeholder', admin: { width: '50%', placeholder: SIDE_DEFAULTS.searchPlaceholder } },
+            { name: 'privacy', type: 'text', label: 'Privacy link', admin: { width: '50%', placeholder: SIDE_DEFAULTS.privacy } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'browse', type: 'text', label: 'Browse heading', admin: { width: '33%', placeholder: SIDE_DEFAULTS.browse } },
+            { name: 'allPosts', type: 'text', label: 'All posts', admin: { width: '33%', placeholder: SIDE_DEFAULTS.allPosts } },
+            { name: 'channels', type: 'text', label: 'Channels heading', admin: { width: '34%', placeholder: SIDE_DEFAULTS.channels } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'yourChannels', type: 'text', label: "Readers' own channels heading", admin: { width: '33%', placeholder: SIDE_DEFAULTS.yourChannels } },
+            { name: 'newChannel', type: 'text', label: 'New channel button', admin: { width: '33%', placeholder: SIDE_DEFAULTS.newChannel } },
+            { name: 'newChannelPlaceholder', type: 'text', label: 'New channel placeholder', admin: { width: '34%', placeholder: SIDE_DEFAULTS.newChannelPlaceholder } },
+          ],
+        },
+        { name: 'mineHint', type: 'text', label: 'Hint when a reader has no channels', admin: { placeholder: SIDE_DEFAULTS.mineHint } },
+        {
+          type: 'row',
+          fields: [
+            { name: 'you', type: 'text', label: 'Account heading', admin: { width: '25%', placeholder: SIDE_DEFAULTS.you } },
+            { name: 'signIn', type: 'text', label: 'Sign-in link', admin: { width: '25%', placeholder: SIDE_DEFAULTS.signIn } },
+            { name: 'signInRest', type: 'text', label: 'After the sign-in link', admin: { width: '50%', placeholder: SIDE_DEFAULTS.signInRest } },
+          ],
+        },
+        {
+          name: 'openSections',
+          type: 'select',
+          hasMany: true,
+          label: 'Sections open at first',
+          defaultValue: SIDE_DEFAULTS.openSections,
+          options: [
+            { label: 'Browse', value: 'browse' },
+            { label: "Readers' own channels", value: 'mine' },
+            { label: 'Channels', value: 'channels' },
+            { label: 'Account', value: 'you' },
+          ],
+          admin: { description: 'Readers can still fold or unfold each one; their choice is remembered on their device.' },
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'openCurrent', type: 'checkbox', label: 'Open the current channel by itself', defaultValue: true, admin: { width: '35%' } },
+            { name: 'showCounts', type: 'checkbox', label: 'Show post counts', defaultValue: true, admin: { width: '25%' } },
+            { name: 'itemsPerChannel', type: 'number', label: 'Posts listed under each channel', defaultValue: SIDE_DEFAULTS.itemsPerChannel, min: 0, max: 200, admin: { width: '40%', description: '0 hides the posts, so channels do not fold open.' } },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'empty',
+      type: 'group',
+      label: 'Empty pages and labels',
+      admin: { description: 'What shows when there is nothing to list, said like a terminal. Empty fields use the default shown.' },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'indexCommand', type: 'text', label: 'No posts: command', admin: { width: '40%', placeholder: EMPTY_DEFAULTS.indexCommand } },
+            { name: 'indexLine', type: 'text', label: 'No posts: reply', admin: { width: '60%', placeholder: EMPTY_DEFAULTS.indexLine } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'searchLine', type: 'text', label: 'Search found nothing', admin: { width: '50%', placeholder: EMPTY_DEFAULTS.searchLine } },
+            { name: 'channelLine', type: 'text', label: 'Empty channel', admin: { width: '50%', placeholder: EMPTY_DEFAULTS.channelLine } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'indexEyebrow', type: 'text', label: 'Small label above the heading', admin: { width: '50%', placeholder: EMPTY_DEFAULTS.indexEyebrow } },
+            { name: 'channelEyebrow', type: 'text', label: 'Small label on channel pages', admin: { width: '50%', placeholder: EMPTY_DEFAULTS.channelEyebrow, description: 'Shown after the page heading, e.g. "./stdout · channel".' } },
+          ],
+        },
+      ],
     },
     { name: 'blockedWords', type: 'textarea', label: 'Blocked words', admin: { description: 'Extra words to refuse, one per line or comma-separated. Disguises like f*ck or sh1t are caught too.' } },
   ],

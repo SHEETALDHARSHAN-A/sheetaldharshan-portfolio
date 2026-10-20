@@ -1139,6 +1139,8 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-card-stats i { font-style: normal; color: var(--faint); }
 
 .kb-side-chips { display: grid; gap: 22px; }
+/* Line the column up with the page heading (below its small label), search box centred on it. */
+@media (min-width: 1201px) { .kb-side { margin-top: calc(32px * var(--space, 1) + 8px); } }
 .kb-side { display: grid; gap: 22px; position: sticky; top: 30px; animation: el-in 480ms var(--ease-out) 120ms both; }
 .kb-side-sec h2 { font-family: var(--font-condensed); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin: 0 0 6px; }
 .kb-side-list { list-style: none; margin: 0; padding: 0; }

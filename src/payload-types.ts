@@ -3426,6 +3426,47 @@ export interface KbSetting {
    */
   moderation?: ('auto' | 'anonymous' | 'all') | null;
   /**
+   * The column on the right of ./stdout pages (search, sections and channels that fold open). Empty fields use the default shown.
+   */
+  side?: {
+    searchPlaceholder?: string | null;
+    privacy?: string | null;
+    browse?: string | null;
+    allPosts?: string | null;
+    channels?: string | null;
+    yourChannels?: string | null;
+    newChannel?: string | null;
+    newChannelPlaceholder?: string | null;
+    mineHint?: string | null;
+    you?: string | null;
+    signIn?: string | null;
+    signInRest?: string | null;
+    /**
+     * Readers can still fold or unfold each one; their choice is remembered on their device.
+     */
+    openSections?: ('browse' | 'mine' | 'channels' | 'you')[] | null;
+    openCurrent?: boolean | null;
+    showCounts?: boolean | null;
+    /**
+     * 0 hides the posts, so channels do not fold open.
+     */
+    itemsPerChannel?: number | null;
+  };
+  /**
+   * What shows when there is nothing to list, said like a terminal. Empty fields use the default shown.
+   */
+  empty?: {
+    indexCommand?: string | null;
+    indexLine?: string | null;
+    searchLine?: string | null;
+    channelLine?: string | null;
+    indexEyebrow?: string | null;
+    /**
+     * Shown after the page heading, e.g. "./stdout · channel".
+     */
+    channelEyebrow?: string | null;
+  };
+  /**
    * Extra words to refuse, one per line or comma-separated. Disguises like f*ck or sh1t are caught too.
    */
   blockedWords?: string | null;
@@ -3795,6 +3836,36 @@ export interface KbSettingsSelect<T extends boolean = true> {
   signIn?: T;
   notify?: T;
   moderation?: T;
+  side?:
+    | T
+    | {
+        searchPlaceholder?: T;
+        privacy?: T;
+        browse?: T;
+        allPosts?: T;
+        channels?: T;
+        yourChannels?: T;
+        newChannel?: T;
+        newChannelPlaceholder?: T;
+        mineHint?: T;
+        you?: T;
+        signIn?: T;
+        signInRest?: T;
+        openSections?: T;
+        openCurrent?: T;
+        showCounts?: T;
+        itemsPerChannel?: T;
+      };
+  empty?:
+    | T
+    | {
+        indexCommand?: T;
+        indexLine?: T;
+        searchLine?: T;
+        channelLine?: T;
+        indexEyebrow?: T;
+        channelEyebrow?: T;
+      };
   blockedWords?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -28,14 +28,14 @@ export default async function ChannelPage({ params }: Props) {
     <KbShell
       active={c.slug}
       head={
-        <KbHead eyebrow={`${kb.heading} · channel`} title={`${c.emoji ?? '#'} ${c.title}`} intro={c.description || `${c.posts} post${c.posts === 1 ? '' : 's'} in this channel.`}>
+        <KbHead eyebrow={`${kb.heading} · ${kb.empty.channelEyebrow}`} title={`${c.emoji ?? '#'} ${c.title}`} intro={c.description || `${c.posts} post${c.posts === 1 ? '' : 's'} in this channel.`}>
           {kb.rules.stars ? <StarButton id={c.id} title={c.title} /> : null}
         </KbHead>
       }
     >
       <JsonLd data={breadcrumbSchema(site, [{ name: kb.heading, path: '/notes' }, { name: `#${c.title}`, path: `/notes/c/${c.slug}` }])} />
       {posts.length === 0 ? (
-        <KbEmpty command={`ls ./stdout/${c.slug}`} lines={['(empty: nothing here yet)']} />
+        <KbEmpty command={`ls ./stdout/${c.slug}`} lines={[kb.empty.channelLine]} />
       ) : (
         <div className="kb-cards">
           {posts.map((post) => (

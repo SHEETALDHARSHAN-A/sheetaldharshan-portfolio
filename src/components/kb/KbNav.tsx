@@ -11,6 +11,7 @@ import { listActions, listError, useLists } from './lists'
 import { askToSignIn, useReader } from './reader'
 import { StarIcon } from './StarButton'
 import { reloadStars, useStars } from './stars'
+import { SIDE_DEFAULTS, type KbSide } from '@/utilities/kbText'
 
 type Child = { key: string | number; slug: string; title: string }
 
@@ -27,12 +28,12 @@ function readFolds(): Record<string, boolean> {
 type Fold = { isOpen: (key: string, byDefault: boolean) => boolean; flip: (key: string, byDefault: boolean) => void }
 
 /** A section heading that folds its contents. */
-function Section({ fold, id, title, className, children }: { fold: Fold; id: string; title: string; className?: string; children: React.ReactNode }) {
-  const open = fold.isOpen(`s:${id}`, true)
+function Section({ fold, id, title, className, openByDefault = true, children }: { fold: Fold; id: string; title: string; className?: string; openByDefault?: boolean; children: React.ReactNode }) {
+  const open = fold.isOpen(`s:${id}`, openByDefault)
   return (
     <section className={`kb-side-sec${className ? ` ${className}` : ''}`} data-folded={open ? undefined : true}>
       <h2>
-        <button type="button" className="kb-sec-toggle" aria-expanded={open} onClick={() => fold.flip(`s:${id}`, true)}>
+        <button type="button" className="kb-sec-toggle" aria-expanded={open} onClick={() => fold.flip(`s:${id}`, openByDefault)}>
           <ChevronRight aria-hidden="true" className="kb-chev" />
           {title}
         </button>
@@ -45,13 +46,14 @@ function Section({ fold, id, title, className, children }: { fold: Fold; id: str
 }
 
 /** One parent row (a channel), with its children (posts) folded beneath it. */
-function Parent({ fold, activePost, id, href, mark, label, count, current, items, after }: { fold: Fold; activePost?: string; id: string; href: string; mark: string; label: string; count: number; current: boolean; items: Child[]; after?: React.ReactNode }) {
-  const open = items.length > 0 && fold.isOpen(`c:${id}`, current)
+function Parent({ fold, activePost, id, href, mark, label, count, current, openCurrent = true, showCount = true, items, after }: { fold: Fold; activePost?: string; id: string; href: string; mark: string; label: string; count: number; current: boolean; openCurrent?: boolean; showCount?: boolean; items: Child[]; after?: React.ReactNode }) {
+  const byDefault = current && openCurrent
+  const open = items.length > 0 && fold.isOpen(`c:${id}`, byDefault)
   return (
     <li className="kb-side-item" data-open={open || undefined}>
       <div className="kb-parent">
         {items.length ? (
-          <button type="button" className="kb-twisty" aria-expanded={open} aria-label={`${open ? 'Fold' : 'Show'} posts in ${label}`} onClick={() => fold.flip(`c:${id}`, current)}>
+          <button type="button" className="kb-twisty" aria-expanded={open} aria-label={`${open ? 'Fold' : 'Show'} posts in ${label}`} onClick={() => fold.flip(`c:${id}`, byDefault)}>
             <ChevronRight aria-hidden="true" className="kb-chev" />
           </button>
         ) : (
@@ -60,7 +62,7 @@ function Parent({ fold, activePost, id, href, mark, label, count, current, items
         <Link href={href} className="kb-side-row" aria-current={current ? 'page' : undefined}>
           <span className="kb-hash">{mark}</span>
           <span className="kb-side-name">{label}</span>
-          <span className="kb-side-count">{count}</span>
+          {showCount ? <span className="kb-side-count">{count}</span> : null}
         </Link>
         {after}
       </div>
@@ -85,7 +87,9 @@ function Parent({ fold, activePost, id, href, mark, label, count, current, items
  * channel you're in opens by itself, with the current post marked. On narrower screens the column
  * turns into search plus a row of channel chips (the tree is folded away there).
  */
-export function KbNav({ channels, active, activePost, query, stars = true, signIn = true }: { channels: Channel[]; active?: string; activePost?: string; query?: string; stars?: boolean; signIn?: boolean }) {
+export function KbNav({ channels, active, activePost, query, stars = true, signIn = true, side = SIDE_DEFAULTS }: { channels: Channel[]; active?: string; activePost?: string; query?: string; stars?: boolean; signIn?: boolean; side?: KbSide }) {
+  const t = side
+  const opens = (id: KbSide['openSections'][number]) => t.openSections.includes(id)
   const { counts, mine, toggle } = useStars()
   const { reader, ready, signOut } = useReader()
   const lists = useLists(reader?.id)
@@ -138,7 +142,9 @@ export function KbNav({ channels, active, activePost, query, stars = true, signI
       label={c.title}
       count={c.posts}
       current={active === c.slug}
-      items={c.items.map((p) => ({ key: p.slug, ...p }))}
+      openCurrent={t.openCurrent}
+      showCount={t.showCounts}
+      items={c.items.slice(0, t.itemsPerChannel).map((p) => ({ key: p.slug, ...p }))}
       after={
         stars ? (
           <button type="button" className="kb-side-star" aria-pressed={mine.includes(c.id)} aria-label={`${mine.includes(c.id) ? 'Unstar' : 'Star'} #${c.title}`} title={counts[c.id] ? `${counts[c.id]} star${counts[c.id] === 1 ? '' : 's'}` : 'Star'} onClick={() => void toggle(c.id)}>
@@ -161,18 +167,18 @@ export function KbNav({ channels, active, activePost, query, stars = true, signI
         <label className="sr-only" htmlFor="kb-q">
           Search ./stdout
         </label>
-        <input id="kb-q" name="q" type="search" placeholder="Search notes" defaultValue={query ?? ''} />
+        <input id="kb-q" name="q" type="search" placeholder={t.searchPlaceholder} defaultValue={query ?? ''} />
       </form>
 
       <div className="kb-side-chips" ref={chips}>
-        <Section fold={fold} id="browse" title="Browse">
+        <Section fold={fold} id="browse" title={t.browse} openByDefault={opens('browse')}>
           <ul className="kb-side-list">
             <li className="kb-side-item">
               <div className="kb-parent">
                 <span className="kb-twisty" aria-hidden="true" />
                 <Link href="/notes" className="kb-side-row" aria-current={active === 'all' ? 'page' : undefined}>
                   <span className="kb-hash">≡</span>
-                  <span className="kb-side-name">All posts</span>
+                  <span className="kb-side-name">{t.allPosts}</span>
                 </Link>
               </div>
             </li>
@@ -181,7 +187,7 @@ export function KbNav({ channels, active, activePost, query, stars = true, signI
         </Section>
 
         {ready && signIn && reader ? (
-          <Section fold={fold} id="mine" title="Your channels" className="kb-side-mine">
+          <Section fold={fold} id="mine" title={t.yourChannels} className="kb-side-mine" openByDefault={opens('mine')}>
             <ul className="kb-side-list">
               {lists.map((l) => (
                 <Parent
@@ -194,7 +200,9 @@ export function KbNav({ channels, active, activePost, query, stars = true, signI
                   label={l.name}
                   count={l.count}
                   current={active === `saved-${l.id}`}
-                  items={(l.items ?? []).map((p) => ({ key: p.id, slug: p.slug, title: p.title }))}
+                  openCurrent={t.openCurrent}
+                  showCount={t.showCounts}
+                  items={(l.items ?? []).slice(0, t.itemsPerChannel).map((p) => ({ key: p.id, slug: p.slug, title: p.title }))}
                 />
               ))}
             </ul>
@@ -210,7 +218,7 @@ export function KbNav({ channels, active, activePost, query, stars = true, signI
                   setListErr('')
                 }}
               >
-                <input value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={60} placeholder="Channel name" aria-label="New channel name" autoFocus />
+                <input value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={60} placeholder={t.newChannelPlaceholder} aria-label="New channel name" autoFocus />
                 <button type="submit" className="kb-link" disabled={!newName.trim()}>
                   Create
                 </button>
@@ -220,23 +228,23 @@ export function KbNav({ channels, active, activePost, query, stars = true, signI
               </form>
             ) : (
               <button type="button" className="kb-link kb-side-add" onClick={() => setAdding(true)}>
-                + New channel
+                {t.newChannel}
               </button>
             )}
             {listErr ? <p className="kb-error">{listErr}</p> : null}
-            {!lists.length && !adding ? <p className="kb-side-hint">Save posts into your own channels with the Save button on any post.</p> : null}
+            {!lists.length && !adding ? <p className="kb-side-hint">{t.mineHint}</p> : null}
           </Section>
         ) : null}
 
         {channels.length > 0 ? (
-          <Section fold={fold} id="channels" title="Channels">
+          <Section fold={fold} id="channels" title={t.channels} openByDefault={opens('channels')}>
             <ul className="kb-side-list">{channels.map((c) => channelRow(c, `c-${c.id}`))}</ul>
           </Section>
         ) : null}
       </div>
 
       {ready && signIn ? (
-        <Section fold={fold} id="you" title="You" className="kb-side-you">
+        <Section fold={fold} id="you" title={t.you} className="kb-side-you" openByDefault={opens('you')}>
           {reader ? (
             <div className="kb-you">
               <Avatar name={reader.name} src={reader.avatar} size={30} />
@@ -251,15 +259,15 @@ export function KbNav({ channels, active, activePost, query, stars = true, signI
           ) : (
             <p className="kb-you-out">
               <button type="button" className="kb-link" onClick={() => askToSignIn()}>
-                Sign in
+                {t.signIn}
               </button>{' '}
-              to comment, like and star channels.
+              {t.signInRest}
             </p>
           )}
         </Section>
       ) : null}
       <Link href="/privacy" className="kb-privacy">
-        Privacy
+        {t.privacy}
       </Link>
     </aside>
   )

@@ -21,7 +21,7 @@ export async function KbShell({ head, active, activePost, query, children }: { h
             {head}
             {children}
           </div>
-          <KbNav channels={channels} active={active} activePost={activePost} query={query} stars={kb.rules.stars} signIn={kb.rules.signIn} />
+          <KbNav channels={channels} active={active} activePost={activePost} query={query} stars={kb.rules.stars} signIn={kb.rules.signIn} side={kb.side} />
         </div>
         <Suspense fallback={null}>
           <SignInDialog />

@@ -4,6 +4,7 @@ import configPromise from '@payload-config'
 import { getPayload, type Payload, type Where } from 'payload'
 
 import { siteRules, type SiteRules } from '@/utilities/kbRules'
+import { toKbEmpty, toKbSide, type KbEmptyText, type KbSide } from '@/utilities/kbText'
 import type { About as AboutDoc, Category, Post as PostDoc, Project as ProjectDoc } from '@/payload-types'
 import { toMediaRef } from '@/data/media'
 import {
@@ -39,7 +40,7 @@ async function isDraft(): Promise<boolean> {
 
 const defaultNav: NavItem[] = [
   { label: 'Projects', href: '/projects' },
-  { label: './stdout', href: '/notes' },
+  { label: './StdOut', href: '/notes' },
   { label: 'Research', href: '/research' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
@@ -326,12 +327,14 @@ export const getChannels = cache(async (): Promise<Channel[]> => {
     })
 })
 
-export type KbSettings = { heading: string; intro: string; rules: SiteRules }
+export type KbSettings = { heading: string; intro: string; rules: SiteRules; side: KbSide; empty: KbEmptyText }
 export const getKbSettings = cache(async (): Promise<KbSettings> => {
   const payload = await getClient()
   const g = (await payload.findGlobal({ slug: 'kb-settings', depth: 0 }).catch(dbFailed)) as unknown as ({ heading?: string; intro?: string } & Record<string, unknown>) | undefined
   return {
     rules: siteRules(g),
+    side: toKbSide(g),
+    empty: toKbEmpty(g),
     heading: g?.heading || './stdout',
     intro: g?.intro || "What I'm reading, building and learning, written up as I go.",
   }

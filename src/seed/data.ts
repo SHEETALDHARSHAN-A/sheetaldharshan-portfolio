@@ -17,7 +17,7 @@ export const homepageMessages: { content: string; style: string; choices?: { lab
 export const navigation = {
   items: [
     { label: 'Projects', href: '/projects', visible: true },
-    { label: './stdout', href: '/notes', visible: true },
+    { label: './StdOut', href: '/notes', visible: true },
     { label: 'Research', href: '/research', visible: true },
     { label: 'About', href: '/about', visible: true },
     { label: 'Contact', href: '/contact', visible: true },
