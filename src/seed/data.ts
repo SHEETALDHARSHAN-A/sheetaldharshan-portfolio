@@ -18,8 +18,8 @@ export const navigation = {
   items: [
     { label: 'Projects', href: '/projects', visible: true },
     { label: './StdOut', href: '/notes', visible: true },
-    { label: 'Research', href: '/research', visible: true },
     { label: 'About', href: '/about', visible: true },
+    { label: 'Research', href: '/research', visible: true },
     { label: 'Contact', href: '/contact', visible: true },
   ],
   footerLinks: [] as { label: string; href: string }[],

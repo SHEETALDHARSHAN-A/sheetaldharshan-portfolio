@@ -41,8 +41,8 @@ async function isDraft(): Promise<boolean> {
 const defaultNav: NavItem[] = [
   { label: 'Projects', href: '/projects' },
   { label: './StdOut', href: '/notes' },
-  { label: 'Research', href: '/research' },
   { label: 'About', href: '/about' },
+  { label: 'Research', href: '/research' },
   { label: 'Contact', href: '/contact' },
 ]
 

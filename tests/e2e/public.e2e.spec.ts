@@ -62,8 +62,9 @@ test.describe('Public site', () => {
     await page.goto(`${base}/blog`)
     await expect(page).toHaveURL(/\/notes$/)
     await expect(page.locator('h1')).toContainText('./stdout')
-    await expect(page.locator('.kb-side a[aria-current="page"]')).toContainText('All posts')
-    const channel = page.locator('.kb-side a[href^="/notes/c/"]').first()
+    const side = page.locator('.kb-layout > .kb-side')
+    await expect(side.locator('a[aria-current="page"]')).toContainText('All posts')
+    const channel = side.locator('a[href^="/notes/c/"]').first()
     if (await channel.count()) {
       const name = (await channel.locator('.kb-side-name').innerText()).trim()
       await channel.click()

@@ -45,7 +45,7 @@ export function KbSideResizer() {
         handle.setPointerCapture(e.pointerId)
         const right = aside.getBoundingClientRect().right
         let width = aside.getBoundingClientRect().width
-        document.documentElement.dataset.resizing = 'true'
+        document.documentElement.dataset.resizing = 'kb'
         const move = (ev: PointerEvent) => {
           width = Math.round(Math.min(MAX, Math.max(MIN, right - ev.clientX)))
           setWidth(width)

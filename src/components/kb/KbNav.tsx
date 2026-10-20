@@ -2,6 +2,7 @@
 
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import type { Channel } from '@/data/types'
 import { VerifiedTick } from './Author'
@@ -87,7 +88,17 @@ function Parent({ fold, activePost, id, href, mark, label, count, current, openC
  * channel you're in opens by itself, with the current post marked. On narrower screens the column
  * turns into search plus a row of channel chips (the tree is folded away there).
  */
-export function KbNav({ channels, active, activePost, query, stars = true, signIn = true, side = SIDE_DEFAULTS }: { channels: Channel[]; active?: string; activePost?: string; query?: string; stars?: boolean; signIn?: boolean; side?: KbSide }) {
+export function KbNav({ channels, stars = true, signIn = true, side = SIDE_DEFAULTS, variant = 'column' }: { channels: Channel[]; stars?: boolean; signIn?: boolean; side?: KbSide; variant?: 'column' | 'bar' }) {
+  const qid = variant === 'bar' ? 'kb-q-bar' : 'kb-q'
+  // Where we are, read from the address, since this column stays mounted between pages.
+  const pathname = usePathname()
+  const params = useSearchParams()
+  const router = useRouter()
+  const query = params.get('q') ?? undefined
+  const seg = pathname.split('/').filter(Boolean) // ['notes', …]
+  const activePost = seg.length === 2 && !['me'].includes(seg[1]) ? seg[1] : undefined
+  const active =
+    seg[1] === 'c' ? seg[2] : seg[1] === 'saved' ? `saved-${seg[2]}` : activePost ? channels.find((c) => c.items.some((p) => p.slug === activePost))?.slug : seg.length === 1 && !query ? 'all' : undefined
   const t = side
   const opens = (id: KbSide['openSections'][number]) => t.openSections.includes(id)
   const { counts, mine, toggle } = useStars()
@@ -159,15 +170,26 @@ export function KbNav({ channels, active, activePost, query, stars = true, signI
   return (
     <aside className="kb-side" aria-label="./stdout channels">
       <KbSideResizer />
-      <form action="/notes" method="get" role="search" className="kb-search">
+      <form
+        action="/notes"
+        method="get"
+        role="search"
+        className="kb-search"
+        onSubmit={(e) => {
+          // Navigate in place, so this column stays put; without JavaScript the form still works.
+          e.preventDefault()
+          const q = String(new FormData(e.currentTarget).get('q') ?? '').trim()
+          router.push(q ? `/notes?q=${encodeURIComponent(q)}` : '/notes')
+        }}
+      >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" />
         </svg>
-        <label className="sr-only" htmlFor="kb-q">
+        <label className="sr-only" htmlFor={qid}>
           Search ./stdout
         </label>
-        <input id="kb-q" name="q" type="search" placeholder={t.searchPlaceholder} defaultValue={query ?? ''} />
+        <input key={query ?? ''} id={qid} name="q" type="search" placeholder={t.searchPlaceholder} defaultValue={query ?? ''} />
       </form>
 
       <div className="kb-side-chips" ref={chips}>

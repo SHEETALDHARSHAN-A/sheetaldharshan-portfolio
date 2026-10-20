@@ -40,7 +40,7 @@ export default async function KbPostPage({ params }: Props) {
   const rules = postRules(kb.rules, post.interaction)
 
   return (
-    <KbShell active={post.channel?.slug} activePost={post.slug}>
+    <KbShell>
       {draft && <LivePreviewListener />}
       <JsonLd
         data={{

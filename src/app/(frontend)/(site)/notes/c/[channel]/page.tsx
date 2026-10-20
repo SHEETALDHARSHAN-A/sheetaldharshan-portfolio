@@ -26,7 +26,6 @@ export default async function ChannelPage({ params }: Props) {
 
   return (
     <KbShell
-      active={c.slug}
       head={
         <KbHead eyebrow={`${kb.heading} · ${kb.empty.channelEyebrow}`} title={`${c.emoji ?? '#'} ${c.title}`} intro={c.description || `${c.posts} post${c.posts === 1 ? '' : 's'} in this channel.`}>
           {kb.rules.stars ? <StarButton id={c.id} title={c.title} /> : null}

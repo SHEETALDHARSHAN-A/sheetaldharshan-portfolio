@@ -10,7 +10,7 @@ type Props = { params: Promise<{ id: string }> }
 export default async function SavedChannelPage({ params }: Props) {
   const { id } = await params
   return (
-    <KbShell active={`saved-${id}`}>
+    <KbShell>
       <YourChannel id={id} />
     </KbShell>
   )

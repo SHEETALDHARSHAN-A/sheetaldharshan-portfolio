@@ -18,7 +18,7 @@ export default async function StdoutPage({ searchParams }: Props) {
   const [kb, posts, stats] = await Promise.all([getKbSettings(), getPosts({ query }), getPostStats()])
 
   return (
-    <KbShell active={query ? undefined : 'all'} query={query} head={<KbHead eyebrow={query ? 'Search' : kb.empty.indexEyebrow} title={kb.heading} lowercase intro={query ? `Posts matching “${query}”.` : kb.intro} />}>
+    <KbShell head={<KbHead eyebrow={query ? 'Search' : kb.empty.indexEyebrow} title={kb.heading} lowercase intro={query ? `Posts matching “${query}”.` : kb.intro} />}>
       {posts.length === 0 ? (
         query ? (
           <KbEmpty command={`grep -ri "${query}" ./stdout`} lines={[kb.empty.searchLine]} />

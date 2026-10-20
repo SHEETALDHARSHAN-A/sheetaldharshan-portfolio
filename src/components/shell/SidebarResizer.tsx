@@ -30,7 +30,7 @@ export function SidebarResizer() {
         handle.setPointerCapture(e.pointerId)
         const left = sidebar.getBoundingClientRect().left
         let width = sidebar.getBoundingClientRect().width
-        document.documentElement.dataset.resizing = 'true'
+        document.documentElement.dataset.resizing = 'sidebar'
         const move = (ev: PointerEvent) => {
           width = Math.round(Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, ev.clientX - left)))
           setWidth(width)

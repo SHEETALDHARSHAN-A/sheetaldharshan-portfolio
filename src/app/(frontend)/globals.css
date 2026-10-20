@@ -340,7 +340,7 @@ button.activity-logo:focus-visible { outline: 2px solid var(--accent); outline-o
 /* Drag handle on the sidebar's right edge. */
 .sidebar-resizer { position: absolute; top: 0; right: -4px; bottom: 0; width: 8px; z-index: 5; cursor: col-resize; touch-action: none; }
 .sidebar-resizer::after { content: ''; position: absolute; top: 0; bottom: 0; left: 3px; width: 2px; background: transparent; transition: background 150ms ease; }
-.sidebar-resizer:hover::after, html[data-resizing] .sidebar-resizer::after { background: var(--accent); }
+.sidebar-resizer:hover::after, html[data-resizing='sidebar'] .sidebar-resizer::after { background: var(--accent); }
 html[data-resizing], html[data-resizing] * { cursor: col-resize !important; user-select: none !important; }
 /* Visitor light/dark switch (Magic UI Animated Theme Toggler), at the bottom of the sidebar. */
 .theme-toggle { display: inline-grid; place-items: center; width: 20px; height: 20px; margin: -3px 0; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; transition: color 160ms ease, transform 200ms ease; }
@@ -639,11 +639,12 @@ html[data-navigated] .sidebar .wordmark, html[data-navigated] .sidebar-nav a, ht
 .about-head, .about-main { grid-column: 1; }
 /* Hide / show the right-hand column (AsideToggle): the text then takes the full width. */
 .about { position: relative; transition: grid-template-columns 360ms var(--ease-out), column-gap 360ms var(--ease-out); }
-html[data-resizing] .about { transition: none; }
+html[data-resizing='about'] .about { transition: none; }
+html[data-resizing='kb'] .kb-layout { transition: none; }
 /* The divider on the photo column's left edge: drag to resize, grip to hide (AsideResizer). */
 .aside-resizer { position: absolute; top: 0; bottom: 0; left: calc(clamp(24px, 4vw, 60px) / -2 - 6px); width: 12px; z-index: 5; cursor: col-resize; touch-action: none; display: grid; place-items: center; }
 .aside-resizer::before { content: ''; position: absolute; top: 8%; bottom: 8%; left: 5px; width: 2px; border-radius: 2px; background: transparent; transition: background 150ms ease; }
-.aside-resizer:hover::before, html[data-resizing] .aside-resizer::before { background: var(--line-strong); }
+.aside-resizer:hover::before, html[data-resizing='about'] .about .aside-resizer::before, html[data-resizing='kb'] .kb-side-resizer::before { background: var(--line-strong); }
 .aside-grip { position: relative; display: grid; place-items: center; width: 18px; height: 40px; padding: 0; border: 0; border-radius: 999px; background: var(--surface); color: var(--muted); cursor: pointer; opacity: 0.55; transition: opacity 150ms ease, color 150ms ease; }
 .aside-resizer:hover .aside-grip, .aside-grip:focus-visible { opacity: 1; color: var(--text); }
 .aside-grip svg { width: 14px; height: 14px; }
@@ -1180,7 +1181,7 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
   .kb-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; max-width: 900px; }
   .kb-head { max-width: 900px; }
   /* Search on its own row, then the channels as one row of chips that scrolls sideways. */
-  .kb-side { order: -1; position: static; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: none; }
+  .kb-side { position: static; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; animation: none; }
   .kb-side-chips { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 6px; mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
   .kb-side-chips::-webkit-scrollbar { display: none; }
   .kb-side-sec h2, .kb-side-you, .kb-privacy, .kb-side-count, .kb-side-star, .kb-side-mine .kb-side-add, .kb-side-mine .kb-side-hint, .kb-side-new, .kb-side-mine .kb-error { display: none; }
@@ -1266,9 +1267,14 @@ button.kb-twisty:hover { color: var(--text); background: var(--surface); }
 .kb-child[aria-current='page'] { color: var(--accent); background: var(--accent-soft); font-weight: 500; }
 @media (max-width: 1200px) {
   /* Narrow: header first, then search and the chip row; the tree folds away. */
-  .kb-main { display: contents; }
-  .kb-main > .kb-head { order: -2; }
   .kb-sec-body, .kb-sec-body[hidden] { display: flex !important; gap: 6px; }
   .kb-side-sec h2, .kb-twisty, .kb-children { display: none !important; }
   .kb-parent { display: block; }
+}
+
+/* Wide screens: the fixed column in the layout. Narrower: a bar inside each page, under the header. */
+.kb-narrow-nav { display: none; }
+@media (max-width: 1200px) {
+  .kb-layout > .kb-side { display: none; }
+  .kb-narrow-nav { display: block; margin: 0 0 20px; }
 }
