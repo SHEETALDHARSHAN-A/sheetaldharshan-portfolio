@@ -101,7 +101,7 @@ const ContactPageConfig: GlobalConfig = {
               label: 'Sender address',
               admin: { width: '40%', placeholder: 'contact@yourdomain.com', description: 'On a domain verified in Resend. No mailbox needed: replies go to the visitor. Empty: CONTACT_FROM_EMAIL.' },
             },
-            { name: 'emailAccent', type: 'text', label: 'Accent colour', defaultValue: DEFAULT_ACCENT, admin: { width: '20%', description: 'Top bar and button, e.g. #ff3400.' } },
+            { name: 'emailAccent', type: 'text', label: 'Accent colour', defaultValue: DEFAULT_ACCENT, admin: { width: '20%', placeholder: 'Theme accent', description: 'Optional, e.g. #3d8bff. Empty: the site theme. Emails use the theme colours (Site-wide → Theme).' } },
           ],
         },
         {

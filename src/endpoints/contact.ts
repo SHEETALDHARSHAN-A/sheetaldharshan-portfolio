@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import type { Endpoint } from 'payload'
 import { checkAnswer, toContactSettings, type ContactSettings } from '@/utilities/contactFields'
 import { sameOrigin } from '@/utilities/sameOrigin'
-import { emailAlertsReady, sendTemplate } from '@/utilities/emailAlert'
+import { emailAlertsReady, sendTemplate, siteAppearance } from '@/utilities/emailAlert'
 import { SAMPLE, type EmailVars } from '@/utilities/emailTemplate'
 
 const recent = new Map<string, number[]>()
@@ -89,12 +89,15 @@ export const contact: Endpoint = {
 }
 
 type PayloadLike = Parameters<Endpoint['handler']>[0]['payload']
-export type Site = { name: string; url: string; email?: string }
+export type Site = { name: string; url: string; email?: string; appearance: Record<string, unknown> | null }
 
 /** Your name, site address and email from Site-wide → Name & profiles, for the emails. */
 export async function siteInfo(payload: PayloadLike): Promise<Site> {
-  const s = (await payload.findGlobal({ slug: 'site-settings' as never, depth: 0 }).catch(() => null)) as { displayName?: string; fullName?: string; canonicalUrl?: string; email?: string } | null
-  return { name: s?.fullName || s?.displayName || 'My website', url: (s?.canonicalUrl || process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/$/, ''), email: s?.email || undefined }
+  const [s, appearance] = await Promise.all([
+    payload.findGlobal({ slug: 'site-settings' as never, depth: 0 }).catch(() => null) as Promise<{ displayName?: string; fullName?: string; canonicalUrl?: string; email?: string } | null>,
+    siteAppearance(payload),
+  ])
+  return { name: s?.fullName || s?.displayName || 'My website', url: (s?.canonicalUrl || process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/$/, ''), email: s?.email || undefined, appearance }
 }
 
 /** Who gets alerts: the address set on the Contact page, or the site's email. */
@@ -105,14 +108,14 @@ async function alertOwner(settings: ContactSettings, site: Site, vars: EmailVars
   if (!emailAlertsReady()) return 'Not sent: RESEND_API_KEY is not set'
   const to = alertRecipient(settings, site)
   if (!to) return 'Not sent: no address to send to'
-  const result = await sendTemplate(settings, settings.alertEmail, vars, answers, { to, replyTo: vars.email, buttonHref: `mailto:${vars.email}` })
+  const result = await sendTemplate(settings, settings.alertEmail, vars, answers, { to, replyTo: vars.email, buttonHref: `mailto:${vars.email}`, appearance: site.appearance })
   return result.ok ? `Emailed to ${to}` : `Not sent: ${result.reason}`
 }
 
 /** The optional "thanks" email to the visitor; replies to it come to you. */
 async function thankVisitor(settings: ContactSettings, site: Site, vars: EmailVars, answers: { label: string; value: string }[]) {
   if (!settings.confirm || !emailAlertsReady() || !vars.email) return
-  await sendTemplate(settings, settings.confirmEmail, vars, answers, { to: vars.email, replyTo: alertRecipient(settings, site), buttonHref: site.url || undefined })
+  await sendTemplate(settings, settings.confirmEmail, vars, answers, { to: vars.email, replyTo: alertRecipient(settings, site), buttonHref: site.url || undefined, appearance: site.appearance })
 }
 
 /**
@@ -136,6 +139,7 @@ export const contactTest: Endpoint = {
     const result = await sendTemplate(settings, thanks ? settings.confirmEmail : settings.alertEmail, vars, SAMPLE.answers, {
       to,
       buttonHref: thanks ? site.url || undefined : `mailto:${SAMPLE.email}`,
+      appearance: site.appearance,
     })
     return Response.json(
       result.ok

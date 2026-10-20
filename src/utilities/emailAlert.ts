@@ -1,5 +1,6 @@
 import type { ContactSettings } from './contactFields'
-import { fill, formatFrom, renderEmail, type EmailTemplate, type EmailVars } from './emailTemplate'
+import type { Payload } from 'payload'
+import { emailLook, fill, formatFrom, renderEmail, type EmailTemplate, type EmailVars } from './emailTemplate'
 
 /**
  * Contact page emails, sent through Resend (resend.com, free up to 3,000 emails a month).
@@ -42,14 +43,19 @@ export async function sendEmail(input: { from: string; to: string; replyTo?: str
   }
 }
 
-/** Renders a template from the settings and sends it. */
+/** The site theme (Site-wide → Theme), for emails that look like the site. */
+export async function siteAppearance(payload: Payload): Promise<Record<string, unknown> | null> {
+  return (await payload.findGlobal({ slug: 'appearance' as never, depth: 0 }).catch(() => null)) as Record<string, unknown> | null
+}
+
+/** Renders a template from the settings, in the site theme's colours, and sends it. */
 export function sendTemplate(
   settings: ContactSettings,
   template: EmailTemplate,
   vars: EmailVars,
   answers: { label: string; value: string }[],
-  opts: { to: string; replyTo?: string; buttonHref?: string },
+  opts: { to: string; replyTo?: string; buttonHref?: string; appearance: Record<string, unknown> | null },
 ) {
-  const email = renderEmail(template, vars, answers, { look: { accent: settings.accent }, buttonHref: opts.buttonHref })
+  const email = renderEmail(template, vars, answers, { look: emailLook(opts.appearance, settings.accent), buttonHref: opts.buttonHref })
   return sendEmail({ from: sender(settings, vars).from, to: opts.to, replyTo: opts.replyTo, ...email })
 }

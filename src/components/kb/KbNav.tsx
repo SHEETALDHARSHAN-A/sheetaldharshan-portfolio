@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { Channel } from '@/data/types'
 import { Avatar } from './Avatar'
 import { VerifiedTick } from './Author'
@@ -25,6 +25,19 @@ export function KbNav({ channels, active, query, stars = true, signIn = true }: 
   }, [ready, reader?.id])
 
   const lists = useLists(reader?.id)
+  const side = useRef<HTMLElement>(null)
+  // When the column is a sideways-scrolling row (narrower screens), bring the current channel into view.
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      const el = side.current
+      const current = el?.querySelector<HTMLElement>('.kb-side-row[aria-current="page"]')
+      if (!el || !current || el.scrollWidth <= el.clientWidth) return
+      const box = el.getBoundingClientRect()
+      const r = current.getBoundingClientRect()
+      el.scrollTo({ left: el.scrollLeft + r.left - box.left - box.width / 3 })
+    }, 120)
+    return () => window.clearTimeout(id)
+  }, [active, lists.length])
   const [adding, setAdding] = useState(false)
   const [newName, setNewName] = useState('')
   const [listErr, setListErr] = useState('')
@@ -45,7 +58,7 @@ export function KbNav({ channels, active, query, stars = true, signIn = true }: 
   )
 
   return (
-    <aside className="kb-side" aria-label="./stdout channels">
+    <aside className="kb-side" aria-label="./stdout channels" ref={side}>
       <form action="/notes" method="get" role="search" className="kb-search">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />

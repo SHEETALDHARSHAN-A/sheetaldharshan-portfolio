@@ -1115,7 +1115,8 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.8fr); gap: clamp(24px, 4vw, 56px); align-items: start; max-width: 1100px; }
 .kb-main { min-width: 0; }
 .kb-head { max-width: 1100px; }
-.kb-head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.kb-head-row { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; }
+.kb-head-row .kb-star { margin-top: 8px; }
 .kb-head h1.kb-lower, a[href="/notes"], a[href="/notes"] * { text-transform: none; }
 .kb-cards { display: grid; gap: 16px; }
 .kb-card { position: relative; border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; display: grid; gap: 8px; transition: border-color 180ms ease, transform 180ms var(--ease-out), background 180ms ease; }
@@ -1163,17 +1164,25 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-term-cursor { display: inline-block; width: 8px; height: 1.05em; margin-left: 4px; vertical-align: -0.15em; background: var(--text-soft); animation: kb-blink 1.1s steps(1) infinite; }
 @keyframes kb-blink { 50% { opacity: 0; } }
 
-@media (max-width: 960px) {
-  .kb-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-  .kb-side { order: -1; position: static; display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; animation: none; }
+/* Narrower than 1200px the side column no longer fits beside the posts: it becomes a bar above
+   them (search, then channels as chips that scroll sideways). The floating avatar keeps "You". */
+@media (max-width: 1200px) {
+  .kb-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; max-width: 900px; }
+  .kb-head { max-width: 900px; }
+  .kb-side { order: -1; position: static; display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 6px; animation: none; mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
   .kb-side::-webkit-scrollbar { display: none; }
-  .kb-side-sec h2, .kb-side-you, .kb-privacy, .kb-side-count, .kb-side-star { display: none; }
-  .kb-search { flex: 0 0 160px; height: 36px; }
+  .kb-side-sec h2, .kb-side-you, .kb-privacy, .kb-side-count, .kb-side-star, .kb-side-mine .kb-side-add, .kb-side-mine .kb-side-hint, .kb-side-new, .kb-side-mine .kb-error { display: none; }
+  .kb-side .kb-side-you, .kb-side .kb-privacy { display: none; }
+  .kb-search { flex: 0 0 200px; height: 38px; }
   .kb-side-sec, .kb-side-list { display: flex; gap: 6px; flex: none; }
-  .kb-side-row { grid-template-columns: auto auto; padding: 7px 12px; border: 0; border-radius: 999px; background: var(--surface); white-space: nowrap; font-size: 14px; }
-  .kb-side-row:hover { padding-left: 12px; }
-  .kb-side-row[aria-current='page'] { background: var(--accent); color: var(--accent-ink); }
+  .kb-side-row { grid-template-columns: auto auto; gap: 6px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; white-space: nowrap; font-size: 14px; }
+  .kb-side-row:hover { padding-left: 14px; border-color: var(--line-strong); color: var(--text); }
+  .kb-side-row[aria-current='page'] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
   .kb-side-row[aria-current='page'] .kb-hash { color: inherit; }
+  .kb-side-mine .kb-side-row { border-style: dashed; }
+}
+@media (max-width: 960px) {
+  .kb-search { flex-basis: 160px; height: 36px; }
   .kb-card { padding: 18px; }
 }
 
@@ -1204,3 +1213,22 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
   .kb-side-mine .kb-side-add, .kb-side-mine .kb-side-hint, .kb-side-new { display: none; }
   .kb-save-pop { right: auto; left: 0; }
 }
+
+/* Sign-in, in the Contact form's style */
+.kb-signin { display: grid; gap: 14px; max-width: 440px; }
+.kb-signin-title { margin: 0; font-weight: 600; font-size: 17px; color: var(--text); }
+.kb-signin .kb-note { margin-top: 4px; }
+.kb-signin-wide { width: 100%; justify-content: center; padding: 12px 18px; font-size: 14.5px; }
+.kb-gh { position: relative; gap: 10px; }
+.kb-gh-note { margin-left: 2px; font-size: 11.5px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, #1d9bf0 18%, transparent); color: #1d6fd6; }
+.kb-or { display: flex; align-items: center; gap: 12px; color: var(--faint); font-size: 12.5px; }
+.kb-or::before, .kb-or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.kb-signin-form { display: grid; gap: 12px; }
+.kb-signin-form .cf-field input { padding: 11px 14px; }
+.kb-signin-foot { margin: 0; color: var(--faint); font-size: 12.5px; }
+.kb-signin-foot a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.kb-signin-sent { justify-items: center; text-align: center; padding: 8px 0; }
+.kb-signin-mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
+.kb-modal-card:has(.kb-signin) { width: min(440px, 100%); padding: 22px 24px 24px; gap: 16px; }
+.kb-modal-card .kb-signin { max-width: none; }
+.kb-signin-inline { max-width: 520px; }

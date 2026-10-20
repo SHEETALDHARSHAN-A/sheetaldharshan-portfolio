@@ -4,17 +4,22 @@ import { useAllFormFields } from '@payloadcms/ui'
 import { reduceFieldsToValues } from 'payload/shared'
 import { useEffect, useState } from 'react'
 import { toContactSettings } from '@/utilities/contactFields'
-import { fill, renderEmail, SAMPLE } from '@/utilities/emailTemplate'
+import { emailLook, fill, renderEmail, SAMPLE } from '@/utilities/emailTemplate'
 import { SendTestEmail } from './SendTestEmail'
 
 /** A live preview of one Contact page email, with sample answers, as it will look in an inbox. */
 export function EmailPreview({ kind = 'alert' }: { kind?: 'alert' | 'confirm' }) {
   const [fields] = useAllFormFields()
   const [site, setSite] = useState({ name: 'My website', url: '' })
+  const [appearance, setAppearance] = useState<Record<string, unknown> | null>(null)
   useEffect(() => {
     fetch('/api/globals/site-settings?depth=0', { credentials: 'include' })
       .then((r) => r.json())
       .then((s: { fullName?: string; displayName?: string; canonicalUrl?: string }) => setSite({ name: s.fullName || s.displayName || 'My website', url: (s.canonicalUrl || '').replace(/\/$/, '') }))
+      .catch(() => undefined)
+    fetch('/api/globals/appearance?depth=0', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((a: Record<string, unknown>) => setAppearance(a))
       .catch(() => undefined)
   }, [])
 
@@ -22,7 +27,7 @@ export function EmailPreview({ kind = 'alert' }: { kind?: 'alert' | 'confirm' })
   const vars = { name: SAMPLE.name, email: SAMPLE.email, topic: SAMPLE.topic, site: site.name, url: site.url }
   const thanks = kind === 'confirm'
   const email = renderEmail(thanks ? settings.confirmEmail : settings.alertEmail, vars, SAMPLE.answers, {
-    look: { accent: settings.accent },
+    look: emailLook(appearance, settings.accent),
     buttonHref: thanks ? site.url || '#' : `mailto:${SAMPLE.email}`,
   })
   const from = `${fill(settings.fromName, vars) || site.name} <${settings.fromEmail || 'CONTACT_FROM_EMAIL'}>`
@@ -43,7 +48,7 @@ export function EmailPreview({ kind = 'alert' }: { kind?: 'alert' | 'confirm' })
             <strong>Subject</strong> {email.subject}
           </span>
         </div>
-        <iframe title={`${kind} email preview`} srcDoc={email.html} sandbox="" style={{ width: '100%', height: 560, border: 0, display: 'block', background: '#f1f2e9' }} />
+        <iframe title={`${kind} email preview`} srcDoc={email.html} sandbox="" style={{ width: '100%', height: 560, border: 0, display: 'block', background: emailLook(appearance, settings.accent).background }} />
       </div>
       <SendTestEmail kind={kind} />
     </div>

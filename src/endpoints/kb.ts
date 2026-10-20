@@ -61,6 +61,8 @@ function reply(ctx: Ctx, body: unknown, status = 200, extraCookie?: string): Res
 }
 
 const SIGN_IN = { error: 'Please sign in first.', signIn: true }
+/** When a write doesn't come from a page on this site (an old tab, an app's built-in browser, another site). */
+const NOT_SAME_SITE = { error: "This didn't come from an open page on this site, so it was stopped to keep your account safe. Refresh the page and try again; on a phone, open the site in your browser rather than inside another app." }
 
 async function readBody(req: PayloadRequest): Promise<Body> {
   try {
@@ -108,7 +110,7 @@ async function tellOwner(req: PayloadRequest, s: Settings, m: { subject: string;
     { subject: m.subject, heading: m.heading, intro: m.intro, showAnswers: true, button: 'Open in the admin', footer: 'Sent by ./stdout on {url}.' },
     { name: '', email: '', site: site.name, url: site.url },
     m.rows,
-    { to, replyTo: m.replyTo, buttonHref: `${site.url}/admin/${m.adminPath}` },
+    { to, replyTo: m.replyTo, buttonHref: `${site.url}/admin/${m.adminPath}`, appearance: site.appearance },
   )
   return result.ok ? `Emailed to ${to}` : `Not sent: ${result.reason}`
 }
@@ -139,7 +141,7 @@ const signout: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const ctx: Ctx = { req, reader: null, doc: null, renew: false }
-    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!sameOrigin(req)) return reply(ctx, NOT_SAME_SITE, 403)
     return reply(ctx, { ok: true }, 200, clearCookie(secure(req)))
   },
 }
@@ -150,7 +152,7 @@ const signoutAll: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const ctx = await context(req)
-    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!sameOrigin(req)) return reply(ctx, NOT_SAME_SITE, 403)
     if (ctx.doc) await req.payload.update({ collection: 'readers' as never, id: ctx.doc.id, data: { sessionVersion: (ctx.doc.sessionVersion ?? 1) + 1 } as never, overrideAccess: true })
     return reply({ ...ctx, renew: false }, { ok: true }, 200, clearCookie(secure(req)))
   },
@@ -162,7 +164,7 @@ const emailLink: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const ctx: Ctx = { req, reader: null, doc: null, renew: false }
-    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!sameOrigin(req)) return reply(ctx, NOT_SAME_SITE, 403)
     const body = await readBody(req)
     if (isBot(body)) return reply(ctx, { ok: true })
     const email = text(body.email, 200).toLowerCase()
@@ -183,7 +185,7 @@ const emailLink: Endpoint = {
       { subject: 'Your sign-in link for {site} · ./stdout', heading: 'Sign in to ./stdout', intro: 'Click the button to sign in as {email}. The link works once, for the next 15 minutes.', showAnswers: false, button: 'Sign in', footer: "If you didn't ask for this, you can ignore this email; nobody can sign in without it." },
       { name: name || email, email, site: site.name, url: site.url },
       [],
-      { to: email, buttonHref: `${origin}/auth/reader/email?token=${token}` },
+      { to: email, buttonHref: `${origin}/auth/reader/email?token=${token}`, appearance: site.appearance },
     )
     if (!result.ok) return reply(ctx, { error: 'The email could not be sent. Please try again, or use GitHub.' }, 502)
     return reply(ctx, { ok: true })
@@ -196,7 +198,7 @@ const profile: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const ctx = await context(req)
-    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!sameOrigin(req)) return reply(ctx, NOT_SAME_SITE, 403)
     if (!ctx.reader) return reply(ctx, SIGN_IN, 401)
     const name = text((await readBody(req)).name, 60)
     if (name.length < 2) return reply(ctx, { errors: { name: 'Please use at least 2 characters.' } }, 400)
@@ -288,7 +290,7 @@ const stars: Endpoint = {
 /** Shared start of every signed-in write: same site, signed in, not too fast. */
 async function guard(req: PayloadRequest, kind: string, max: number): Promise<{ ctx: Ctx; body: Body; error?: Response }> {
   const ctx = await context(req)
-  if (!sameOrigin(req)) return { ctx, body: {}, error: reply(ctx, { error: 'Not allowed.' }, 403) }
+  if (!sameOrigin(req)) return { ctx, body: {}, error: reply(ctx, NOT_SAME_SITE, 403) }
   if (!ctx.reader) return { ctx, body: {}, error: reply(ctx, SIGN_IN, 401) }
   const body = await readBody(req)
   if (tooMany(`${kind}|${ctx.reader.id}`, max)) return { ctx, body, error: reply(ctx, { error: 'That is a lot in a short time. Please try again in a few minutes.' }, 429) }
@@ -301,7 +303,7 @@ const comment: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const ctx = await context(req)
-    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!sameOrigin(req)) return reply(ctx, NOT_SAME_SITE, 403)
     const body = await readBody(req)
     // Anonymous comments are welcome but braked harder, and any link waits for approval.
     const reader = ctx.reader
@@ -505,7 +507,7 @@ const feedback: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const ctx = await context(req)
-    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!sameOrigin(req)) return reply(ctx, NOT_SAME_SITE, 403)
     const body = await readBody(req)
     if (isBot(body)) return reply(ctx, { ok: true })
     const s = await settingsOf(req)
@@ -542,7 +544,7 @@ const report: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const ctx = await context(req)
-    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!sameOrigin(req)) return reply(ctx, NOT_SAME_SITE, 403)
     const body = await readBody(req)
     if (isBot(body)) return reply(ctx, { ok: true })
     if (!(await settingsOf(req)).reports) return reply(ctx, { error: 'Reporting is switched off.' }, 403)
@@ -651,7 +653,7 @@ const deleteAccount: Endpoint = {
   method: 'post',
   handler: async (req) => {
     const ctx = await context(req)
-    if (!sameOrigin(req)) return reply(ctx, { error: 'Not allowed.' }, 403)
+    if (!sameOrigin(req)) return reply(ctx, NOT_SAME_SITE, 403)
     if (!ctx.reader) return reply(ctx, SIGN_IN, 401)
     const id = ctx.reader.id
     const keepAnonymous = (await readBody(req)).comments === 'anonymous'

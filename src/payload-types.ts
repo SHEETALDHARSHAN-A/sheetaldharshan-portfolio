@@ -3289,7 +3289,7 @@ export interface ContactPage {
    */
   fromEmail?: string | null;
   /**
-   * Top bar and button, e.g. #ff3400.
+   * Optional, e.g. #3d8bff. Empty: the site theme. Emails use the theme colours (Site-wide → Theme).
    */
   emailAccent?: string | null;
   /**

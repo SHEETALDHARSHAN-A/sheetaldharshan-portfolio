@@ -16,7 +16,8 @@ export type EmailTemplate = {
   footer: string
 }
 
-export type EmailLook = { accent: string }
+/** The colours of an email, taken from the site theme (see emailLook). */
+export type EmailLook = { mode: 'dark' | 'light'; background: string; card: string; text: string; soft: string; muted: string; line: string; accent: string; accentInk: string }
 
 export const DEFAULT_ALERT: EmailTemplate = {
   subject: 'New message from {name} · {topic}',
@@ -37,7 +38,59 @@ export const DEFAULT_CONFIRM: EmailTemplate = {
 }
 
 export const DEFAULT_FROM_NAME = '{site} · Contact'
-export const DEFAULT_ACCENT = '#ff3400'
+/** Empty: the email uses the site theme's accent colour. */
+export const DEFAULT_ACCENT = ''
+
+const PRESET = {
+  dark: { background: '#000000', surface: '#1c1c1e', text: '#f2f2f2', muted: '#8a8a8e', line: '#2c2c2e' },
+  light: { background: '#f3f2ee', surface: '#e6e5e0', text: '#121212', muted: '#6b6b6b', line: '#d9d8d2' },
+}
+const ACCENTS: Record<string, { dark: string; light: string; ink?: string }> = {
+  blue: { dark: '#3d8bff', light: '#3d8bff' },
+  orange: { dark: '#ff5a1f', light: '#ff5a1f' },
+  green: { dark: '#3ccf7a', light: '#3ccf7a', ink: '#04140a' },
+  violet: { dark: '#a78bfa', light: '#a78bfa', ink: '#120a2a' },
+  neutral: { dark: '#e5e5e5', light: '#111111' },
+}
+const HEXC = /^#[0-9a-f]{6}$/i
+const pickHex = (...v: unknown[]) => v.find((x): x is string => typeof x === 'string' && HEXC.test(x))
+
+/** Black or white text, whichever reads better on a colour. */
+function inkFor(hex: string): string {
+  const n = parseInt(hex.slice(1), 16)
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+  return 0.299 * r + 0.587 * g + 0.114 * b > 160 ? '#000000' : '#ffffff'
+}
+
+/**
+ * The email's colours from the site theme (Site-wide → Theme): its default mode (dark or light),
+ * the accent preset, and any custom colours, so emails look like the site. `accentOverride` is
+ * the optional accent set on the Contact page.
+ */
+export function emailLook(appearance: Record<string, unknown> | null | undefined, accentOverride?: string): EmailLook {
+  const a = appearance ?? {}
+  const mode: 'dark' | 'light' = a.theme === 'light' ? 'light' : 'dark'
+  const p = mode === 'dark' ? 'color' : 'light'
+  const c = (k: string) => a[`${p}${k}`]
+  const base = PRESET[mode]
+  const preset = ACCENTS[String(a.accent)] ?? ACCENTS.blue
+  const background = pickHex(c('Background')) ?? base.background
+  const surface = pickHex(c('Surface')) ?? base.surface
+  const text = pickHex(c('Text')) ?? base.text
+  const accent = pickHex(accentOverride?.trim(), c('Accent')) ?? preset[mode]
+  return {
+    mode,
+    // Dark: the page is the background and the card the surface; light: the other way round.
+    background: mode === 'dark' ? background : surface,
+    card: mode === 'dark' ? surface : background,
+    text,
+    soft: text,
+    muted: pickHex(c('Muted')) ?? base.muted,
+    line: pickHex(c('Line')) ?? base.line,
+    accent,
+    accentInk: pickHex(accentOverride) || pickHex(c('Accent')) ? inkFor(accent) : (preset.ink ?? inkFor(accent)),
+  }
+}
 
 export type EmailVars = { name: string; email: string; topic?: string; site: string; url: string }
 
@@ -62,7 +115,6 @@ const paragraphs = (text: string, style: string) =>
     .map((p) => `<p style="${style}">${esc(p).replace(/\n/g, '<br>')}</p>`)
     .join('\n')
 
-const safeColour = (c: string) => (/^#[0-9a-f]{3,8}$/i.test(c.trim()) ? c.trim() : DEFAULT_ACCENT)
 
 /** Renders one email: a subject, a plain-text body and an HTML body that works in Gmail, Outlook and Apple Mail. */
 export function renderEmail(
@@ -71,7 +123,8 @@ export function renderEmail(
   answers: { label: string; value: string }[],
   opts: { look: EmailLook; buttonHref?: string },
 ): { subject: string; text: string; html: string } {
-  const accent = safeColour(opts.look.accent)
+  const k = opts.look
+  const accent = k.accent
   const subject = fill(t.subject, v).replace(/\s+/g, ' ') || 'New message'
   const heading = fill(t.heading, v)
   const intro = fill(t.intro, v)
@@ -86,28 +139,28 @@ export function renderEmail(
   const font = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
   const rows = shown
     .map(
-      (a) => `<tr><td style="padding:12px 0;border-top:1px solid #ecece8">
-<div style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#8a8a85;margin:0 0 4px">${esc(a.label)}</div>
-<div style="font-size:15px;line-height:1.55;color:#1b1b1b;white-space:pre-wrap">${esc(a.value).replace(/\n/g, '<br>')}</div>
+      (a) => `<tr><td style="padding:12px 0;border-top:1px solid ${k.line}">
+<div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:${k.muted};margin:0 0 4px">${esc(a.label)}</div>
+<div style="font-size:15px;line-height:1.55;color:${k.text};white-space:pre-wrap">${esc(a.value).replace(/\n/g, '<br>')}</div>
 </td></tr>`,
     )
     .join('\n')
 
   const html = `<!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${esc(subject)}</title></head>
-<body style="margin:0;padding:0;background:#f1f2e9;font-family:${font}">
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="${k.mode}"><meta name="supported-color-schemes" content="${k.mode}"><title>${esc(subject)}</title></head>
+<body style="margin:0;padding:0;background:${k.background};font-family:${font}">
 <div style="display:none;max-height:0;overflow:hidden">${esc(intro.split('\n')[0] ?? '')}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f2e9"><tr><td align="center" style="padding:32px 16px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:14px;border:1px solid #e3e4da">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${k.background}"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:${k.card};border-radius:14px;border:1px solid ${k.line}">
 <tr><td style="height:4px;background:${accent};border-radius:14px 14px 0 0;font-size:0;line-height:0">&nbsp;</td></tr>
 <tr><td style="padding:26px 28px 6px">
-<div style="font-size:13px;font-weight:700;color:#1b1b1b;margin:0 0 18px">${esc(v.site)}<span style="color:${accent}">.</span></div>
-${heading ? `<h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:#1b1b1b">${esc(heading)}</h1>` : ''}
-${paragraphs(intro, 'margin:0 0 12px;font-size:15px;line-height:1.6;color:#3a3a37')}
+<div style="font-size:13px;font-weight:700;letter-spacing:.02em;color:${k.text};margin:0 0 18px">${esc(v.site)}<span style="color:${accent}">.</span></div>
+${heading ? `<h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:${k.text}">${esc(heading)}</h1>` : ''}
+${paragraphs(intro, `margin:0 0 12px;font-size:15px;line-height:1.6;color:${k.soft};opacity:.85`)}
 </td></tr>
 ${rows ? `<tr><td style="padding:6px 28px 4px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table></td></tr>` : ''}
-${button && opts.buttonHref ? `<tr><td style="padding:16px 28px 8px"><a href="${esc(opts.buttonHref)}" style="display:inline-block;background:${accent};color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:11px 20px;border-radius:999px">${esc(button)}</a></td></tr>` : ''}
-<tr><td style="padding:18px 28px 26px">${paragraphs(footer, 'margin:0;font-size:12px;line-height:1.55;color:#8a8a85')}</td></tr>
+${button && opts.buttonHref ? `<tr><td style="padding:16px 28px 8px"><a href="${esc(opts.buttonHref)}" style="display:inline-block;background:${accent};color:${k.accentInk};text-decoration:none;font-weight:600;font-size:15px;padding:11px 20px;border-radius:999px">${esc(button)}</a></td></tr>` : ''}
+<tr><td style="padding:18px 28px 26px">${paragraphs(footer, `margin:0;font-size:12px;line-height:1.55;color:${k.muted}`)}</td></tr>
 </table>
 </td></tr></table>
 </body></html>`

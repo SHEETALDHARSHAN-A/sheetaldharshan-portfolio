@@ -14,82 +14,96 @@ const PROBLEMS: Record<string, string> = {
   deleted: 'Your account and its data were deleted. Thanks for reading.',
 }
 
-/** The sign-in choices: GitHub, or a one-time link by email. Used in the dialog and under posts. */
-export function SignInOptions({ why }: { why?: string }) {
+/** The sign-in choices, laid out like the Contact form: GitHub, or a one-time link by email. */
+export function SignInOptions({ why, heading = true }: { why?: string; heading?: boolean }) {
   const pathname = usePathname()
-  const [mode, setMode] = useState<'pick' | 'email' | 'sent'>('pick')
+  const [sent, setSent] = useState(false)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
-  const [state, setState] = useState<{ busy?: boolean; error?: string }>({})
+  const [state, setState] = useState<{ busy?: boolean; error?: string; field?: 'email' | 'name' }>({})
   const startedAt = useRef(0)
+  useEffect(() => {
+    startedAt.current = Date.now()
+  }, [])
   const next = typeof window === 'undefined' ? pathname : `${pathname}${window.location.hash || ''}`
 
-  if (mode === 'sent')
+  if (sent)
     return (
-      <div className="kb-signin">
-        <p className="kb-signin-title">Check your inbox ✉️</p>
+      <div className="kb-signin kb-signin-sent" role="status">
+        <span className="kb-signin-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 6h16v12H4z" />
+            <path d="m4 7 8 6 8-6" />
+          </svg>
+        </span>
+        <p className="kb-signin-title">Check your inbox</p>
         <p className="kb-note">
-          We sent a sign-in link to <strong>{email}</strong>. It works once, for 15 minutes. Not there? Check spam, or{' '}
-          <button type="button" className="kb-link" onClick={() => setMode('email')}>
-            send it again
-          </button>
-          .
+          A sign-in link is on its way to <strong>{email}</strong>. It works once, for 15 minutes.
         </p>
+        <button type="button" className="btn ghost kb-signin-wide" onClick={() => setSent(false)}>
+          Use a different email
+        </button>
       </div>
     )
 
   return (
     <div className="kb-signin">
-      <p className="kb-signin-title">Sign in {why ?? 'to comment, like and rate'}</p>
-      <p className="kb-note">
-        No password needed. Your email is never shown. See the <Link href="/privacy">privacy notice</Link>.
-      </p>
-      <div className="kb-signin-buttons">
-        <a className="btn kb-gh" href={`/auth/reader/github?next=${encodeURIComponent(next)}`}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8 0 3.2.9.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1 .9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3" />
-          </svg>
-          Continue with GitHub
-        </a>
-        {mode === 'pick' ? (
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={() => {
-              startedAt.current = Date.now()
-              setMode('email')
-            }}
-          >
-            Email me a sign-in link
-          </button>
-        ) : null}
-      </div>
-      {mode === 'email' ? (
-        <form
-          className="kb-form"
-          onSubmit={async (e) => {
-            e.preventDefault()
-            setState({ busy: true })
-            const website = (e.currentTarget.querySelector('input[name="website"]') as HTMLInputElement | null)?.value ?? ''
-            const res = await fetch('/api/kb/email-link', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, name, next, website, startedAt: startedAt.current }) }).catch(() => null)
-            const body = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string; errors?: Record<string, string> } | null
-            if (body?.ok) {
-              setState({})
-              setMode('sent')
-            } else setState({ error: body?.errors ? Object.values(body.errors)[0] : body?.error ?? 'It could not be sent. Please try again.' })
-          }}
-        >
-          <div className="kb-form-row">
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" aria-label="Your email" autoFocus />
-            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Your name (shown on comments)" aria-label="Your name" />
-            <input type="text" name="website" tabIndex={-1} autoComplete="off" className="kb-hp" aria-hidden="true" />
-            <button type="submit" className="btn" disabled={state.busy}>
-              {state.busy ? 'Sending…' : 'Send link'}
-            </button>
-          </div>
-          {state.error ? <p className="kb-error">{state.error}</p> : null}
-        </form>
+      {heading ? (
+        <div>
+          <p className="kb-signin-title">Sign in {why ?? 'to comment, like and rate'}</p>
+          <p className="kb-note">No password needed.</p>
+        </div>
       ) : null}
+      <a className="btn kb-signin-wide kb-gh" href={`/auth/reader/github?next=${encodeURIComponent(next)}`}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8 0 3.2.9.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1 .9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3" />
+        </svg>
+        Continue with GitHub
+        <span className="kb-gh-note">verified badge</span>
+      </a>
+      <div className="kb-or" aria-hidden="true">
+        <span>or get a link by email</span>
+      </div>
+      <form
+        className="kb-signin-form"
+        noValidate
+        onSubmit={async (e) => {
+          e.preventDefault()
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) return setState({ error: 'Please enter a valid email address, like ada@example.com.', field: 'email' })
+          setState({ busy: true })
+          const website = (e.currentTarget.querySelector('input[name="website"]') as HTMLInputElement | null)?.value ?? ''
+          const res = await fetch('/api/kb/email-link', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, name, next, website, startedAt: startedAt.current }) }).catch(() => null)
+          const body = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string; errors?: Record<string, string> } | null
+          if (body?.ok) {
+            setState({})
+            setSent(true)
+          } else if (body?.errors) {
+            const [field, error] = Object.entries(body.errors)[0]
+            setState({ error, field: field === 'name' ? 'name' : 'email' })
+          } else setState({ error: body?.error ?? 'It could not be sent. Please try again.' })
+        }}
+      >
+        <label className="cf-field">
+          <span>Your email</span>
+          <input type="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ada@example.com" aria-invalid={state.field === 'email' || undefined} />
+          {state.field === 'email' && state.error ? <em role="alert">{state.error}</em> : null}
+        </label>
+        <label className="cf-field">
+          <span>
+            Name on your comments <small>optional</small>
+          </span>
+          <input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Ada Lovelace" aria-invalid={state.field === 'name' || undefined} />
+          {state.field === 'name' && state.error ? <em role="alert">{state.error}</em> : null}
+        </label>
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" className="kb-hp" aria-hidden="true" />
+        <button type="submit" className="btn ghost kb-signin-wide" disabled={state.busy}>
+          {state.busy ? 'Sending…' : 'Email me a sign-in link'}
+        </button>
+        {state.error && !state.field ? <p className="kb-error">{state.error}</p> : null}
+      </form>
+      <p className="kb-signin-foot">
+        Your email is never shown. <Link href="/privacy">Privacy</Link>
+      </p>
     </div>
   )
 }
@@ -127,13 +141,13 @@ export function SignInDialog() {
     <div className="kb-modal" role="dialog" aria-modal="true" aria-label="Sign in" onMouseDown={(e) => e.target === e.currentTarget && setOpen(null)}>
       <div className="kb-modal-card">
         <div className="kb-modal-head">
-          <strong>Sign in to ./stdout</strong>
+          <strong className="kb-signin-title">Sign in {open.why ?? 'to comment, like and rate'}</strong>
           <button type="button" className="kb-x" onClick={() => setOpen(null)} aria-label="Close">
             ×
           </button>
         </div>
         {open.problem ? <p className={open.problem.startsWith('Your account') ? 'kb-note' : 'kb-error'}>{open.problem}</p> : null}
-        <SignInOptions why={open.why} />
+        <SignInOptions why={open.why} heading={false} />
       </div>
     </div>,
     document.body,
