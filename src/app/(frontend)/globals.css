@@ -1230,7 +1230,8 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-signin .kb-note { margin-top: 4px; }
 .kb-signin-wide { width: 100%; justify-content: center; padding: 12px 18px; font-size: 14.5px; }
 .kb-gh { position: relative; gap: 10px; }
-.kb-gh-note { margin-left: 2px; font-size: 11.5px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, #1d9bf0 18%, transparent); color: #1d6fd6; }
+.kb-gh-note { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; padding: 3px 9px 3px 4px; border-radius: 999px; background: color-mix(in srgb, #1d9bf0 14%, transparent); color: #1a73d9; font-size: 12px; font-weight: 600; }
+.kb-gh-note .kb-tick { vertical-align: 0; }
 .kb-or { display: flex; align-items: center; gap: 12px; color: var(--faint); font-size: 12.5px; }
 .kb-or::before, .kb-or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 .kb-signin-form { display: grid; gap: 12px; }
@@ -1245,3 +1246,26 @@ a.kb-author-name:hover { text-decoration: underline; text-underline-offset: 3px;
 .kb-waiting { display: inline-flex; align-items: center; gap: 10px; margin: 0; color: var(--muted); font-size: 13.5px; }
 .kb-waiting i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--accent); animation: kb-spin 0.9s linear infinite; }
 @keyframes kb-spin { to { transform: rotate(360deg); } }
+
+/* The side column as a tree: folding sections, and channels that open to list their posts */
+.kb-side-sec h2 { margin: 0 0 6px; }
+.kb-sec-toggle { display: inline-flex; align-items: center; gap: 4px; margin-left: -4px; padding: 2px 4px; border: 0; border-radius: 6px; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.kb-sec-toggle:hover { background: var(--surface); }
+.kb-chev { width: 13px; height: 13px; flex: none; transition: transform 180ms var(--ease-out); }
+.kb-sec-toggle[aria-expanded='true'] .kb-chev, .kb-twisty[aria-expanded='true'] .kb-chev { transform: rotate(90deg); }
+.kb-side-sec[data-folded] { padding-bottom: 2px; }
+.kb-parent { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; position: relative; }
+.kb-twisty { display: grid; place-items: center; width: 18px; height: 26px; margin-left: -4px; padding: 0; border: 0; border-radius: 5px; background: none; color: var(--faint); cursor: pointer; }
+button.kb-twisty:hover { color: var(--text); background: var(--surface); }
+.kb-children { list-style: none; margin: 2px 0 8px 9px; padding: 0 0 0 14px; border-left: 1px solid var(--line); display: grid; gap: 1px; animation: el-in 180ms var(--ease-out) both; }
+.kb-child { display: block; padding: 6px 8px; border-radius: 6px; color: var(--muted); font-size: 13.5px; line-height: 1.35; overflow-wrap: anywhere; transition: color 140ms ease, background 140ms ease; }
+.kb-child:hover { color: var(--text); background: var(--surface); }
+.kb-child[aria-current='page'] { color: var(--accent); background: var(--accent-soft); font-weight: 500; }
+@media (max-width: 1200px) {
+  /* Narrow: header first, then search and the chip row; the tree folds away. */
+  .kb-main { display: contents; }
+  .kb-main > .kb-head { order: -2; }
+  .kb-sec-body, .kb-sec-body[hidden] { display: flex !important; gap: 6px; }
+  .kb-side-sec h2, .kb-twisty, .kb-children { display: none !important; }
+  .kb-parent { display: block; }
+}

@@ -10,15 +10,18 @@ import { SignInDialog } from './SignIn'
  * Every ./stdout page, laid out like the Contact page: the page header across the top, the posts
  * (or one post) on the left, and a column on the right with search, channels and your account.
  */
-export async function KbShell({ head, active, query, children }: { head?: React.ReactNode; active?: string; query?: string; children: React.ReactNode }) {
+export async function KbShell({ head, active, activePost, query, children }: { head?: React.ReactNode; active?: string; activePost?: string; query?: string; children: React.ReactNode }) {
   const [channels, kb] = await Promise.all([getChannels(), getKbSettings()])
   return (
     <PageFrame>
       <div className="page kb-page">
-        {head}
         <div className="kb-layout">
-          <div className="kb-main">{children}</div>
-          <KbNav channels={channels} active={active} query={query} stars={kb.rules.stars} signIn={kb.rules.signIn} />
+          {/* The header sits in the left column, so the side column starts level with it. */}
+          <div className="kb-main">
+            {head}
+            {children}
+          </div>
+          <KbNav channels={channels} active={active} activePost={activePost} query={query} stars={kb.rules.stars} signIn={kb.rules.signIn} />
         </div>
         <Suspense fallback={null}>
           <SignInDialog />

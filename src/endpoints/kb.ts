@@ -756,7 +756,12 @@ const lists: Endpoint = {
     const ctx = await context(req)
     if (!ctx.reader) return reply(ctx, { lists: [] })
     const r = await req.payload.find({ collection: 'reader-lists' as never, where: { reader: { equals: ctx.reader.id } }, depth: 0, limit: MAX_LISTS, pagination: false, sort: 'name', overrideAccess: true })
-    return reply(ctx, { lists: (r.docs as unknown as ListDoc[]).map(listOut) })
+    const docs = r.docs as unknown as ListDoc[]
+    // Titles of the saved posts, for the side column's tree.
+    const all = [...new Set(docs.flatMap((l) => ids(l.posts)))]
+    const posts = all.length ? ((await req.payload.find({ collection: 'posts', where: { and: [{ id: { in: all } }, { _status: { equals: 'published' } }] }, depth: 0, limit: MAX_SAVED, pagination: false, select: { slug: true, title: true } })).docs as unknown as { id: number; slug: string; title: string }[]) : []
+    const byId = new Map(posts.map((p) => [p.id, { id: p.id, slug: p.slug, title: p.title }]))
+    return reply(ctx, { lists: docs.map((l) => ({ ...listOut(l), items: [...ids(l.posts)].reverse().map((id) => byId.get(id)).filter(Boolean) })) })
   },
 }
 

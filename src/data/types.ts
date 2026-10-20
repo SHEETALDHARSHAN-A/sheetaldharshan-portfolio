@@ -103,7 +103,7 @@ export const kindLabels: Record<ProjectKind, string> = {
   experiment: 'Experiment',
 }
 
-export type Channel = { id: string; slug: string; title: string; emoji?: string; description?: string; posts: number }
+export type Channel = { id: string; slug: string; title: string; emoji?: string; description?: string; posts: number; items: { slug: string; title: string }[] }
 
 export type PostSummary = {
   id: string

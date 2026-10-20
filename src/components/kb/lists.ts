@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { currentReader } from './reader'
 
 /** The signed-in reader's own channels, shared by the side column, the Save button and their pages. */
-export type List = { id: number; name: string; description: string; emoji: string; posts: number[]; count: number; updatedAt: string }
+export type List = { id: number; name: string; description: string; emoji: string; posts: number[]; count: number; updatedAt: string; items?: { id: number; slug: string; title: string }[] }
 type Result = { ok?: boolean; error?: string; errors?: Record<string, string>; list?: List }
 
 let lists: List[] = []
@@ -30,8 +30,11 @@ const call = async (path: string, body: object): Promise<Result> => {
 export const listError = (r: Result) => (r.errors ? Object.values(r.errors)[0] : r.error) ?? 'Something went wrong.'
 
 function upsert(l: List) {
-  lists = [...lists.filter((x) => x.id !== l.id), l].sort((a, b) => a.name.localeCompare(b.name))
+  const old = lists.find((x) => x.id === l.id)
+  lists = [...lists.filter((x) => x.id !== l.id), { ...l, items: old?.items }].sort((a, b) => a.name.localeCompare(b.name))
   emit()
+  // Fetch the saved posts' titles again for the side column's tree.
+  void reloadLists()
 }
 
 export const listActions = {

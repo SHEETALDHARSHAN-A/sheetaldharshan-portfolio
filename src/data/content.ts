@@ -308,13 +308,22 @@ export const getChannels = cache(async (): Promise<Channel[]> => {
   const payload = await getClient()
   const [channels, posts] = await Promise.all([
     payload.find({ collection: 'categories', depth: 0, limit: 100, sort: ['order', 'title'] }).catch(dbFailed),
-    payload.find({ collection: 'posts', depth: 0, limit: 1000, pagination: false, where: { _status: { equals: 'published' } }, select: { categories: true } }).catch(dbFailed),
+    payload.find({ collection: 'posts', depth: 0, limit: 1000, pagination: false, sort: '-publishedAt', where: { _status: { equals: 'published' } }, select: { categories: true, slug: true, title: true } }).catch(dbFailed),
   ])
-  const counts = new Map<string, number>()
-  for (const post of posts?.docs ?? []) for (const c of post.categories ?? []) counts.set(String(typeof c === 'object' ? c.id : c), (counts.get(String(typeof c === 'object' ? c.id : c)) ?? 0) + 1)
+  // Each channel's posts, newest first, for the side column's tree.
+  const items = new Map<string, { slug: string; title: string }[]>()
+  for (const post of posts?.docs ?? []) {
+    for (const c of post.categories ?? []) {
+      const key = String(typeof c === 'object' ? c.id : c)
+      items.set(key, [...(items.get(key) ?? []), { slug: post.slug ?? '', title: post.title }])
+    }
+  }
   return (channels?.docs ?? [])
     .filter((c) => c.slug)
-    .map((c) => ({ id: String(c.id), slug: c.slug ?? '', title: c.title, emoji: c.emoji || undefined, description: c.description || undefined, posts: counts.get(String(c.id)) ?? 0 }))
+    .map((c) => {
+      const list = items.get(String(c.id)) ?? []
+      return { id: String(c.id), slug: c.slug ?? '', title: c.title, emoji: c.emoji || undefined, description: c.description || undefined, posts: list.length, items: list.slice(0, 50) }
+    })
 })
 
 export type KbSettings = { heading: string; intro: string; rules: SiteRules }
