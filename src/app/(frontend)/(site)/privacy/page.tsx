@@ -21,7 +21,7 @@ export default async function PrivacyPage() {
           <h2>The short version</h2>
           <ul>
             <li>You can read everything here without an account, and nothing tracks you: there are no analytics, ads or tracking cookies.</li>
-            <li>I only keep what you choose to send: a message on the Contact page, or a comment, rating or feedback in ./stdout.</li>
+            <li>I only keep what you choose to send: a message on the Contact page, or a comment, rating or feedback in ./stdout. Channels you make and posts you save there are private to you.</li>
             <li>Your email address is never shown publicly or shared, and is never used for newsletters or marketing.</li>
             <li>Signed-in readers can download or delete their data any time from <Link href="/notes/me">their page</Link>.</li>
           </ul>
@@ -35,6 +35,11 @@ export default async function PrivacyPage() {
           <p>
             If you sign in with <strong>GitHub</strong>, I receive your GitHub name, username, profile picture and the email GitHub shares. If you sign in with an <strong>email link</strong>, I keep your email address and the name you choose. Your name and picture are shown next to what you write; GitHub
             accounts show a verified tick and link to your GitHub profile. Your email is never shown.
+          </p>
+          <h3>Your own channels and saved posts</h3>
+          <p>
+            Signed-in readers can make their own channels and save posts into them. These are <strong>private</strong>: only you see them, through your account. They are not shown to other readers, and I only see them as entries in the admin (so I can remove one if needed). They are
+            included when you download your data, and deleted with your account.
           </p>
           <h3>Comments, ratings, likes, stars, reports and feedback</h3>
           <p>
@@ -88,6 +93,12 @@ export default async function PrivacyPage() {
             </li>
             <li>
               <strong>Edit or delete a comment:</strong> the Edit and Delete buttons under it (signed-in comments).
+            </li>
+            <li>
+              <strong>Rename, empty or delete your own channels:</strong> open the channel from the side column or <Link href="/notes/me">your page</Link>.
+            </li>
+            <li>
+              <strong>Sign out on every device:</strong> your picture at the bottom right → Sign out on all devices.
             </li>
             <li>
               <strong>Delete your account:</strong> <Link href="/notes/me">your page</Link> → Delete my account. You choose whether your comments are deleted or kept as Anonymous.

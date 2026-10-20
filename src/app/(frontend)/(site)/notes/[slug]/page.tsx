@@ -10,6 +10,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { KbShell } from '@/components/kb/KbShell'
 import { Prereq } from '@/components/kb/Prereq'
 import { Discussion } from '@/components/kb/Discussion'
+import { SaveButton } from '@/components/kb/SaveButton'
 import { SelectionFeedback } from '@/components/kb/SelectionFeedback'
 import { breadcrumbSchema } from '@/data/seo'
 import { formatDate, getKbSettings, getPost, getSite } from '@/data/content'
@@ -68,10 +69,13 @@ export default async function KbPostPage({ params }: Props) {
             </Link>
           ) : null}
           <h1>{post.title}</h1>
-          <div className="meta">
-            <span>{formatDate(post.publishedAt)}</span>
-            <span>{post.readingMinutes} min read</span>
-            <span>{site.fullName}</span>
+          <div className="kb-article-bar">
+            <div className="meta">
+              <span>{formatDate(post.publishedAt)}</span>
+              <span>{post.readingMinutes} min read</span>
+              <span>{site.fullName}</span>
+            </div>
+            {kb.rules.signIn ? <SaveButton postId={post.id} /> : null}
           </div>
         </header>
         {post.cover && (

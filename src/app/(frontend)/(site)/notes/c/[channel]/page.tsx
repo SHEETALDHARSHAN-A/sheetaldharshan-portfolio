@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { KbShell } from '@/components/kb/KbShell'
+import { KbEmpty, KbHead, KbShell } from '@/components/kb/KbShell'
 import { PostRow } from '@/components/kb/PostRow'
 import { StarButton } from '@/components/kb/StarButton'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -25,22 +25,19 @@ export default async function ChannelPage({ params }: Props) {
   if (!c) notFound()
 
   return (
-    <KbShell active={c.slug}>
+    <KbShell
+      active={c.slug}
+      head={
+        <KbHead eyebrow={`${kb.heading} · channel`} title={`${c.emoji ?? '#'} ${c.title}`} intro={c.description || `${c.posts} post${c.posts === 1 ? '' : 's'} in this channel.`}>
+          {kb.rules.stars ? <StarButton id={c.id} title={c.title} /> : null}
+        </KbHead>
+      }
+    >
       <JsonLd data={breadcrumbSchema(site, [{ name: kb.heading, path: '/notes' }, { name: `#${c.title}`, path: `/notes/c/${c.slug}` }])} />
-      <header className="kb-channel-head">
-        <div>
-          <h1>
-            <span className="kb-hash">{c.emoji ?? '#'}</span>
-            {c.title}
-          </h1>
-          {c.description ? <p>{c.description}</p> : null}
-        </div>
-        {kb.rules.stars ? <StarButton id={c.id} title={c.title} /> : null}
-      </header>
       {posts.length === 0 ? (
-        <div className="empty">Nothing in #{c.title} yet.</div>
+        <KbEmpty command={`ls ./stdout/${c.slug}`} lines={['(empty: nothing here yet)']} />
       ) : (
-        <div className="kb-rows">
+        <div className="kb-cards">
           {posts.map((post) => (
             <PostRow key={post.id} post={post} stats={stats[post.id]} showChannel={false} />
           ))}

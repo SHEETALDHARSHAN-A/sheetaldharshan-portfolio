@@ -82,6 +82,7 @@ export interface Config {
     'kb-reports': KbReport;
     'kb-votes': KbVote;
     readers: Reader;
+    'reader-lists': ReaderList;
     'reader-links': ReaderLink;
     messages: Message;
     users: User;
@@ -117,6 +118,7 @@ export interface Config {
     'kb-reports': KbReportsSelect<false> | KbReportsSelect<true>;
     'kb-votes': KbVotesSelect<false> | KbVotesSelect<true>;
     readers: ReadersSelect<false> | ReadersSelect<true>;
+    'reader-lists': ReaderListsSelect<false> | ReaderListsSelect<true>;
     'reader-links': ReaderLinksSelect<false> | ReaderLinksSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -1374,6 +1376,22 @@ export interface KbVote {
   createdAt: string;
 }
 /**
+ * Channels readers made for themselves, to save posts in. Private to each reader; listed here only so you can see and remove them.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reader-lists".
+ */
+export interface ReaderList {
+  id: number;
+  name: string;
+  description?: string | null;
+  emoji?: string | null;
+  reader: number | Reader;
+  posts?: (number | Post)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "reader-links".
  */
@@ -1680,6 +1698,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'readers';
         value: number | Reader;
+      } | null)
+    | ({
+        relationTo: 'reader-lists';
+        value: number | ReaderList;
       } | null)
     | ({
         relationTo: 'reader-links';
@@ -2422,6 +2444,19 @@ export interface ReadersSelect<T extends boolean = true> {
   githubLogin?: T;
   providerId?: T;
   avatar?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reader-lists_select".
+ */
+export interface ReaderListsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  emoji?: T;
+  reader?: T;
+  posts?: T;
   updatedAt?: T;
   createdAt?: T;
 }

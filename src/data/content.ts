@@ -324,7 +324,7 @@ export const getKbSettings = cache(async (): Promise<KbSettings> => {
   return {
     rules: siteRules(g),
     heading: g?.heading || './stdout',
-    intro: g?.intro || "What's on my screen right now: notes on what I'm reading, building and learning, written up so you can read along. Pick a channel, star the ones you like, and tell me if anything could be clearer.",
+    intro: g?.intro || "What I'm reading, building and learning, written up as I go.",
   }
 })
 

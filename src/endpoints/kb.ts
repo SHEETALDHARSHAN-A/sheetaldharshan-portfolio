@@ -616,12 +616,13 @@ const myData: Endpoint = {
     if (!ctx.reader || !ctx.doc) return reply(ctx, SIGN_IN, 401)
     const id = ctx.reader.id
     const all = (collection: string, where: Where) => req.payload.find({ collection: collection as never, where, depth: 0, limit: 5000, pagination: false, overrideAccess: true }).then((r) => r.docs as unknown as Record<string, unknown>[])
-    const [comments, reviews, votes, reports, feedback] = await Promise.all([
+    const [comments, reviews, votes, reports, feedback, savedLists] = await Promise.all([
       all('kb-comments', { reader: { equals: id } }),
       all('kb-reviews', { reader: { equals: id } }),
       all('kb-votes', { reader: { equals: id } }),
       all('kb-reports', { reader: { equals: id } }),
       all('kb-feedback', { reader: { equals: id } }),
+      all('reader-lists', { reader: { equals: id } }),
     ])
     const pick = (o: Record<string, unknown>, keys: string[]) => Object.fromEntries(keys.filter((k) => o[k] !== undefined && o[k] !== null).map((k) => [k, o[k]]))
     const d = ctx.doc as unknown as Record<string, unknown>
@@ -633,6 +634,7 @@ const myData: Endpoint = {
       likesAndStars: votes.map((v) => pick(v, ['kind', 'target', 'createdAt'])),
       reports: reports.map((r) => pick(r, ['comment', 'reason', 'note', 'status', 'createdAt'])),
       feedback: feedback.map((f) => pick(f, ['post', 'kind', 'quote', 'note', 'email', 'createdAt'])),
+      yourChannels: savedLists.map((l) => pick(l, ['name', 'description', 'emoji', 'posts', 'createdAt', 'updatedAt'])),
     }
     const headers = new Headers({ 'Cache-Control': 'no-store', 'Content-Type': 'application/json; charset=utf-8', 'Content-Disposition': 'attachment; filename="field-notes-my-data.json"' })
     return new Response(JSON.stringify(data, null, 2), { headers })
@@ -663,6 +665,7 @@ const deleteAccount: Endpoint = {
       await payload.update({ collection: 'kb-comments' as never, id: Number(t), data: { likes: count } as never, ...o }).catch(() => undefined)
     }
     await payload.delete({ collection: 'kb-reviews' as never, where: { reader: { equals: id } }, ...o })
+    await payload.delete({ collection: 'reader-lists' as never, where: { reader: { equals: id } }, ...o })
     await payload.delete({ collection: 'kb-reports' as never, where: { reader: { equals: id } }, ...o })
     await payload.update({ collection: 'kb-feedback' as never, where: { reader: { equals: id } }, data: { reader: null, email: null } as never, ...o })
     const comments = (await payload.find({ collection: 'kb-comments' as never, where: { reader: { equals: id } }, depth: 0, limit: 5000, pagination: false, ...o })).docs as unknown as { id: number }[]
@@ -685,4 +688,137 @@ const deleteAccount: Endpoint = {
   },
 }
 
-export const kbEndpoints: Endpoint[] = [myData, deleteAccount, report, my, me, signout, signoutAll, emailLink, profile, thread, stars, comment, commentEdit, commentDelete, like, star, review, reviewDelete, feedback]
+/* ------------------------------------------------------------------ readers' own channels */
+
+const MAX_LISTS = 50
+const MAX_SAVED = 500
+type ListDoc = { id: number; name: string; description?: string | null; emoji?: string | null; reader: unknown; posts?: unknown[] | null; updatedAt: string; createdAt: string }
+const ids = (posts: unknown[] | null | undefined) => (posts ?? []).map((p) => relId(p)).filter((n): n is number => typeof n === 'number')
+const listOut = (l: ListDoc) => ({ id: l.id, name: l.name, description: l.description ?? '', emoji: l.emoji ?? '', posts: ids(l.posts), count: ids(l.posts).length, updatedAt: l.updatedAt })
+
+/** A list's name or description: required, short, and passing the abuse check. */
+function listText(body: Body, s: Settings): { name: string; description: string; emoji: string; error?: string } {
+  const name = text(body.name, 60)
+  const description = text(body.description, 200)
+  const emoji = text(body.emoji, 8)
+  if (name.length < 1) return { name, description, emoji, error: 'Give your channel a name.' }
+  if (moderate(`${name} ${description}`, { blocked: s.blocked }).action === 'reject') return { name, description, emoji, error: REJECT_MESSAGE }
+  return { name, description, emoji }
+}
+
+/** Your own channel, or an error response. */
+async function ownList(ctx: Ctx, id: unknown): Promise<{ list?: ListDoc; error?: Response }> {
+  const n = idOf(id)
+  const list = n ? ((await ctx.req.payload.findByID({ collection: 'reader-lists' as never, id: n, depth: 0, overrideAccess: true }).catch(() => null)) as ListDoc | null) : null
+  if (!list || relId(list.reader) !== ctx.reader!.id) return { error: reply(ctx, { error: 'That channel was not found.' }, 404) }
+  return { list }
+}
+
+/** GET /api/kb/lists: your channels, with the posts saved in each (ids). */
+const lists: Endpoint = {
+  path: '/kb/lists',
+  method: 'get',
+  handler: async (req) => {
+    const ctx = await context(req)
+    if (!ctx.reader) return reply(ctx, { lists: [] })
+    const r = await req.payload.find({ collection: 'reader-lists' as never, where: { reader: { equals: ctx.reader.id } }, depth: 0, limit: MAX_LISTS, pagination: false, sort: 'name', overrideAccess: true })
+    return reply(ctx, { lists: (r.docs as unknown as ListDoc[]).map(listOut) })
+  },
+}
+
+/** GET /api/kb/list?id=: one of your channels, with its saved posts. */
+const listOne: Endpoint = {
+  path: '/kb/list',
+  method: 'get',
+  handler: async (req) => {
+    const ctx = await context(req)
+    if (!ctx.reader) return reply(ctx, SIGN_IN, 401)
+    const { list, error } = await ownList(ctx, new URL(req.url ?? 'http://x').searchParams.get('id'))
+    if (error) return error
+    const postIds = ids(list!.posts)
+    const posts = postIds.length
+      ? ((await req.payload.find({ collection: 'posts', where: { and: [{ id: { in: postIds } }, { _status: { equals: 'published' } }] }, depth: 1, limit: MAX_SAVED, pagination: false }).catch(() => ({ docs: [] }))).docs as unknown as { id: number; slug: string; title: string; publishedAt?: string; meta?: { description?: string }; categories?: { title?: string; slug?: string; emoji?: string }[] }[])
+      : []
+    // Keep the reader's own order: most recently saved last in the list, shown first.
+    const byId = new Map(posts.map((p) => [p.id, p]))
+    return reply(ctx, {
+      list: listOut(list!),
+      posts: [...postIds].reverse().map((id) => byId.get(id)).filter(Boolean).map((p) => {
+        const c = p!.categories?.find((x) => typeof x === 'object')
+        return { id: p!.id, slug: p!.slug, title: p!.title, excerpt: p!.meta?.description ?? '', publishedAt: p!.publishedAt, channel: c?.slug ? { title: c.title, slug: c.slug, emoji: c.emoji || undefined } : null }
+      }),
+    })
+  },
+}
+
+/** POST /api/kb/list-create {name, description?, emoji?, post?}: a new channel, optionally saving a post into it. */
+const listCreate: Endpoint = {
+  path: '/kb/list-create',
+  method: 'post',
+  handler: async (req) => {
+    const { ctx, body, error } = await guard(req, 'lc', 20)
+    if (error) return error
+    const s = await settingsOf(req)
+    const t = listText(body, s)
+    if (t.error) return reply(ctx, { errors: { name: t.error } }, 400)
+    const count = (await req.payload.count({ collection: 'reader-lists' as never, where: { reader: { equals: ctx.reader!.id } }, overrideAccess: true })).totalDocs
+    if (count >= MAX_LISTS) return reply(ctx, { error: `You can have up to ${MAX_LISTS} channels.` }, 400)
+    const post = body.post ? await postOf(req, body.post, s) : undefined
+    const doc = (await req.payload.create({ collection: 'reader-lists' as never, data: { name: t.name, description: t.description || undefined, emoji: t.emoji || undefined, reader: ctx.reader!.id, posts: post ? [post.id] : [] } as never, overrideAccess: true })) as unknown as ListDoc
+    return reply(ctx, { ok: true, list: listOut(doc) })
+  },
+}
+
+/** POST /api/kb/list-update {id, name, description?, emoji?}: renames or describes your channel. */
+const listUpdate: Endpoint = {
+  path: '/kb/list-update',
+  method: 'post',
+  handler: async (req) => {
+    const { ctx, body, error } = await guard(req, 'lu', 40)
+    if (error) return error
+    const { list, error: notYours } = await ownList(ctx, body.id)
+    if (notYours) return notYours
+    const t = listText(body, await settingsOf(req))
+    if (t.error) return reply(ctx, { errors: { name: t.error } }, 400)
+    const doc = (await req.payload.update({ collection: 'reader-lists' as never, id: list!.id, data: { name: t.name, description: t.description || null, emoji: t.emoji || null } as never, overrideAccess: true })) as unknown as ListDoc
+    return reply(ctx, { ok: true, list: listOut(doc) })
+  },
+}
+
+/** POST /api/kb/list-delete {id}: deletes your channel (the posts themselves are untouched). */
+const listDelete: Endpoint = {
+  path: '/kb/list-delete',
+  method: 'post',
+  handler: async (req) => {
+    const { ctx, body, error } = await guard(req, 'ld', 40)
+    if (error) return error
+    const { list, error: notYours } = await ownList(ctx, body.id)
+    if (notYours) return notYours
+    await req.payload.delete({ collection: 'reader-lists' as never, id: list!.id, overrideAccess: true })
+    return reply(ctx, { ok: true })
+  },
+}
+
+/** POST /api/kb/list-save {id, post, saved}: saves a post into your channel, or takes it out. */
+const listSave: Endpoint = {
+  path: '/kb/list-save',
+  method: 'post',
+  handler: async (req) => {
+    const { ctx, body, error } = await guard(req, 'ls', 120)
+    if (error) return error
+    const { list, error: notYours } = await ownList(ctx, body.id)
+    if (notYours) return notYours
+    const postId = idOf(body.post)
+    if (!postId) return reply(ctx, { error: 'Which post?' }, 400)
+    const current = ids(list!.posts).filter((id) => id !== postId)
+    if (body.saved !== false) {
+      if (!(await postOf(req, postId))) return reply(ctx, { error: 'That post was not found.' }, 404)
+      if (current.length >= MAX_SAVED) return reply(ctx, { error: `A channel holds up to ${MAX_SAVED} posts.` }, 400)
+      current.push(postId)
+    }
+    const doc = (await req.payload.update({ collection: 'reader-lists' as never, id: list!.id, data: { posts: current } as never, overrideAccess: true })) as unknown as ListDoc
+    return reply(ctx, { ok: true, list: listOut(doc) })
+  },
+}
+
+export const kbEndpoints: Endpoint[] = [lists, listOne, listCreate, listUpdate, listDelete, listSave, myData, deleteAccount, report, my, me, signout, signoutAll, emailLink, profile, thread, stars, comment, commentEdit, commentDelete, like, star, review, reviewDelete, feedback]

@@ -236,6 +236,31 @@ export const Readers: CollectionConfig = {
   ],
 }
 
+/**
+ * Readers' own channels: private lists where they save (bookmark) posts. Only their owner sees
+ * them on the site; created, renamed, filled and deleted through /api/kb/lists*.
+ */
+export const ReaderLists: CollectionConfig = {
+  slug: 'reader-lists',
+  labels: { singular: 'Reader channel', plural: 'Reader channels' },
+  admin: {
+    group: GROUP,
+    useAsTitle: 'name',
+    defaultColumns: ['name', 'reader', 'updatedAt'],
+    description: "Channels readers made for themselves, to save posts in. Private to each reader; listed here only so you can see and remove them.",
+  },
+  access: adminOnly,
+  defaultSort: '-updatedAt',
+  timestamps: true,
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'description', type: 'text' },
+    { name: 'emoji', type: 'text' },
+    { name: 'reader', type: 'relationship', relationTo: 'readers', required: true, index: true, admin: { position: 'sidebar', readOnly: true } },
+    { name: 'posts', type: 'relationship', relationTo: 'posts', hasMany: true, label: 'Saved posts' },
+  ],
+}
+
 /** Emailed sign-in links: only a hash of the token is kept, each works once for 15 minutes. */
 export const ReaderLinks: CollectionConfig = {
   slug: 'reader-links',
@@ -260,7 +285,7 @@ const KbSettingsConfig: GlobalConfig = {
   access: { read: () => true, update: authenticated },
   fields: [
     { name: 'heading', type: 'text', defaultValue: './stdout', admin: { description: 'The page heading and the browser tab title.' } },
-    { name: 'intro', type: 'textarea', defaultValue: "What's on my screen right now: notes on what I'm reading, building and learning, written up so you can read along. Pick a channel, star the ones you like, and tell me if anything could be clearer.", admin: { description: 'The line under the heading: what this page is for.' } },
+    { name: 'intro', type: 'textarea', defaultValue: "What I'm reading, building and learning, written up as I go.", admin: { description: 'The line under the heading: what this page is for.' } },
     {
       type: 'collapsible',
       label: 'What readers can do (every post)',

@@ -7,6 +7,7 @@ import { useReader } from './reader'
 import { SignInOptions } from './SignIn'
 import { StarIcon } from './StarButton'
 import { Time } from './Time'
+import { listActions, listError, useLists } from './lists'
 
 type PostRef = { title: string; slug: string } | null
 type Mine = {
@@ -21,6 +22,7 @@ const STATUS: Record<string, string> = { published: 'Live', pending: 'Waiting fo
 const REASON: Record<string, string> = { spam: 'Spam', abuse: 'Abuse', hate: 'Hate', misleading: 'Misleading', 'off-topic': 'Off-topic', other: 'Other' }
 const TABS = [
   ['comments', 'Comments'],
+  ['mine', 'Your channels'],
   ['starred', 'Starred channels'],
   ['reviews', 'Ratings'],
   ['liked', 'Liked'],
@@ -36,6 +38,9 @@ export function MyNotes() {
   const { reader, ready, signOut } = useReader()
   const [data, setData] = useState<Mine | null>(null)
   const [tab, setTab] = useState<Tab>('comments')
+  const lists = useLists(reader?.id)
+  const [newName, setNewName] = useState('')
+  const [listErr, setListErr] = useState('')
 
   useEffect(() => {
     if (!reader) return
@@ -57,7 +62,7 @@ export function MyNotes() {
       </div>
     )
 
-  const counts: Record<Tab, number> = { comments: data?.comments.length ?? 0, starred: data?.starred.length ?? 0, reviews: data?.reviews.length ?? 0, liked: data?.liked.length ?? 0, reports: data?.reports.length ?? 0 }
+  const counts: Record<Tab, number> = { mine: lists.length, comments: data?.comments.length ?? 0, starred: data?.starred.length ?? 0, reviews: data?.reviews.length ?? 0, liked: data?.liked.length ?? 0, reports: data?.reports.length ?? 0 }
   const empty = (text: string) => <p className="kb-empty-c">{text}</p>
   return (
     <div className="kb-me">
@@ -96,6 +101,44 @@ export function MyNotes() {
         ) : (
           empty('You have not commented yet.')
         )
+      ) : tab === 'mine' ? (
+        <div className="kb-me">
+          {lists.length ? (
+            <ul className="kb-me-list">
+              {lists.map((l) => (
+                <li key={l.id}>
+                  <p className="kb-me-body">
+                    <Link href={`/notes/saved/${l.id}`}>
+                      {l.emoji || '◆'} {l.name}
+                    </Link>
+                  </p>
+                  <p className="kb-me-meta">
+                    {l.count} saved post{l.count === 1 ? '' : 's'}
+                    {l.description ? ` · ${l.description}` : ''} · private
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            empty('Make channels of your own and save posts into them with the Save button on any post.')
+          )}
+          <form
+            className="kb-form-row"
+            onSubmit={async (e) => {
+              e.preventDefault()
+              const r = await listActions.create(newName)
+              if (!r.ok) return setListErr(listError(r))
+              setNewName('')
+              setListErr('')
+            }}
+          >
+            <input value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={60} placeholder="New channel, e.g. Read later" aria-label="New channel name" />
+            <button type="submit" className="btn" disabled={!newName.trim()}>
+              Create channel
+            </button>
+          </form>
+          {listErr ? <p className="kb-error">{listErr}</p> : null}
+        </div>
       ) : tab === 'starred' ? (
         data.starred.length ? (
           <ul className="kb-me-chips">
@@ -210,6 +253,8 @@ function YourData() {
                 const res = await fetch('/api/kb/delete-account', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ comments }) }).catch(() => null)
                 const body = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string } | null
                 if (!body?.ok) return setState({ error: body?.error ?? 'It could not be deleted. Please try again.' })
+                // A full reload, so nothing from the deleted account stays in memory.
+                // eslint-disable-next-line @next/next/no-location-assign-relative-destination
                 window.location.assign('/notes?signin=deleted')
               }}
             >
